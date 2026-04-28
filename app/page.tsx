@@ -1,70 +1,172 @@
-export default function HomePage() {
+type ReportBlock = {
+  slug: string;
+  name: string;
+  headline: string;
+  teaser: string;
+  confidence: number;
+};
+
+type TodayTeaserResponse = {
+  date: string;
+  title: string;
+  intro: string;
+  blocks: ReportBlock[];
+  daily_price_eur: number;
+  weekly_cta_enabled: boolean;
+};
+
+const orderedTopics = [
+  { slug: "macro", name: "Макроэкономика" },
+  { slug: "central-banks-rates", name: "Центральные банки и ставки" },
+  { slug: "stocks", name: "Акции и фондовый рынок" },
+  { slug: "bonds", name: "Облигации и долговой рынок" },
+  { slug: "fx", name: "Валюты и Forex" },
+  { slug: "commodities-energy", name: "Сырьё и энергия" },
+  { slug: "crypto", name: "Крипта и цифровые активы" },
+  { slug: "banking-credit", name: "Банковский сектор и кредит" },
+  { slug: "regulation-fincrime", name: "Регулирование и финпреступления" },
+  { slug: "geopolitics-risks", name: "Геополитика и рыночные риски" },
+];
+
+const fallbackData: TodayTeaserResponse = {
+  date: new Date().toISOString().slice(0, 10),
+  title: "Ежедневная аналитика рынка в 10 ключевых темах",
+  intro:
+    "Редакционная витрина временно недоступна. Попробуйте обновить страницу через несколько секунд.",
+  blocks: [],
+  daily_price_eur: 5,
+  weekly_cta_enabled: true,
+};
+
+async function getTodayTeaser(): Promise<TodayTeaserResponse> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+  if (!baseUrl) {
+    return fallbackData;
+  }
+
+  try {
+    const response = await fetch(`${baseUrl}/api/report/today-teaser`, {
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      return fallbackData;
+    }
+
+    return (await response.json()) as TodayTeaserResponse;
+  } catch {
+    return fallbackData;
+  }
+}
+
+export default async function HomePage() {
+  const data = await getTodayTeaser();
+
+  const blocksBySlug = new Map(data.blocks.map((block) => [block.slug, block]));
+
   return (
     <main className="min-h-screen bg-neutral-950 text-white">
-      <section className="mx-auto flex min-h-screen max-w-7xl flex-col justify-center px-6 py-20 lg:px-8">
-        <div className="max-w-4xl">
-          <div className="mb-6 inline-flex rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs uppercase tracking-[0.2em] text-white/60">
-            Finance Analytics Weekly
+      <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8">
+        <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-8 md:p-10">
+          <div className="mb-4 inline-flex rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] uppercase tracking-[0.24em] text-white/50">
+            Daily Financial Intelligence · {data.date}
           </div>
 
-          <h1 className="text-4xl font-semibold leading-tight tracking-tight md:text-6xl">
-            Аналитика рынков, которую читают, когда нужны решения, а не шум
-          </h1>
+          <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
+            <div>
+              <h1 className="text-4xl font-semibold tracking-tight md:text-6xl">
+                {data.title}
+              </h1>
 
-          <p className="mt-6 max-w-2xl text-base leading-7 text-white/70 md:text-lg">
-            Премиальная финансовая аналитика с понятной подачей, кратким превью,
-            возможностью купить полный материал или подписаться на еженедельную рассылку.
-          </p>
+              <p className="mt-5 max-w-3xl text-base leading-7 text-white/70 md:text-lg">
+                {data.intro}
+              </p>
+            </div>
 
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <button className="rounded-2xl bg-white px-5 py-3 text-sm font-medium text-neutral-950 transition hover:scale-[1.02]">
-              Читать аналитику
-            </button>
-            <button className="rounded-2xl border border-white/15 px-5 py-3 text-sm text-white/80 transition hover:border-white/30 hover:text-white">
-              Подписаться на weekly
-            </button>
+            <div className="rounded-[1.75rem] border border-white/10 bg-black/30 p-6">
+              <p className="text-xs uppercase tracking-[0.24em] text-white/45">
+                Что внутри выпуска
+              </p>
+
+              <ul className="mt-4 space-y-3 text-sm leading-6 text-white/75">
+                <li>10 тематических блоков по рынкам</li>
+                <li>Главный тезис по каждому направлению</li>
+                <li>Краткий аналитический teaser из backend</li>
+                <li>Оценка уверенности по теме</li>
+              </ul>
+            </div>
           </div>
         </div>
 
-        <div className="mt-16 grid gap-6 lg:grid-cols-3">
-          <article className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6">
-            <p className="text-xs uppercase tracking-[0.2em] text-white/45">
-              Preview
-            </p>
-            <h2 className="mt-4 text-2xl font-semibold tracking-tight">
-              Нефть, доллар и риск-сентимент: что меняется на этой неделе
-            </h2>
-            <p className="mt-4 text-sm leading-7 text-white/65">
-              Краткий фрагмент аналитики показывает направление мысли, основные
-              сигналы и контекст, а полный текст доступен после покупки.
-            </p>
-          </article>
+        <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {orderedTopics.map((topic, index) => {
+            const block = blocksBySlug.get(topic.slug);
 
-          <article className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6">
-            <p className="text-xs uppercase tracking-[0.2em] text-white/45">
-              One-time purchase
-            </p>
-            <h2 className="mt-4 text-2xl font-semibold tracking-tight">
-              Купи полный разбор
-            </h2>
-            <p className="mt-4 text-sm leading-7 text-white/65">
-              Пользователь может открыть платежную страницу Stripe и получить
-              полный материал после успешной оплаты.
-            </p>
-          </article>
+            return (
+              <article
+                key={topic.slug}
+                className="rounded-[1.75rem] border border-white/10 bg-white/[0.04] p-6 transition hover:border-white/20 hover:bg-white/[0.06]"
+              >
+                <div className="flex items-center justify-between gap-4">
+                  <p className="text-xs uppercase tracking-[0.24em] text-white/40">
+                    Тема {String(index + 1).padStart(2, "0")}
+                  </p>
 
-          <article className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6">
-            <p className="text-xs uppercase tracking-[0.2em] text-white/45">
-              Weekly subscription
-            </p>
-            <h2 className="mt-4 text-2xl font-semibold tracking-tight">
-              Подписка на weekly аналитику
-            </h2>
-            <p className="mt-4 text-sm leading-7 text-white/65">
-              Еженедельная подписка для тех, кто хочет стабильно получать
-              аналитику на email без ручной покупки каждого материала.
-            </p>
-          </article>
+                  <span className="rounded-full border border-white/10 px-2.5 py-1 text-[11px] uppercase tracking-[0.2em] text-white/45">
+                    {block ? `${Math.round(block.confidence * 100)}%` : "—"}
+                  </span>
+                </div>
+
+                <h2 className="mt-5 text-2xl font-semibold tracking-tight">
+                  {topic.name}
+                </h2>
+
+                <p className="mt-4 text-sm font-medium leading-7 text-white/90">
+                  {block?.headline ?? "Аналитический блок подгружается с backend."}
+                </p>
+
+                <p className="mt-4 text-sm leading-7 text-white/65">
+                  {block?.teaser ?? "Контент этой темы появится после получения ответа от backend."}
+                </p>
+              </article>
+            );
+          })}
+        </div>
+
+        <div className="mt-10 rounded-[2rem] border border-white/10 bg-white/[0.03] p-8 md:p-10">
+          <div className="grid gap-8 lg:grid-cols-[1fr_0.8fr] lg:items-end">
+            <div>
+              <p className="text-xs uppercase tracking-[0.24em] text-white/40">
+                Полный выпуск
+              </p>
+
+              <h3 className="mt-4 text-3xl font-semibold tracking-tight md:text-4xl">
+                Полная версия раскрывает весь сегодняшний аналитический выпуск
+              </h3>
+
+              <p className="mt-4 max-w-3xl text-sm leading-7 text-white/65 md:text-base">
+                В открытой витрине пользователь видит структуру, темы и вводные тезисы.
+                Полный выпуск раскрывает расширенную аналитику по каждому блоку,
+                выводы, риски и watchlist на продолжение дня.
+              </p>
+            </div>
+
+            <div className="rounded-[1.5rem] border border-white/10 bg-black/30 p-6">
+              <p className="text-xs uppercase tracking-[0.24em] text-white/40">
+                Weekly
+              </p>
+
+              <p className="mt-3 text-lg font-medium tracking-tight">
+                Weekly-версия остаётся отдельным расширенным форматом
+              </p>
+
+              <p className="mt-3 text-sm leading-7 text-white/60">
+                Сначала пользователь видит ценность ежедневной витрины и тематическое покрытие,
+                а уже потом принимает решение о более глубоком формате.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
     </main>
