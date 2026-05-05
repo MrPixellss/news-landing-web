@@ -30,9 +30,8 @@ const orderedTopics = [
 
 const fallbackData: TodayTeaserResponse = {
   date: new Date().toISOString().slice(0, 10),
-  title: "Ежедневная аналитика рынка в 10 ключевых темах",
-  intro:
-    "Редакционная витрина временно недоступна. Попробуйте обновить страницу через несколько секунд.",
+  title: "",
+  intro: "",
   blocks: [],
   daily_price_eur: 5,
   weekly_cta_enabled: true,
@@ -76,11 +75,11 @@ export default async function HomePage() {
           <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
             <div>
               <h1 className="text-4xl font-semibold tracking-tight md:text-6xl">
-                {data.title}
+                {data.title ?? ""}
               </h1>
 
               <p className="mt-5 max-w-3xl text-base leading-7 text-white/70 md:text-lg">
-                {data.intro}
+                {data.intro ?? ""}
               </p>
             </div>
 
@@ -114,7 +113,9 @@ export default async function HomePage() {
                   </p>
 
                   <span className="rounded-full border border-white/10 px-2.5 py-1 text-[11px] uppercase tracking-[0.2em] text-white/45">
-                    {block ? `${Math.round(block.confidence * 100)}%` : "—"}
+                    {block?.confidence != null
+                      ? `${Math.round(block.confidence * 100)}%`
+                      : "-"}
                   </span>
                 </div>
 
@@ -123,50 +124,15 @@ export default async function HomePage() {
                 </h2>
 
                 <p className="mt-4 text-sm font-medium leading-7 text-white/90">
-                  {block?.headline ?? "Аналитический блок подгружается с backend."}
+                  {block?.headline ?? ""}
                 </p>
 
                 <p className="mt-4 text-sm leading-7 text-white/65">
-                  {block?.teaser ?? "Контент этой темы появится после получения ответа от backend."}
+                  {block?.teaser ?? ""}
                 </p>
               </article>
             );
           })}
-        </div>
-
-        <div className="mt-10 rounded-[2rem] border border-white/10 bg-white/[0.03] p-8 md:p-10">
-          <div className="grid gap-8 lg:grid-cols-[1fr_0.8fr] lg:items-end">
-            <div>
-              <p className="text-xs uppercase tracking-[0.24em] text-white/40">
-                Полный выпуск
-              </p>
-
-              <h3 className="mt-4 text-3xl font-semibold tracking-tight md:text-4xl">
-                Полная версия раскрывает весь сегодняшний аналитический выпуск
-              </h3>
-
-              <p className="mt-4 max-w-3xl text-sm leading-7 text-white/65 md:text-base">
-                В открытой витрине пользователь видит структуру, темы и вводные тезисы.
-                Полный выпуск раскрывает расширенную аналитику по каждому блоку,
-                выводы, риски и watchlist на продолжение дня.
-              </p>
-            </div>
-
-            <div className="rounded-[1.5rem] border border-white/10 bg-black/30 p-6">
-              <p className="text-xs uppercase tracking-[0.24em] text-white/40">
-                Weekly
-              </p>
-
-              <p className="mt-3 text-lg font-medium tracking-tight">
-                Weekly-версия остаётся отдельным расширенным форматом
-              </p>
-
-              <p className="mt-3 text-sm leading-7 text-white/60">
-                Сначала пользователь видит ценность ежедневной витрины и тематическое покрытие,
-                а уже потом принимает решение о более глубоком формате.
-              </p>
-            </div>
-          </div>
         </div>
       </section>
     </main>
