@@ -63,6 +63,14 @@ export default async function HomePage() {
   const data = await getTodayTeaser();
 
   const blocksBySlug = new Map(data.blocks.map((block) => [block.slug, block]));
+  const hasReportContent =
+    Boolean(data.title?.trim()) ||
+    Boolean(data.intro?.trim()) ||
+    data.blocks.length > 0;
+  const pageTitle = hasReportContent ? data.title : "Аналитика готовится";
+  const pageIntro = hasReportContent
+    ? data.intro
+    : "Мы уже собираем первоисточники и проверяем материалы. Когда ежедневный отчёт будет готов, здесь появятся выводы по рынкам.";
 
   return (
     <main className="min-h-screen bg-neutral-950 text-white">
@@ -75,11 +83,11 @@ export default async function HomePage() {
           <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
             <div>
               <h1 className="text-4xl font-semibold tracking-tight md:text-6xl">
-                {data.title ?? ""}
+                {pageTitle}
               </h1>
 
               <p className="mt-5 max-w-3xl text-base leading-7 text-white/70 md:text-lg">
-                {data.intro ?? ""}
+                {pageIntro}
               </p>
             </div>
 
@@ -124,11 +132,12 @@ export default async function HomePage() {
                 </h2>
 
                 <p className="mt-4 text-sm font-medium leading-7 text-white/90">
-                  {block?.headline ?? ""}
+                  {block?.headline ?? "Ожидает данных"}
                 </p>
 
                 <p className="mt-4 text-sm leading-7 text-white/65">
-                  {block?.teaser ?? ""}
+                  {block?.teaser ??
+                    "Блок появится после обработки источников и прохождения правил качества."}
                 </p>
               </article>
             );
