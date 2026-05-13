@@ -1,148 +1,99 @@
+import Link from "next/link";
+import {
+  confidenceLabel,
+  getTodayTeaser,
+  orderedTopics,
+  shortPreview,
+} from "./lib/report";
+
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-type ReportBlock = {
-  slug: string;
-  name: string;
-  headline: string;
-  teaser: string;
-  confidence: number;
-};
-
-type TodayTeaserResponse = {
-  date: string;
-  language?: string;
-  title: string;
-  intro: string;
-  blocks: ReportBlock[];
-  daily_price_eur: number;
-  weekly_cta_enabled: boolean;
-};
-
-const orderedTopics = [
-  { slug: "macro", name: "Makroekonomi" },
-  { slug: "central-banks-rates", name: "Centralbanker och räntor" },
-  { slug: "stocks", name: "Aktier och börs" },
-  { slug: "bonds", name: "Obligationer och kreditmarknad" },
-  { slug: "fx", name: "Valutor och FX" },
-  { slug: "commodities-energy", name: "Råvaror och energi" },
-  { slug: "crypto", name: "Krypto och digitala tillgångar" },
-  { slug: "banking-credit", name: "Bank och kredit" },
-  { slug: "regulation-fincrime", name: "Reglering och finansiell brottslighet" },
-  { slug: "geopolitics-risks", name: "Geopolitik och marknadsrisker" },
-];
-
-const fallbackData: TodayTeaserResponse = {
-  date: new Date().toISOString().slice(0, 10),
-  language: "sv",
-  title: "",
-  intro: "",
-  blocks: [],
-  daily_price_eur: 5,
-  weekly_cta_enabled: true,
-};
-
-async function getTodayTeaser(): Promise<TodayTeaserResponse> {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_API_BASE_URL ??
-    "https://financial-analyst-api-vjrq.onrender.com";
-
-  try {
-    const response = await fetch(`${baseUrl}/api/report/today-teaser`, {
-      cache: "no-store",
-    });
-
-    if (!response.ok) {
-      return fallbackData;
-    }
-
-    return (await response.json()) as TodayTeaserResponse;
-  } catch {
-    return fallbackData;
-  }
-}
-
 export default async function HomePage() {
   const data = await getTodayTeaser();
-
   const blocksBySlug = new Map(data.blocks.map((block) => [block.slug, block]));
-  const hasReportContent =
-    Boolean(data.title?.trim()) ||
-    Boolean(data.intro?.trim()) ||
-    data.blocks.length > 0;
-  const pageTitle = hasReportContent ? data.title : "Analysen förbereds";
-  const pageIntro = hasReportContent
-    ? data.intro
-    : "Vi samlar primärkällor, rensar materialet och låter det passera våra kvalitetsregler. När dagens rapport är klar visas slutsatserna här.";
+  const hasReportContent = data.blocks.length > 0;
 
   return (
-    <main className="min-h-screen bg-neutral-950 text-white">
-      <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8">
-        <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-8 md:p-10">
-          <div className="mb-4 inline-flex rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] uppercase tracking-[0.24em] text-white/50">
-            Daglig finansiell analys · {data.date}
+    <main className="min-h-screen bg-[#0b0c0f] text-zinc-50">
+      <section className="border-b border-white/10 bg-[#111318]">
+        <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 py-7 md:px-8 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-300">
+              {data.date}
+            </p>
+            <h1 className="mt-3 max-w-4xl text-3xl font-semibold tracking-tight md:text-5xl">
+              {hasReportContent ? data.title : "Dagens analys förbereds"}
+            </h1>
+            <p className="mt-4 max-w-3xl text-sm leading-6 text-zinc-300 md:text-base">
+              {hasReportContent
+                ? data.intro
+                : "Analysen visas här när dagens primärkällor har passerat kvalitetssil, topic routing och analytikerregler."}
+            </p>
           </div>
 
-          <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
+          <div className="flex min-w-48 items-center justify-between gap-4 border-t border-white/10 pt-4 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
             <div>
-              <h1 className="text-4xl font-semibold tracking-tight md:text-6xl">
-                {pageTitle}
-              </h1>
-
-              <p className="mt-5 max-w-3xl text-base leading-7 text-white/70 md:text-lg">
-                {pageIntro}
+              <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">
+                Daglig rapport
+              </p>
+              <p className="mt-1 text-2xl font-semibold">
+                {data.daily_price_eur} €
               </p>
             </div>
-
-            <div className="rounded-[1.75rem] border border-white/10 bg-black/30 p-6">
-              <p className="text-xs uppercase tracking-[0.24em] text-white/45">
-                I dagens genomgång
+            <div className="text-right">
+              <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">
+                Teman
               </p>
-
-              <ul className="mt-4 space-y-3 text-sm leading-6 text-white/75">
-                <li>10 marknadsteman med separata regler</li>
-                <li>Primärkällor sparas innan analysen byggs</li>
-                <li>Kvalitet, routing och analys loggas steg för steg</li>
-                <li>Fördjupad rapport öppnas senare via betalflödet</li>
-              </ul>
+              <p className="mt-1 text-2xl font-semibold">
+                {data.blocks.length || orderedTopics.length}
+              </p>
             </div>
           </div>
         </div>
+      </section>
 
-        <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+      <section className="mx-auto max-w-7xl px-5 py-6 md:px-8 md:py-8">
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {orderedTopics.map((topic, index) => {
             const block = blocksBySlug.get(topic.slug);
+            const headline = block?.headline || "Analytiken för temat bearbetas";
+            const preview =
+              shortPreview(block?.teaser || "") ||
+              "När signalerna är klara visas en kort förhandsvisning här.";
 
             return (
-              <article
+              <Link
                 key={topic.slug}
-                className="rounded-[1.75rem] border border-white/10 bg-white/[0.04] p-6 transition hover:border-white/20 hover:bg-white/[0.06]"
+                href={`/topics/${topic.slug}`}
+                className="group min-h-64 border border-white/10 bg-white/[0.035] p-5 transition hover:border-emerald-300/40 hover:bg-white/[0.06] focus:outline-none focus:ring-2 focus:ring-emerald-300/70"
               >
-                <div className="flex items-center justify-between gap-4">
-                  <p className="text-xs uppercase tracking-[0.24em] text-white/40">
-                    Tema {String(index + 1).padStart(2, "0")}
-                  </p>
-
-                  <span className="rounded-full border border-white/10 px-2.5 py-1 text-[11px] uppercase tracking-[0.2em] text-white/45">
-                    {block?.confidence != null
-                      ? `${Math.round(block.confidence * 100)}%`
-                      : "-"}
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">
+                      Tema {String(index + 1).padStart(2, "0")}
+                    </p>
+                    <h2 className="mt-3 text-xl font-semibold leading-tight">
+                      {topic.name}
+                    </h2>
+                  </div>
+                  <span className="shrink-0 border border-white/10 px-2 py-1 text-xs font-medium text-zinc-300">
+                    {confidenceLabel(block?.confidence)}
                   </span>
                 </div>
 
-                <h2 className="mt-5 text-2xl font-semibold tracking-tight">
-                  {topic.name}
-                </h2>
-
-                <p className="mt-4 text-sm font-medium leading-7 text-white/90">
-                  {block?.headline ?? "Väntar på signaler"}
+                <p className="mt-5 text-base font-semibold leading-6 text-zinc-50">
+                  {headline}
                 </p>
 
-                <p className="mt-4 text-sm leading-7 text-white/65">
-                  {block?.teaser ??
-                    "Blocket visas när källor har samlats in, rensats och passerat kvalitetsreglerna."}
+                <p className="mt-4 line-clamp-4 text-sm leading-6 text-zinc-400">
+                  {preview}
                 </p>
-              </article>
+
+                <p className="mt-6 text-sm font-semibold text-emerald-300 transition group-hover:text-emerald-200">
+                  Läs preview
+                </p>
+              </Link>
             );
           })}
         </div>
