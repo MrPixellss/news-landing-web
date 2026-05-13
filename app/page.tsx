@@ -41,7 +41,9 @@ const fallbackData: TodayTeaserResponse = {
 };
 
 async function getTodayTeaser(): Promise<TodayTeaserResponse> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const baseUrl =
+    process.env.NEXT_PUBLIC_API_BASE_URL ??
+    "https://financial-analyst-api-vjrq.onrender.com";
 
   if (!baseUrl) {
     return fallbackData;
