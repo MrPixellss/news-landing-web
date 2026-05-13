@@ -16,6 +16,26 @@ export type TodayTeaserResponse = {
   weekly_cta_enabled: boolean;
 };
 
+export type TopicReportSection = {
+  id?: string;
+  title?: string;
+  body?: string;
+  items?: string[];
+};
+
+export type TopicReportResponse = {
+  date: string;
+  language?: string;
+  report_title: string;
+  report_intro: string;
+  daily_price_eur: number;
+  weekly_cta_enabled: boolean;
+  topic: ReportBlock & {
+    full_report_body: string;
+    sections: TopicReportSection[];
+  };
+};
+
 export const orderedTopics = [
   { slug: "macro", name: "Makroekonomi" },
   { slug: "central-banks-rates", name: "Centralbanker och räntor" },
@@ -56,6 +76,28 @@ export async function getTodayTeaser(): Promise<TodayTeaserResponse> {
     return (await response.json()) as TodayTeaserResponse;
   } catch {
     return fallbackData;
+  }
+}
+
+export async function getTopicReport(
+  slug: string,
+): Promise<TopicReportResponse | null> {
+  const baseUrl =
+    process.env.NEXT_PUBLIC_API_BASE_URL ??
+    "https://financial-analyst-api-vjrq.onrender.com";
+
+  try {
+    const response = await fetch(`${baseUrl}/api/report/topic/${slug}`, {
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    return (await response.json()) as TopicReportResponse;
+  } catch {
+    return null;
   }
 }
 

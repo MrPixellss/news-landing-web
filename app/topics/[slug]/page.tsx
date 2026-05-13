@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   confidenceLabel,
+  getTopicReport,
   getTodayTeaser,
   orderedTopics,
   shortPreview,
@@ -16,6 +17,14 @@ type TopicPageProps = {
   }>;
 };
 
+const sectionLabels = new Map([
+  ["executive_view", "Slutsats"],
+  ["key_signals", "Viktigaste signaler"],
+  ["market_read_through", "Marknadstolkning"],
+  ["risk_view", "Riskbild"],
+  ["scenario_map", "Scenarier"],
+]);
+
 export default async function TopicPage({ params }: TopicPageProps) {
   const { slug } = await params;
   const topic = orderedTopics.find((item) => item.slug === slug);
@@ -25,11 +34,20 @@ export default async function TopicPage({ params }: TopicPageProps) {
   }
 
   const data = await getTodayTeaser();
+  const topicReport = await getTopicReport(slug);
   const block = data.blocks.find((item) => item.slug === slug);
-  const hasBlock = Boolean(block);
-  const headline = block?.headline || "Analytiken för temat bearbetas";
+  const reportTopic = topicReport?.topic;
+  const hasBlock = Boolean(reportTopic || block);
+  const headline =
+    reportTopic?.headline || block?.headline || "Analytiken för temat bearbetas";
+  const fullReportBody = reportTopic?.full_report_body || block?.teaser || "";
+  const reportParagraphs = fullReportBody
+    .split(/\n{2,}/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+  const sections = reportTopic?.sections || [];
   const preview =
-    shortPreview(block?.teaser || "", 3) ||
+    shortPreview(fullReportBody, 3) ||
     "Temats analys visas här när tillräckligt många signaler har passerat reglerna.";
 
   return (
@@ -46,7 +64,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
           <div className="mt-8 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-300">
-                {data.date}
+                {topicReport?.date || data.date}
               </p>
               <h1 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl">
                 {topic.name}
@@ -55,7 +73,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
 
             <div className="flex gap-2 text-sm">
               <span className="border border-white/10 px-3 py-2 text-zinc-300">
-                {confidenceLabel(block?.confidence)}
+                {confidenceLabel(reportTopic?.confidence ?? block?.confidence)}
               </span>
               <span className="border border-white/10 px-3 py-2 text-zinc-300">
                 {data.daily_price_eur} €
@@ -83,16 +101,35 @@ export default async function TopicPage({ params }: TopicPageProps) {
             </p>
           </div>
 
+          {sections.length ? (
+            <div className="mt-6 border border-white/10 bg-white/[0.025] p-5">
+              <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">
+                Innehåll
+              </p>
+              <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                {sections.map((section) => (
+                  <p
+                    key={section.id || section.title}
+                    className="border border-white/10 px-3 py-2 text-sm text-zinc-300"
+                  >
+                    {sectionLabels.get(section.id || "") ||
+                      section.title ||
+                      "Analysdel"}
+                  </p>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
           <div className="relative mt-6 overflow-hidden border border-white/10 bg-white/[0.035] p-5">
             <div className="max-h-40 select-none space-y-4 overflow-hidden blur-[5px]">
-              <p className="text-base leading-8 text-zinc-300">
-                {block?.teaser || preview}
-              </p>
-              <p className="text-base leading-8 text-zinc-300">
-                Rapporten väger signalstyrka, upprepning mellan källor,
-                marknadspåverkan, riktning och osäkerhet innan slutsatsen
-                formuleras för dagens läge.
-              </p>
+              {(reportParagraphs.length ? reportParagraphs : [preview]).map(
+                (paragraph) => (
+                  <p key={paragraph} className="text-base leading-8 text-zinc-300">
+                    {paragraph}
+                  </p>
+                ),
+              )}
             </div>
             <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#0f1116] to-transparent" />
           </div>
