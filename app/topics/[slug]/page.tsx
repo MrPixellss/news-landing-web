@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { CheckoutButton } from "../../components/CheckoutButton";
 import {
   displayDate,
   getTopicReport,
@@ -155,15 +156,13 @@ export default async function TopicPage({ params }: TopicPageProps) {
               <div className="absolute inset-x-0 bottom-0 grid min-h-40 place-items-center bg-gradient-to-t from-[#0b0f14] via-[#0b0f14]/95 to-transparent p-6">
                 <div className="w-full max-w-md border border-emerald-300/45 bg-[#07090b]/90 p-5 text-center">
                   <p className="text-lg font-bold">Hela analysen är låst</p>
-                  <button
-                    className="mt-4 w-full bg-emerald-300 px-5 py-4 text-sm font-black text-[#04100b] opacity-70"
-                    disabled
-                    type="button"
-                  >
-                    Lås upp för {data.daily_price_eur} euro
-                  </button>
+                  <CheckoutButton
+                    priceEur={data.daily_price_eur}
+                    topicSlug={slug}
+                  />
                   <p className="mt-3 text-sm leading-6 text-[#8d9aaa]">
-                    Betalning och e-postleverans aktiveras i nästa produktsteg.
+                    Efter betalning skickas rapporten till e-postadressen du
+                    anger hos Stripe.
                   </p>
                 </div>
               </div>
