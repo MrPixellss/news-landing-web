@@ -11,8 +11,13 @@ export const revalidate = 0;
 
 export default async function HomePage() {
   const data = await getTodayTeaser();
-  const blocksBySlug = new Map(data.blocks.map((block) => [block.slug, block]));
-  const hasReportContent = data.blocks.length > 0;
+  const hasFreshReport = data.is_fresh !== false && data.blocks.length > 0;
+  const blocksBySlug = new Map(
+    hasFreshReport ? data.blocks.map((block) => [block.slug, block]) : [],
+  );
+  const displayDate = hasFreshReport
+    ? data.date
+    : data.expected_date || data.date;
 
   return (
     <main className="min-h-screen bg-[#0b0c0f] text-zinc-50">
@@ -20,13 +25,13 @@ export default async function HomePage() {
         <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 py-7 md:px-8 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-300">
-              {data.date}
+              {displayDate}
             </p>
             <h1 className="mt-3 max-w-4xl text-3xl font-semibold tracking-tight md:text-5xl">
-              {hasReportContent ? data.title : "Dagens analys förbereds"}
+              {hasFreshReport ? data.title : "Dagens analys förbereds"}
             </h1>
             <p className="mt-4 max-w-3xl text-sm leading-6 text-zinc-300 md:text-base">
-              {hasReportContent
+              {hasFreshReport
                 ? data.intro
                 : "Analysen visas här när dagens primärkällor har passerat kvalitetssil, topic routing och analytikerregler."}
             </p>

@@ -8,6 +8,9 @@ export type ReportBlock = {
 
 export type TodayTeaserResponse = {
   date: string;
+  expected_date?: string;
+  is_fresh?: boolean;
+  freshness_status?: string;
   language?: string;
   title: string;
   intro: string;
@@ -25,6 +28,9 @@ export type TopicReportSection = {
 
 export type TopicReportResponse = {
   date: string;
+  expected_date?: string;
+  is_fresh?: boolean;
+  freshness_status?: string;
   language?: string;
   report_title: string;
   report_intro: string;
@@ -49,8 +55,13 @@ export const orderedTopics = [
   { slug: "geopolitics-risks", name: "Geopolitik och marknadsrisker" },
 ];
 
+const fallbackDate = new Date().toISOString().slice(0, 10);
+
 export const fallbackData: TodayTeaserResponse = {
-  date: new Date().toISOString().slice(0, 10),
+  date: fallbackDate,
+  expected_date: fallbackDate,
+  is_fresh: false,
+  freshness_status: "preparing",
   language: "sv",
   title: "",
   intro: "",

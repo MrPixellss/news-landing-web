@@ -36,11 +36,16 @@ export default async function TopicPage({ params }: TopicPageProps) {
   const data = await getTodayTeaser();
   const topicReport = await getTopicReport(slug);
   const block = data.blocks.find((item) => item.slug === slug);
-  const reportTopic = topicReport?.topic;
-  const hasBlock = Boolean(reportTopic || block);
+  const freshBlock = data.is_fresh !== false ? block : undefined;
+  const freshTopicReport = topicReport?.is_fresh !== false ? topicReport : null;
+  const reportTopic = freshTopicReport?.topic;
+  const hasBlock = Boolean(reportTopic || freshBlock);
+  const displayDate =
+    freshTopicReport?.date ||
+    (data.is_fresh !== false ? data.date : data.expected_date || data.date);
   const headline =
-    reportTopic?.headline || block?.headline || "Analytiken för temat bearbetas";
-  const fullReportBody = reportTopic?.full_report_body || block?.teaser || "";
+    reportTopic?.headline || freshBlock?.headline || "Analytiken för temat bearbetas";
+  const fullReportBody = reportTopic?.full_report_body || freshBlock?.teaser || "";
   const reportParagraphs = fullReportBody
     .split(/\n{2,}/)
     .map((item) => item.trim())
@@ -64,7 +69,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
           <div className="mt-8 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-300">
-                {topicReport?.date || data.date}
+                {displayDate}
               </p>
               <h1 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl">
                 {topic.name}
@@ -73,7 +78,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
 
             <div className="flex gap-2 text-sm">
               <span className="border border-white/10 px-3 py-2 text-zinc-300">
-                {confidenceLabel(reportTopic?.confidence ?? block?.confidence)}
+                {confidenceLabel(reportTopic?.confidence ?? freshBlock?.confidence)}
               </span>
               <span className="border border-white/10 px-3 py-2 text-zinc-300">
                 {data.daily_price_eur} €
