@@ -35,8 +35,10 @@ export default async function TopicPage({ params }: TopicPageProps) {
     notFound();
   }
 
-  const data = await getTodayTeaser();
-  const topicReport = await getTopicReport(slug);
+  const [data, topicReport] = await Promise.all([
+    getTodayTeaser(),
+    getTopicReport(slug),
+  ]);
   const block = data.blocks.find((item) => item.slug === slug);
   const freshBlock = data.is_fresh !== false ? block : undefined;
   const freshTopicReport = topicReport?.is_fresh !== false ? topicReport : null;
