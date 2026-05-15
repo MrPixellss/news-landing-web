@@ -47,7 +47,7 @@ export const orderedTopics = [
   { slug: "central-banks-rates", name: "Centralbanker och räntor" },
   { slug: "stocks", name: "Aktier och börs" },
   { slug: "bonds", name: "Obligationer och kreditmarknad" },
-  { slug: "fx", name: "Valutor och FX" },
+  { slug: "fx", name: "Valutor och växelkurser" },
   { slug: "commodities-energy", name: "Råvaror och energi" },
   { slug: "crypto", name: "Krypto och digitala tillgångar" },
   { slug: "banking-credit", name: "Bank och kredit" },
@@ -112,13 +112,6 @@ export async function getTopicReport(
   }
 }
 
-export function confidenceLabel(confidence: number | null | undefined) {
-  if (confidence == null) {
-    return "Ny";
-  }
-  return `${Math.round(confidence * 100)}%`;
-}
-
 export function shortPreview(text: string, maxSentences = 2) {
   const clean = text.replace(/\s+/g, " ").trim();
   if (!clean) {
@@ -128,5 +121,43 @@ export function shortPreview(text: string, maxSentences = 2) {
   const sentences = clean.split(/(?<=[.!?])\s+/).filter(Boolean);
   return (sentences.length ? sentences.slice(0, maxSentences).join(" ") : clean)
     .slice(0, 520)
+    .trim();
+}
+
+export function displayDate(value: string | undefined) {
+  return (value || new Date().toISOString().slice(0, 10)).replaceAll("-", ".");
+}
+
+export function normalizeSwedishCopy(text: string | undefined) {
+  return (text || "")
+    .replaceAll("topic routing", "ämnesstyrning")
+    .replaceAll("Topic routing", "Ämnesstyrning")
+    .replaceAll("USA-inflation", "amerikansk inflation")
+    .replaceAll("USA:s inflation", "amerikansk inflation")
+    .replaceAll("FX", "växelkurser")
+    .replaceAll("EUR", "euro")
+    .replaceAll("IPO-optimism", "börsnoteringsoptimism")
+    .replaceAll("“higher for longer”", "högre räntor under längre tid")
+    .replaceAll("”higher for longer”", "högre räntor under längre tid")
+    .replaceAll('"higher for longer"', "högre räntor under längre tid")
+    .replaceAll("higher for longer", "högre räntor under längre tid")
+    .replaceAll("Higher for longer", "Högre räntor under längre tid")
+    .replaceAll(
+      "the central analytical question is: Does the signal change the market view on growth, inflation, or recession risk?",
+      "den centrala analysfrågan är om signalen ändrar marknadens syn på tillväxt, inflation eller recessionsrisk.",
+    )
+    .replaceAll(
+      "Macro surprises reprice earnings expectations, discount rates, credit risk, and cyclical exposure.",
+      "Makroöverraskningar påverkar vinstförväntningar, räntor, kreditrisk och cyklisk exponering.",
+    )
+    .replaceAll("market view", "marknadssyn")
+    .replaceAll("growth", "tillväxt")
+    .replaceAll("inflation", "inflation")
+    .replaceAll("recession risk", "recessionsrisk")
+    .replaceAll("equities", "aktier")
+    .replaceAll("rates", "räntor")
+    .replaceAll("credit", "kredit")
+    .replaceAll("cyclical sectors", "cykliska sektorer")
+    .replace(/\s+/g, " ")
     .trim();
 }
