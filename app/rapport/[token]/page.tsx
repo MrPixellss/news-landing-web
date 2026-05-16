@@ -115,6 +115,14 @@ function sectionItems(section: FullTopicReport["sections"][number]) {
     .filter(Boolean);
 }
 
+function sectionLead(section: {
+  paragraphs: string[];
+  items: string[];
+}) {
+  const text = [...section.paragraphs, ...section.items].join(" ");
+  return text.replace(/\s+/g, " ").trim();
+}
+
 function formatMetricValue(item: MarketSnapshotItem) {
   const value = Number(item.latest_value);
   if (!Number.isFinite(value)) {
@@ -308,6 +316,10 @@ export default async function PaidReportPage({ params }: PaidReportPageProps) {
                     items: [],
                   },
                 ];
+            const visibleReportLength = displaySections
+              .map(sectionLead)
+              .join(" ")
+              .length;
             const preview = shortPreview(
               normalizeSwedishCopy(topic.teaser || topic.full_report_body),
               2,
@@ -339,13 +351,25 @@ export default async function PaidReportPage({ params }: PaidReportPageProps) {
                   {normalizeSwedishCopy(topic.headline)}
                 </h3>
                 {preview ? (
-                  <p className="mt-5 max-w-4xl text-lg leading-9 text-[#c7d1dd]">
+                  <p className="mt-5 max-w-5xl text-lg leading-9 text-[#c7d1dd]">
                     {preview}
                   </p>
                 ) : null}
 
+                <div className="mt-8 max-w-5xl border-l-2 border-emerald-300/70 pl-5">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
+                    Fullständig analys
+                  </p>
+                  <p className="mt-3 text-base leading-7 text-[#aebccc]">
+                    Rapportdelen nedan visar den betalda analysen som ett
+                    sammanhängande dokument. Korta marknadsbilder och scenarier
+                    ligger kvar i texten, medan rå källnavigation och
+                    webbplatsmenyer är borttagna.
+                  </p>
+                </div>
+
                 {topic.market_snapshot?.length ? (
-                  <div className="mt-7">
+                  <div className="mt-9">
                     <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
                       Marknadsdata
                     </p>
@@ -392,36 +416,57 @@ export default async function PaidReportPage({ params }: PaidReportPageProps) {
                   </div>
                 ) : null}
 
-                <div className="mt-9 space-y-8 text-lg leading-9 text-[#d7e1eb]">
-                  {displaySections.map((section) => (
-                    <section
-                      key={section.key}
-                      className="border-t border-[#26313d] pt-7"
-                    >
-                      <h4 className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
-                        {section.title}
-                      </h4>
+                <div className="mt-10 max-w-5xl bg-[#0a0e13] px-1 py-1">
+                  <div className="border border-[#26313d] bg-[#0b0f14] p-5 md:p-7">
+                    <div className="flex flex-col gap-2 border-b border-[#26313d] pb-5 md:flex-row md:items-end md:justify-between">
+                      <div>
+                        <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
+                          Analysdokument
+                        </p>
+                        <h4 className="mt-2 text-2xl font-bold tracking-[-0.02em] text-white">
+                          {topic.name}: samlad bedömning
+                        </h4>
+                      </div>
+                      <p className="font-mono text-xs font-bold tracking-[0.16em] text-[#7f91a7]">
+                        {visibleReportLength} tecken
+                      </p>
+                    </div>
+
+                    <div className="mt-7 space-y-9 text-lg leading-9 text-[#d7e1eb]">
+                      {displaySections.map((section, sectionIndex) => (
+                        <section key={section.key}>
+                          <h5 className="text-2xl font-bold leading-tight tracking-[-0.02em] text-white">
+                            {section.title}
+                          </h5>
                       {section.paragraphs.length ? (
-                        <div className="mt-4 max-w-4xl space-y-4">
+                        <div className="mt-4 space-y-4">
                           {section.paragraphs.map((paragraph) => (
                             <p key={paragraph}>{paragraph}</p>
                           ))}
                         </div>
                       ) : null}
                       {section.items.length ? (
-                        <ul className="mt-4 max-w-4xl space-y-3">
-                          {section.items.map((item) => (
+                        <ul className="mt-5 space-y-4">
+                          {section.items.map((item, itemIndex) => (
                             <li
                               key={item}
-                              className="border-l-2 border-emerald-300/70 pl-4 text-[#d7e1eb]"
+                              className="grid gap-3 border-t border-[#1f2934] pt-4 text-[#d7e1eb] sm:grid-cols-[42px_minmax(0,1fr)]"
                             >
-                              {item}
+                              <span className="font-mono text-sm font-bold text-emerald-300">
+                                {String(itemIndex + 1).padStart(2, "0")}
+                              </span>
+                              <span>{item}</span>
                             </li>
                           ))}
                         </ul>
                       ) : null}
-                    </section>
-                  ))}
+                          {sectionIndex < displaySections.length - 1 ? (
+                            <div className="mt-8 h-px bg-[#26313d]" />
+                          ) : null}
+                        </section>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </article>
             );
