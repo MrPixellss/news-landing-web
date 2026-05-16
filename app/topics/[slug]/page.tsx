@@ -7,6 +7,7 @@ import {
   getTodayTeaser,
   normalizeSwedishCopy,
   orderedTopics,
+  priceLabel,
   shortPreview,
 } from "../../lib/report";
 
@@ -159,7 +160,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
                 <div className="w-full max-w-md border border-emerald-300/45 bg-[#07090b]/90 p-5 text-center">
                   <p className="text-lg font-bold">Hela analysen är låst</p>
                   <CheckoutButton
-                    priceEur={data.daily_price_eur}
+                    priceLabel={priceLabel(topicReport || data)}
                     topicSlug={slug}
                   />
                   <p className="mt-3 text-sm leading-6 text-[#8d9aaa]">

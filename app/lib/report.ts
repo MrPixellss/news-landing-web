@@ -16,6 +16,9 @@ export type TodayTeaserResponse = {
   intro: string;
   blocks: ReportBlock[];
   daily_price_eur: number;
+  daily_price_cents?: number;
+  daily_price_currency?: string;
+  daily_price_label?: string;
   weekly_cta_enabled: boolean;
 };
 
@@ -35,11 +38,36 @@ export type TopicReportResponse = {
   report_title: string;
   report_intro: string;
   daily_price_eur: number;
+  daily_price_cents?: number;
+  daily_price_currency?: string;
+  daily_price_label?: string;
   weekly_cta_enabled: boolean;
-  topic: ReportBlock & {
-    full_report_body: string;
-    sections: TopicReportSection[];
+  topic: FullTopicReport;
+};
+
+export type FullTopicReport = ReportBlock & {
+  full_report_body: string;
+  sections: TopicReportSection[];
+  language_warnings?: {
+    topic_slug: string;
+    language_model: string;
+    action: string;
+  }[];
+};
+
+export type PaidReportResponse = {
+  date: string;
+  language?: string;
+  report_title: string;
+  report_intro: string;
+  weekly_cta_enabled: boolean;
+  access: {
+    type: string;
+    primary_topic_slug: string;
+    primary_topic_name: string;
+    topic_count: number;
   };
+  topics: FullTopicReport[];
 };
 
 export const orderedTopics = [
@@ -66,7 +94,10 @@ export const fallbackData: TodayTeaserResponse = {
   title: "",
   intro: "",
   blocks: [],
-  daily_price_eur: 5,
+  daily_price_eur: 3,
+  daily_price_cents: 300,
+  daily_price_currency: "sek",
+  daily_price_label: "3 SEK",
   weekly_cta_enabled: true,
 };
 
@@ -110,6 +141,48 @@ export async function getTopicReport(
   } catch {
     return null;
   }
+}
+
+export async function getPaidReport(
+  token: string,
+): Promise<PaidReportResponse | null> {
+  const baseUrl =
+    process.env.NEXT_PUBLIC_API_BASE_URL ??
+    "https://financial-analyst-api-vjrq.onrender.com";
+
+  try {
+    const response = await fetch(`${baseUrl}/api/report/paid/${encodeURIComponent(token)}`, {
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    return (await response.json()) as PaidReportResponse;
+  } catch {
+    return null;
+  }
+}
+
+export function priceLabel(data: {
+  daily_price_label?: string;
+  daily_price_cents?: number;
+  daily_price_currency?: string;
+  daily_price_eur?: number;
+}) {
+  if (data.daily_price_label) {
+    return data.daily_price_label;
+  }
+
+  const cents = data.daily_price_cents;
+  const currency = data.daily_price_currency?.toUpperCase();
+  if (typeof cents === "number" && currency) {
+    const amount = cents / 100;
+    return `${Number.isInteger(amount) ? amount.toFixed(0) : amount.toFixed(2)} ${currency}`;
+  }
+
+  return `${data.daily_price_eur ?? 3} SEK`;
 }
 
 export function shortPreview(text: string, maxSentences = 2) {

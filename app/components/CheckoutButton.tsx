@@ -4,10 +4,10 @@ import { useState } from "react";
 
 type CheckoutButtonProps = {
   topicSlug: string;
-  priceEur: number;
+  priceLabel: string;
 };
 
-export function CheckoutButton({ topicSlug, priceEur }: CheckoutButtonProps) {
+export function CheckoutButton({ topicSlug, priceLabel }: CheckoutButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -49,7 +49,7 @@ export function CheckoutButton({ topicSlug, priceEur }: CheckoutButtonProps) {
         onClick={startCheckout}
         type="button"
       >
-        {isLoading ? "Skickar till Stripe..." : `Lås upp för ${priceEur} euro`}
+        {isLoading ? "Skickar till Stripe..." : `Lås upp analyspaketet för ${priceLabel}`}
       </button>
       {error ? (
         <p className="mt-3 text-sm font-semibold leading-6 text-red-300">{error}</p>
