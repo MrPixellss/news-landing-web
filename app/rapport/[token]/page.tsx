@@ -6,6 +6,7 @@ import {
   orderedTopics,
   shortPreview,
   type FullTopicReport,
+  type MarketSnapshotItem,
 } from "../../lib/report";
 
 export const dynamic = "force-dynamic";
@@ -35,6 +36,58 @@ function paragraphs(text: string) {
     .split(/\n{2,}/)
     .map((item) => item.trim())
     .filter(Boolean);
+}
+
+function formatMetricValue(item: MarketSnapshotItem) {
+  const value = Number(item.latest_value);
+  if (!Number.isFinite(value)) {
+    return "-";
+  }
+  const decimals = Math.abs(value) >= 100 ? 1 : 2;
+  return `${value.toFixed(decimals)}${item.currency === "%" ? "%" : item.currency ? ` ${item.currency}` : ""}`;
+}
+
+function formatChangePct(value: number | null | undefined) {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return "";
+  }
+  const sign = value > 0 ? "+" : "";
+  return `${sign}${value.toFixed(2)}%`;
+}
+
+function MiniChart({ points }: { points: MarketSnapshotItem["points"] }) {
+  const cleanPoints = points
+    .filter((point) => typeof point.value === "number" && Number.isFinite(point.value))
+    .slice(-48);
+
+  if (cleanPoints.length < 2) {
+    return <div className="h-16 border-t border-[#26313d]" />;
+  }
+
+  const width = 180;
+  const height = 58;
+  const values = cleanPoints.map((point) => point.value);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const span = max - min || 1;
+  const path = cleanPoints
+    .map((point, index) => {
+      const x = (index / (cleanPoints.length - 1)) * width;
+      const y = height - ((point.value - min) / span) * height;
+      return `${index === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(" ");
+
+  return (
+    <svg
+      aria-hidden="true"
+      className="mt-4 h-16 w-full overflow-visible"
+      preserveAspectRatio="none"
+      viewBox={`0 0 ${width} ${height}`}
+    >
+      <path d={path} fill="none" stroke="#39e59a" strokeLinecap="round" strokeWidth="3" />
+    </svg>
+  );
 }
 
 export default async function PaidReportPage({ params }: PaidReportPageProps) {
@@ -191,6 +244,51 @@ export default async function PaidReportPage({ params }: PaidReportPageProps) {
                           "Analysdel"}
                       </span>
                     ))}
+                  </div>
+                ) : null}
+
+                {topic.market_snapshot?.length ? (
+                  <div className="mt-7">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
+                      Marknadsdata
+                    </p>
+                    <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                      {topic.market_snapshot.slice(0, 6).map((item) => (
+                        <div
+                          key={item.instrument_id}
+                          className="border border-[#26313d] bg-[#0b0f14] p-4"
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="text-sm font-black text-white">
+                                {item.label}
+                              </p>
+                              <p className="mt-1 text-xs font-bold uppercase tracking-[0.18em] text-[#7f91a7]">
+                                {item.latest_date}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-lg font-black">
+                                {formatMetricValue(item)}
+                              </p>
+                              {formatChangePct(item.period_change_pct) ? (
+                                <p
+                                  className={[
+                                    "mt-1 text-sm font-bold",
+                                    (item.period_change_pct ?? 0) >= 0
+                                      ? "text-emerald-300"
+                                      : "text-red-300",
+                                  ].join(" ")}
+                                >
+                                  {formatChangePct(item.period_change_pct)}
+                                </p>
+                              ) : null}
+                            </div>
+                          </div>
+                          <MiniChart points={item.points} />
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 ) : null}
 

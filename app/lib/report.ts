@@ -48,10 +48,30 @@ export type TopicReportResponse = {
 export type FullTopicReport = ReportBlock & {
   full_report_body: string;
   sections: TopicReportSection[];
+  market_snapshot?: MarketSnapshotItem[];
   language_warnings?: {
     topic_slug: string;
     language_model: string;
     action: string;
+  }[];
+};
+
+export type MarketSnapshotItem = {
+  instrument_id: string;
+  label: string;
+  symbol: string;
+  currency: string;
+  unit: string;
+  latest_date: string;
+  latest_value: number;
+  daily_change?: number | null;
+  daily_change_pct?: number | null;
+  period_start_date?: string | null;
+  period_change?: number | null;
+  period_change_pct?: number | null;
+  points: {
+    date: string;
+    value: number;
   }[];
 };
 
