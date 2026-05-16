@@ -32,9 +32,86 @@ function topicOrder(topic: FullTopicReport) {
 }
 
 function paragraphs(text: string) {
-  return normalizeSwedishCopy(text)
+  return cleanReportText(text)
+    .replace(
+      /\s+(Slutsats|Viktigaste signaler|Marknadstolkning|Riskbild|Scenarier)\s+/g,
+      "\n\n$1\n",
+    )
     .split(/\n{2,}/)
     .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function removeSourceBoilerplate(line: string) {
+  const sourceMarkers = [
+    "Finansinspektionen En stabil",
+    "Sveriges Riksbank ",
+    "English Prenumerera",
+    "Search Options Image Preview",
+    "Share this article",
+    "Copy link",
+  ];
+  const markerIndex = sourceMarkers.reduce<number | null>((earliest, marker) => {
+    const index = line.toLowerCase().indexOf(marker.toLowerCase());
+    if (index < 0) {
+      return earliest;
+    }
+    return earliest === null ? index : Math.min(earliest, index);
+  }, null);
+
+  if (markerIndex === null) {
+    return line;
+  }
+
+  const colonIndex = line.indexOf(":");
+  if (colonIndex > 24 && colonIndex < markerIndex) {
+    return line.slice(0, colonIndex).trim();
+  }
+
+  return line.slice(0, markerIndex).replace(/[:\s-]+$/, "").trim();
+}
+
+function cleanReportText(text: string | undefined) {
+  return normalizeSwedishCopy(text)
+    .split("\n")
+    .map((line) => removeSourceBoilerplate(line.trim()))
+    .filter((line) => {
+      const lower = line.toLowerCase();
+      return (
+        line.length > 0 &&
+        !lower.includes("english prenumerera") &&
+        !lower.includes("search options image preview") &&
+        !lower.includes("copy link") &&
+        !lower.includes("share this article")
+      );
+    })
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+function sectionTitle(section: FullTopicReport["sections"][number]) {
+  return sectionLabels.get(section.id || "") || section.title || "Analys";
+}
+
+function sectionBodyParagraphs(section: FullTopicReport["sections"][number]) {
+  const title = sectionTitle(section);
+  const titlePrefix = title.toLowerCase();
+
+  return paragraphs(section.body || "")
+    .map((paragraph) => {
+      const lower = paragraph.toLowerCase();
+      if (lower.startsWith(`${titlePrefix} `)) {
+        return paragraph.slice(title.length).replace(/^[:\s-]+/, "").trim();
+      }
+      return paragraph;
+    })
+    .filter(Boolean);
+}
+
+function sectionItems(section: FullTopicReport["sections"][number]) {
+  return (section.items || [])
+    .map((item) => cleanReportText(item).replace(/^[-•]\s*/, "").trim())
     .filter(Boolean);
 }
 
@@ -53,6 +130,23 @@ function formatChangePct(value: number | null | undefined) {
   }
   const sign = value > 0 ? "+" : "";
   return `${sign}${value.toFixed(2)}%`;
+}
+
+function marketInsight(item: MarketSnapshotItem) {
+  const change = item.period_change_pct ?? item.daily_change_pct;
+  if (typeof change !== "number" || !Number.isFinite(change)) {
+    return `${item.label} används som marknadskontroll mot analysen, men saknar tillräcklig förändringsdata för en tydlig slutsats.`;
+  }
+
+  const formatted = formatChangePct(change);
+  if (change > 2) {
+    return `${item.label} har stigit tydligt under mätperioden (${formatted}). Det stärker bilden av att marknaden redan prisar in högre risk eller högre nominella nivåer.`;
+  }
+  if (change < -2) {
+    return `${item.label} har fallit tydligt under mätperioden (${formatted}). Det pekar på svagare riskaptit eller lägre prissättning i den delen av marknaden.`;
+  }
+
+  return `${item.label} har rört sig begränsat under mätperioden (${formatted}). Det gör signalen mer neutral och bör läsas tillsammans med källunderlaget.`;
 }
 
 function MiniChart({ points }: { points: MarketSnapshotItem["points"] }) {
@@ -132,7 +226,7 @@ export default async function PaidReportPage({ params }: PaidReportPageProps) {
 
   return (
     <main className="min-h-screen bg-[#07090b] text-zinc-50">
-      <div className="mx-auto max-w-[1440px] px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1180px] px-4 py-6 sm:px-6 lg:px-8">
         <header className="flex items-center gap-3 border-b border-[#1a222c] pb-5">
           <div className="grid size-10 place-items-center bg-emerald-300 text-sm font-black text-[#06100c]">
             F
@@ -196,6 +290,24 @@ export default async function PaidReportPage({ params }: PaidReportPageProps) {
         <section className="space-y-8 py-8">
           {orderedReportTopics.map((topic, index) => {
             const bodyParagraphs = paragraphs(topic.full_report_body || topic.teaser);
+            const structuredSections = topic.sections
+              .map((section) => ({
+                key: section.id || section.title || `${topic.slug}-section`,
+                title: sectionTitle(section),
+                paragraphs: sectionBodyParagraphs(section),
+                items: sectionItems(section),
+              }))
+              .filter((section) => section.paragraphs.length || section.items.length);
+            const displaySections = structuredSections.length
+              ? structuredSections
+              : [
+                  {
+                    key: `${topic.slug}-analysis`,
+                    title: "Analys",
+                    paragraphs: bodyParagraphs,
+                    items: [],
+                  },
+                ];
             const preview = shortPreview(
               normalizeSwedishCopy(topic.teaser || topic.full_report_body),
               2,
@@ -232,27 +344,12 @@ export default async function PaidReportPage({ params }: PaidReportPageProps) {
                   </p>
                 ) : null}
 
-                {topic.sections.length ? (
-                  <div className="mt-6 flex flex-wrap gap-2">
-                    {topic.sections.map((section) => (
-                      <span
-                        key={section.id || section.title}
-                        className="border border-[#26313d] bg-[#0b0f14] px-3 py-2 text-xs font-bold uppercase tracking-[0.18em] text-[#9eacbb]"
-                      >
-                        {sectionLabels.get(section.id || "") ||
-                          section.title ||
-                          "Analysdel"}
-                      </span>
-                    ))}
-                  </div>
-                ) : null}
-
                 {topic.market_snapshot?.length ? (
                   <div className="mt-7">
                     <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
                       Marknadsdata
                     </p>
-                    <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                    <div className="mt-4 grid gap-4 lg:grid-cols-2">
                       {topic.market_snapshot.slice(0, 6).map((item) => (
                         <div
                           key={item.instrument_id}
@@ -286,15 +383,44 @@ export default async function PaidReportPage({ params }: PaidReportPageProps) {
                             </div>
                           </div>
                           <MiniChart points={item.points} />
+                          <p className="mt-4 border-t border-[#26313d] pt-4 text-sm leading-6 text-[#aebccc]">
+                            {marketInsight(item)}
+                          </p>
                         </div>
                       ))}
                     </div>
                   </div>
                 ) : null}
 
-                <div className="mt-7 max-w-4xl space-y-5 text-lg leading-9 text-[#d7e1eb]">
-                  {bodyParagraphs.map((paragraph) => (
-                    <p key={paragraph}>{paragraph}</p>
+                <div className="mt-9 space-y-8 text-lg leading-9 text-[#d7e1eb]">
+                  {displaySections.map((section) => (
+                    <section
+                      key={section.key}
+                      className="border-t border-[#26313d] pt-7"
+                    >
+                      <h4 className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
+                        {section.title}
+                      </h4>
+                      {section.paragraphs.length ? (
+                        <div className="mt-4 max-w-4xl space-y-4">
+                          {section.paragraphs.map((paragraph) => (
+                            <p key={paragraph}>{paragraph}</p>
+                          ))}
+                        </div>
+                      ) : null}
+                      {section.items.length ? (
+                        <ul className="mt-4 max-w-4xl space-y-3">
+                          {section.items.map((item) => (
+                            <li
+                              key={item}
+                              className="border-l-2 border-emerald-300/70 pl-4 text-[#d7e1eb]"
+                            >
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null}
+                    </section>
                   ))}
                 </div>
               </article>

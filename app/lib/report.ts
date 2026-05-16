@@ -222,7 +222,8 @@ export function displayDate(value: string | undefined) {
 }
 
 export function normalizeSwedishCopy(text: string | undefined) {
-  return (text || "")
+  const normalized = (text || "")
+    .replaceAll("\r\n", "\n")
     .replaceAll("topic routing", "ämnesstyrning")
     .replaceAll("Topic routing", "Ämnesstyrning")
     .replaceAll("USA-inflation", "amerikansk inflation")
@@ -244,13 +245,21 @@ export function normalizeSwedishCopy(text: string | undefined) {
       "Makroöverraskningar påverkar vinstförväntningar, räntor, kreditrisk och cyklisk exponering.",
     )
     .replaceAll("market view", "marknadssyn")
+    .replaceAll("funding markets", "finansieringsmarknader")
+    .replaceAll("credit spreads", "kreditspreadar")
     .replaceAll("growth", "tillväxt")
     .replaceAll("inflation", "inflation")
     .replaceAll("recession risk", "recessionsrisk")
     .replaceAll("equities", "aktier")
+    .replaceAll("banks", "banker")
     .replaceAll("rates", "räntor")
     .replaceAll("credit", "kredit")
-    .replaceAll("cyclical sectors", "cykliska sektorer")
-    .replace(/\s+/g, " ")
+    .replaceAll("cyclical sectors", "cykliska sektorer");
+
+  return normalized
+    .split("\n")
+    .map((line) => line.replace(/[ \t]+/g, " ").trim())
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n")
     .trim();
 }
