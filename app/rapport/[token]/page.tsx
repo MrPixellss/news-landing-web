@@ -115,14 +115,6 @@ function sectionItems(section: FullTopicReport["sections"][number]) {
     .filter(Boolean);
 }
 
-function sectionLead(section: {
-  paragraphs: string[];
-  items: string[];
-}) {
-  const text = [...section.paragraphs, ...section.items].join(" ");
-  return text.replace(/\s+/g, " ").trim();
-}
-
 function formatMetricValue(item: MarketSnapshotItem) {
   const value = Number(item.latest_value);
   if (!Number.isFinite(value)) {
@@ -316,14 +308,30 @@ export default async function PaidReportPage({ params }: PaidReportPageProps) {
                     items: [],
                   },
                 ];
-            const visibleReportLength = displaySections
-              .map(sectionLead)
-              .join(" ")
-              .length;
+            const conclusionSection =
+              displaySections.find(
+                (section) =>
+                  section.key === "executive_view" ||
+                  section.title.toLowerCase() === "slutsats",
+              ) || null;
+            const analysisSections = displaySections.filter(
+              (section) => section !== conclusionSection,
+            );
             const preview = shortPreview(
               normalizeSwedishCopy(topic.teaser || topic.full_report_body),
               2,
             );
+            const finalConclusionParagraphs = [
+              preview,
+              ...(conclusionSection?.paragraphs || []),
+            ].filter((paragraph, paragraphIndex, allParagraphs) => {
+              const clean = paragraph.trim();
+              return (
+                clean.length > 0 &&
+                allParagraphs.findIndex((item) => item.trim() === clean) ===
+                  paragraphIndex
+              );
+            });
 
             return (
               <article
@@ -355,18 +363,6 @@ export default async function PaidReportPage({ params }: PaidReportPageProps) {
                     {preview}
                   </p>
                 ) : null}
-
-                <div className="mt-8 max-w-5xl border-l-2 border-emerald-300/70 pl-5">
-                  <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
-                    Fullständig analys
-                  </p>
-                  <p className="mt-3 text-base leading-7 text-[#aebccc]">
-                    Rapportdelen nedan visar den betalda analysen som ett
-                    sammanhängande dokument. Korta marknadsbilder och scenarier
-                    ligger kvar i texten, medan rå källnavigation och
-                    webbplatsmenyer är borttagna.
-                  </p>
-                </div>
 
                 {topic.market_snapshot?.length ? (
                   <div className="mt-9">
@@ -418,7 +414,7 @@ export default async function PaidReportPage({ params }: PaidReportPageProps) {
 
                 <div className="mt-10 max-w-5xl bg-[#0a0e13] px-1 py-1">
                   <div className="border border-[#26313d] bg-[#0b0f14] p-5 md:p-7">
-                    <div className="flex flex-col gap-2 border-b border-[#26313d] pb-5 md:flex-row md:items-end md:justify-between">
+                    <div className="border-b border-[#26313d] pb-5">
                       <div>
                         <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
                           Analysdokument
@@ -427,44 +423,75 @@ export default async function PaidReportPage({ params }: PaidReportPageProps) {
                           {topic.name}: samlad bedömning
                         </h4>
                       </div>
-                      <p className="font-mono text-xs font-bold tracking-[0.16em] text-[#7f91a7]">
-                        {visibleReportLength} tecken
-                      </p>
                     </div>
 
-                    <div className="mt-7 space-y-9 text-lg leading-9 text-[#d7e1eb]">
-                      {displaySections.map((section, sectionIndex) => (
-                        <section key={section.key}>
+                    <div className="mt-7 space-y-10 text-lg leading-9 text-[#d7e1eb]">
+                      {analysisSections.length ? (
+                        <section>
                           <h5 className="text-2xl font-bold leading-tight tracking-[-0.02em] text-white">
-                            {section.title}
+                            Analys
                           </h5>
-                      {section.paragraphs.length ? (
-                        <div className="mt-4 space-y-4">
-                          {section.paragraphs.map((paragraph) => (
-                            <p key={paragraph}>{paragraph}</p>
-                          ))}
-                        </div>
+                          <div className="mt-5 space-y-8">
+                            {analysisSections.map((section) => (
+                              <div key={section.key}>
+                                <h6 className="text-base font-black uppercase tracking-[0.18em] text-emerald-300">
+                                  {section.title}
+                                </h6>
+                                {section.paragraphs.length ? (
+                                  <div className="mt-3 space-y-4">
+                                    {section.paragraphs.map((paragraph) => (
+                                      <p key={paragraph}>{paragraph}</p>
+                                    ))}
+                                  </div>
+                                ) : null}
+                                {section.items.length ? (
+                                  <ul className="mt-4 space-y-4">
+                                    {section.items.map((item, itemIndex) => (
+                                      <li
+                                        key={item}
+                                        className="grid gap-3 border-t border-[#1f2934] pt-4 sm:grid-cols-[42px_minmax(0,1fr)]"
+                                      >
+                                        <span className="font-mono text-sm font-bold text-emerald-300">
+                                          {String(itemIndex + 1).padStart(2, "0")}
+                                        </span>
+                                        <span>{item}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                ) : null}
+                              </div>
+                            ))}
+                          </div>
+                        </section>
                       ) : null}
-                      {section.items.length ? (
-                        <ul className="mt-5 space-y-4">
-                          {section.items.map((item, itemIndex) => (
-                            <li
-                              key={item}
-                              className="grid gap-3 border-t border-[#1f2934] pt-4 text-[#d7e1eb] sm:grid-cols-[42px_minmax(0,1fr)]"
-                            >
-                              <span className="font-mono text-sm font-bold text-emerald-300">
-                                {String(itemIndex + 1).padStart(2, "0")}
-                              </span>
-                              <span>{item}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : null}
-                          {sectionIndex < displaySections.length - 1 ? (
-                            <div className="mt-8 h-px bg-[#26313d]" />
+
+                      {finalConclusionParagraphs.length ||
+                      conclusionSection?.items.length ? (
+                        <section className="border-t border-[#26313d] pt-8">
+                          <h5 className="text-2xl font-bold leading-tight tracking-[-0.02em] text-white">
+                            Slutsats
+                          </h5>
+                          {finalConclusionParagraphs.length ? (
+                            <div className="mt-4 space-y-4">
+                              {finalConclusionParagraphs.map((paragraph) => (
+                                <p key={paragraph}>{paragraph}</p>
+                              ))}
+                            </div>
+                          ) : null}
+                          {conclusionSection?.items.length ? (
+                            <ul className="mt-4 space-y-3">
+                              {conclusionSection.items.map((item) => (
+                                <li
+                                  key={item}
+                                  className="border-l-2 border-emerald-300/70 pl-4"
+                                >
+                                  {item}
+                                </li>
+                              ))}
+                            </ul>
                           ) : null}
                         </section>
-                      ))}
+                      ) : null}
                     </div>
                   </div>
                 </div>
