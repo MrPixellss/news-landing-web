@@ -68,6 +68,27 @@ export default async function TopicPage({ params }: TopicPageProps) {
   const lockedParagraphs = reportParagraphs.length
     ? reportParagraphs.slice(0, 4)
     : [preview];
+  const sectionSummaries = sections
+    .map((section, index) => {
+      const rawSummary = normalizeSwedishCopy(
+        [
+          section.body,
+          Array.isArray(section.items) ? section.items[0] : "",
+        ]
+          .filter(Boolean)
+          .join(" "),
+      );
+
+      return {
+        key: section.id || section.title || `section-${index}`,
+        title:
+          sectionLabels.get(section.id || "") ||
+          section.title ||
+          "Analysdel",
+        summary: shortPreview(rawSummary, 1),
+      };
+    })
+    .filter((section) => section.summary);
 
   return (
     <main className="min-h-screen bg-[#07090b] text-zinc-50">
@@ -118,19 +139,32 @@ export default async function TopicPage({ params }: TopicPageProps) {
             </p>
           </article>
 
-          {sections.length ? (
-            <div className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
-              {sections.map((section) => (
-                <div
-                  key={section.id || section.title}
-                  className="border border-[#26313d] bg-[#0d1117] px-4 py-3 text-center text-sm font-semibold text-[#c4cfdb]"
-                >
-                  {sectionLabels.get(section.id || "") ||
-                    section.title ||
-                    "Analysdel"}
-                </div>
-              ))}
-            </div>
+          {sectionSummaries.length ? (
+            <article className="mt-5 border border-[#26313d] bg-[#0d1117] p-6 md:p-8">
+              <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
+                I den låsta analysen
+              </p>
+              <div className="mt-5 space-y-4">
+                {sectionSummaries.map((section, index) => (
+                  <div
+                    key={section.key}
+                    className="grid gap-4 border-l-2 border-emerald-300/70 bg-[#0b0f14] p-4 sm:grid-cols-[42px_minmax(0,1fr)]"
+                  >
+                    <span className="font-mono text-sm font-bold text-emerald-300">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <span>
+                      <span className="block text-base font-black text-white">
+                        {section.title}
+                      </span>
+                      <span className="mt-2 block text-sm leading-6 text-[#a8b5c4]">
+                        {section.summary}
+                      </span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </article>
           ) : null}
 
           <article className="mt-5 border border-[#26313d] bg-[#0d1117] p-6 md:p-8">
@@ -144,8 +178,8 @@ export default async function TopicPage({ params }: TopicPageProps) {
               {preview}
             </p>
 
-            <div className="relative mt-7 min-h-72 overflow-hidden border border-[#26313d] bg-[#0b0f14]">
-              <div className="max-h-72 select-none space-y-5 overflow-hidden p-7 blur-[5px]">
+            <div className="relative mt-7 min-h-[430px] overflow-hidden border border-[#26313d] bg-[#0b0f14]">
+              <div className="pointer-events-none select-none space-y-5 p-7 blur-[5px]">
                 {lockedParagraphs.map((paragraph) => (
                   <p
                     key={paragraph}
@@ -154,22 +188,25 @@ export default async function TopicPage({ params }: TopicPageProps) {
                     {paragraph}
                   </p>
                 ))}
-              </div>
-              <div className="absolute inset-x-0 bottom-0 grid min-h-40 place-items-center bg-gradient-to-t from-[#0b0f14] via-[#0b0f14]/95 to-transparent p-6">
-                <div className="w-full max-w-xl border border-emerald-300/45 bg-[#07090b]/95 p-5 text-center">
-                  <p className="text-lg font-bold">Hela analysen är låst</p>
-                  <p className="mt-2 text-sm leading-6 text-[#a8b5c4]">
-                    Lås upp dagens fullständiga briefing. Få tillgång till hela
-                    denna analys och dagens övriga 9 marknadsrapporter.
+                {lockedParagraphs.map((paragraph) => (
+                  <p
+                    key={`locked-repeat-${paragraph}`}
+                    className="text-base leading-8 text-[#d4dce6]"
+                  >
+                    {paragraph}
                   </p>
-                  <div className="mt-4 border border-[#26313d] bg-[#0b0f14] p-4 text-left">
-                    <p className="text-sm font-black text-white">
-                      Dagspass: 49 kr
-                    </p>
-                    <p className="mt-1 text-sm leading-6 text-[#a8b5c4]">
-                      Ingen prenumeration krävs.
-                    </p>
-                  </div>
+                ))}
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-b from-[#0b0f14]/20 via-[#0b0f14]/72 to-[#0b0f14]" />
+              <div className="absolute inset-0 grid place-items-center p-5">
+                <div className="w-full max-w-sm border border-emerald-300/55 bg-[#07090b]/95 p-5 text-center shadow-2xl">
+                  <p className="text-xl font-black">
+                    Lås upp dagens fullständiga briefing
+                  </p>
+                  <p className="mt-3 text-sm leading-6 text-[#a8b5c4]">
+                    Få hela denna analys och dagens övriga 9 marknadsrapporter.
+                    Ingen prenumeration krävs.
+                  </p>
                   <CheckoutButton
                     priceLabel="49 kr"
                     topicSlug={slug}
@@ -178,24 +215,6 @@ export default async function TopicPage({ params }: TopicPageProps) {
                     Efter betalning skickas rapporten till e-postadressen du
                     anger hos Stripe.
                   </p>
-                  <div className="mt-5 border-t border-[#26313d] pt-5 text-left">
-                    <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-[#7f91a7]">
-                      Följ marknaden varje dag
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-[#c7d1dd]">
-                      Dagliga briefings, veckosammanfattning och månadsutsikt.
-                    </p>
-                    <p className="mt-2 text-sm font-black text-white">
-                      Månadsaccess: 249 kr/mån
-                    </p>
-                    <button
-                      className="mt-3 w-full border border-[#26313d] px-4 py-3 text-sm font-black text-[#d7e1eb]"
-                      disabled
-                      type="button"
-                    >
-                      Starta månadsaccess
-                    </button>
-                  </div>
                 </div>
               </div>
             </div>
