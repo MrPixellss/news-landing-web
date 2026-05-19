@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as {
     topicSlug?: string;
+    marketingOptIn?: boolean;
   } | null;
   const topicSlug = body?.topicSlug?.trim();
 
@@ -18,7 +19,10 @@ export async function POST(request: Request) {
     const response = await fetch(`${baseUrl}/api/payments/create-checkout-session`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ topic_slug: topicSlug }),
+      body: JSON.stringify({
+        topic_slug: topicSlug,
+        marketing_opt_in: Boolean(body?.marketingOptIn),
+      }),
       cache: "no-store",
     });
     const payload = await response.json().catch(() => ({}));

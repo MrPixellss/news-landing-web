@@ -114,10 +114,10 @@ export const fallbackData: TodayTeaserResponse = {
   title: "",
   intro: "",
   blocks: [],
-  daily_price_eur: 3,
-  daily_price_cents: 300,
+  daily_price_eur: 49,
+  daily_price_cents: 4900,
   daily_price_currency: "sek",
-  daily_price_label: "3 SEK",
+  daily_price_label: "49 kr",
   weekly_cta_enabled: true,
 };
 

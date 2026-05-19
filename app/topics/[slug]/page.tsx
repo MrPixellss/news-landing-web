@@ -7,7 +7,6 @@ import {
   getTodayTeaser,
   normalizeSwedishCopy,
   orderedTopics,
-  priceLabel,
   shortPreview,
 } from "../../lib/report";
 
@@ -157,16 +156,46 @@ export default async function TopicPage({ params }: TopicPageProps) {
                 ))}
               </div>
               <div className="absolute inset-x-0 bottom-0 grid min-h-40 place-items-center bg-gradient-to-t from-[#0b0f14] via-[#0b0f14]/95 to-transparent p-6">
-                <div className="w-full max-w-md border border-emerald-300/45 bg-[#07090b]/90 p-5 text-center">
+                <div className="w-full max-w-xl border border-emerald-300/45 bg-[#07090b]/95 p-5 text-center">
                   <p className="text-lg font-bold">Hela analysen är låst</p>
+                  <p className="mt-2 text-sm leading-6 text-[#a8b5c4]">
+                    Lås upp dagens fullständiga briefing. Få tillgång till hela
+                    denna analys och dagens övriga 9 marknadsrapporter.
+                  </p>
+                  <div className="mt-4 border border-[#26313d] bg-[#0b0f14] p-4 text-left">
+                    <p className="text-sm font-black text-white">
+                      Dagspass: 49 kr
+                    </p>
+                    <p className="mt-1 text-sm leading-6 text-[#a8b5c4]">
+                      Ingen prenumeration krävs.
+                    </p>
+                  </div>
                   <CheckoutButton
-                    priceLabel={priceLabel(topicReport || data)}
+                    priceLabel="49 kr"
                     topicSlug={slug}
                   />
                   <p className="mt-3 text-sm leading-6 text-[#8d9aaa]">
                     Efter betalning skickas rapporten till e-postadressen du
                     anger hos Stripe.
                   </p>
+                  <div className="mt-5 border-t border-[#26313d] pt-5 text-left">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-[#7f91a7]">
+                      Följ marknaden varje dag
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-[#c7d1dd]">
+                      Dagliga briefings, veckosammanfattning och månadsutsikt.
+                    </p>
+                    <p className="mt-2 text-sm font-black text-white">
+                      Månadsaccess: 249 kr/mån
+                    </p>
+                    <button
+                      className="mt-3 w-full border border-[#26313d] px-4 py-3 text-sm font-black text-[#d7e1eb]"
+                      disabled
+                      type="button"
+                    >
+                      Starta månadsaccess
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
