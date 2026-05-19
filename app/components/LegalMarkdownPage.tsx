@@ -1,5 +1,6 @@
 import { readFile } from "fs/promises";
 import path from "path";
+import { BackButton } from "./BackButton";
 
 type LegalMarkdownPageProps = {
   fileName: string;
@@ -93,6 +94,7 @@ export async function LegalMarkdownPage({ fileName }: LegalMarkdownPageProps) {
   return (
     <main className="min-h-screen bg-[#07090b] text-zinc-50">
       <article className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
+        <BackButton />
         <div className="border border-[#26313d] bg-[#0d1117] p-6 md:p-10">
           {blocks.map((block, index) => {
             if (block.type === "h1") {

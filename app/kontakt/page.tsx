@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { BackButton } from "../components/BackButton";
 
 export const metadata: Metadata = {
   title: "Kontakt | Finansanalytik",
@@ -9,6 +10,7 @@ export default function KontaktPage() {
   return (
     <main className="min-h-screen bg-[#07090b] text-zinc-50">
       <section className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
+        <BackButton />
         <div className="border border-[#26313d] bg-[#0d1117] p-6 md:p-10">
           <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
             Kontakt

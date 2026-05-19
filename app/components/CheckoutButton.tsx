@@ -70,11 +70,11 @@ export function CheckoutButton({ topicSlug, priceLabel }: CheckoutButtonProps) {
           />
           <span>
             Jag godkänner{" "}
-            <Link className="text-emerald-300 underline-offset-4 hover:underline" href="/kopvillkor">
+            <Link className="text-emerald-300 underline-offset-4 hover:underline" href="/kopvillkor" rel="noopener noreferrer" target="_blank">
               Köpvillkoren
             </Link>{" "}
             och{" "}
-            <Link className="text-emerald-300 underline-offset-4 hover:underline" href="/integritetspolicy">
+            <Link className="text-emerald-300 underline-offset-4 hover:underline" href="/integritetspolicy" rel="noopener noreferrer" target="_blank">
               Integritetspolicyn
             </Link>
             .
