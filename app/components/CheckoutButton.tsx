@@ -6,23 +6,31 @@ import { useState } from "react";
 type CheckoutButtonProps = {
   topicSlug: string;
   priceLabel: string;
+  productName?: string;
+  buttonLabel?: string;
+  description?: string;
 };
 
 function displayPrice(priceLabel: string) {
   return priceLabel || "49 kr";
 }
 
-export function CheckoutButton({ topicSlug, priceLabel }: CheckoutButtonProps) {
+export function CheckoutButton({
+  topicSlug,
+  priceLabel,
+  productName = "Dagspass",
+  buttonLabel,
+  description = "Du får dagens fullständiga briefing med alla 10 marknadsrapporter levererad via e-post.",
+}: CheckoutButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState("");
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
-  const [acceptedImmediateDelivery, setAcceptedImmediateDelivery] = useState(false);
-  const [acceptedEmailDelivery, setAcceptedEmailDelivery] = useState(false);
+  const [acceptedPurchaseConsent, setAcceptedPurchaseConsent] = useState(false);
   const [marketingOptIn, setMarketingOptIn] = useState(false);
 
-  const canCheckout =
-    acceptedTerms && acceptedImmediateDelivery && acceptedEmailDelivery;
+  const canCheckout = acceptedPurchaseConsent;
+  const visibleButtonLabel =
+    buttonLabel || `Köp dagspass - ${displayPrice(priceLabel)}`;
 
   function openModal() {
     setError("");
@@ -72,7 +80,7 @@ export function CheckoutButton({ topicSlug, priceLabel }: CheckoutButtonProps) {
         onClick={openModal}
         type="button"
       >
-        Köp dagspass - {displayPrice(priceLabel)}
+        {visibleButtonLabel}
       </button>
 
       {isModalOpen ? (
@@ -85,14 +93,13 @@ export function CheckoutButton({ topicSlug, priceLabel }: CheckoutButtonProps) {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
-                  Dagspass
+                  {productName}
                 </p>
                 <h2 className="mt-2 text-2xl font-bold tracking-[-0.02em]">
                   Bekräfta köp - {displayPrice(priceLabel)}
                 </h2>
                 <p className="mt-3 text-sm leading-6 text-[#a8b5c4]">
-                  Du får dagens fullständiga briefing med alla 10
-                  marknadsrapporter levererad via e-post.
+                  {description}
                 </p>
               </div>
               <button
@@ -104,84 +111,67 @@ export function CheckoutButton({ topicSlug, priceLabel }: CheckoutButtonProps) {
               </button>
             </div>
 
-            <div className="mt-6 space-y-3">
-              <label className="flex gap-3 text-sm leading-6 text-[#d7e1eb]">
-                <input
-                  checked={acceptedTerms}
-                  className="mt-1 size-4 shrink-0 accent-emerald-300"
-                  onChange={(event) => setAcceptedTerms(event.target.checked)}
-                  type="checkbox"
-                />
-                <span>
-                  Jag godkänner{" "}
-                  <Link
-                    className="text-emerald-300 underline-offset-4 hover:underline"
-                    href="/kopvillkor"
-                    rel="noopener noreferrer"
-                    target="_blank"
-                  >
-                    Köpvillkoren
-                  </Link>{" "}
-                  och{" "}
-                  <Link
-                    className="text-emerald-300 underline-offset-4 hover:underline"
-                    href="/integritetspolicy"
-                    rel="noopener noreferrer"
-                    target="_blank"
-                  >
-                    Integritetspolicyn
-                  </Link>
-                  .
-                </span>
-              </label>
+            <div className="mt-6 space-y-5">
+              <div>
+                <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.24em] text-[#7f91a7]">
+                  Krävs för köp
+                </p>
+                <label className="flex gap-3 text-sm leading-6 text-[#d7e1eb]">
+                  <input
+                    checked={acceptedPurchaseConsent}
+                    className="mt-1 size-4 shrink-0 accent-emerald-300"
+                    onChange={(event) => setAcceptedPurchaseConsent(event.target.checked)}
+                    type="checkbox"
+                  />
+                  <span>
+                    Jag godkänner{" "}
+                    <Link
+                      className="text-emerald-300 underline-offset-4 hover:underline"
+                      href="/kopvillkor"
+                      rel="noopener noreferrer"
+                      target="_blank"
+                    >
+                      Köpvillkoren
+                    </Link>{" "}
+                    och{" "}
+                    <Link
+                      className="text-emerald-300 underline-offset-4 hover:underline"
+                      href="/integritetspolicy"
+                      rel="noopener noreferrer"
+                      target="_blank"
+                    >
+                      Integritetspolicyn
+                    </Link>
+                    , inklusive omedelbar leverans av digitalt innehåll via
+                    e-post och att ångerrätten går förlorad när leveransen har
+                    påbörjats.
+                  </span>
+                </label>
+              </div>
 
-              <label className="flex gap-3 text-sm leading-6 text-[#d7e1eb]">
-                <input
-                  checked={acceptedImmediateDelivery}
-                  className="mt-1 size-4 shrink-0 accent-emerald-300"
-                  onChange={(event) => setAcceptedImmediateDelivery(event.target.checked)}
-                  type="checkbox"
-                />
-                <span>
-                  Jag samtycker till att det digitala innehållet levereras
-                  omedelbart efter köp och bekräftar att jag förlorar min
-                  ångerrätt när leveransen har påbörjats.
-                </span>
-              </label>
-
-              <label className="flex gap-3 text-sm leading-6 text-[#d7e1eb]">
-                <input
-                  checked={acceptedEmailDelivery}
-                  className="mt-1 size-4 shrink-0 accent-emerald-300"
-                  onChange={(event) => setAcceptedEmailDelivery(event.target.checked)}
-                  type="checkbox"
-                />
-                <span>
-                  Jag samtycker till att få den köpta rapporten skickad till min
-                  e-postadress.
-                </span>
-              </label>
-
-              <label className="flex gap-3 text-sm leading-6 text-[#9facbb]">
-                <input
-                  checked={marketingOptIn}
-                  className="mt-1 size-4 shrink-0 accent-emerald-300"
-                  onChange={(event) => setMarketingOptIn(event.target.checked)}
-                  type="checkbox"
-                />
-                <span>
-                  Jag vill få produktnyheter och erbjudanden via e-post. Jag kan
-                  avregistrera mig när som helst.
-                </span>
-              </label>
+              <div>
+                <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.24em] text-[#7f91a7]">
+                  Valfritt
+                </p>
+                <label className="flex gap-3 text-sm leading-6 text-[#9facbb]">
+                  <input
+                    checked={marketingOptIn}
+                    className="mt-1 size-4 shrink-0 accent-emerald-300"
+                    onChange={(event) => setMarketingOptIn(event.target.checked)}
+                    type="checkbox"
+                  />
+                  <span>
+                    Jag vill få produktnyheter, erbjudanden och marknadsföring
+                    via e-post. Jag kan avregistrera mig när som helst.
+                  </span>
+                </label>
+              </div>
             </div>
 
             <p className="mt-5 border border-[#26313d] bg-[#0b0f14] p-3 text-xs leading-5 text-[#a8b5c4]">
-              Finansanalytik är informations- och utbildningsmaterial baserat
-              på AI-stödd analys av aktuella nyheter, offentliga källor och
-              marknadssignaler. Det är inte investeringsrådgivning, finansiell
-              rådgivning eller en rekommendation att köpa eller sälja
-              tillgångar. Betalning och prenumeration hanteras av TVP Byrå.
+              Finansanalytik är AI-stödd nyhetsanalys för informationsändamål.
+              Det är inte investeringsrådgivning eller en rekommendation att
+              köpa eller sälja tillgångar. Betalning hanteras av TVP Byrå.
             </p>
 
             <div className="mt-6 grid gap-3 sm:grid-cols-[1fr_auto]">
