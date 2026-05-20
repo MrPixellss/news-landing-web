@@ -41,6 +41,8 @@ Innehåll levereras via e-post och/eller görs tillgängligt på webbplatsen.
 
 Alla priser visas i svenska kronor inklusive moms, om inget annat anges.
 
+Dagspass kostar 49 kr inklusive moms. Månadsaccess kostar 249 kr/mån inklusive moms.
+
 Betalning hanteras av Stripe. TVP Byrå lagrar inte fullständiga kortnummer eller fullständiga betalningsuppgifter.
 
 Stripe kan behandla betalningsuppgifter, faktureringsuppgifter och annan information som krävs för att genomföra betalningen.

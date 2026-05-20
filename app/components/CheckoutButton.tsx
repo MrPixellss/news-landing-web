@@ -69,11 +69,13 @@ export function CheckoutButton({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState("");
   const [acceptedPurchaseConsent, setAcceptedPurchaseConsent] = useState(false);
+  const [showPurchaseConsentError, setShowPurchaseConsentError] = useState(false);
   const [marketingOptIn, setMarketingOptIn] = useState(false);
   const [customerCountry, setCustomerCountry] = useState("SE");
   const [billingPostalCode, setBillingPostalCode] = useState("");
 
   const canCheckout = acceptedPurchaseConsent;
+  const priceWithTax = `${displayPrice(priceLabel)}, moms ingår`;
   const visibleButtonLabel =
     buttonLabel || `Köp dagspass - ${displayPrice(priceLabel)}`;
 
@@ -101,6 +103,7 @@ export function CheckoutButton({
 
   function openModal() {
     setError("");
+    setShowPurchaseConsentError(false);
     setIsModalOpen(true);
   }
 
@@ -110,6 +113,7 @@ export function CheckoutButton({
     }
 
     if (!canCheckout) {
+      setShowPurchaseConsentError(true);
       setError("Du behöver godkänna de obligatoriska villkoren före betalning.");
       return;
     }
@@ -171,6 +175,9 @@ export function CheckoutButton({
                 <h2 className="mt-2 text-2xl font-bold tracking-[-0.02em]">
                   Bekräfta köp - {displayPrice(priceLabel)}
                 </h2>
+                <p className="mt-2 text-sm font-bold text-emerald-300">
+                  {priceWithTax}
+                </p>
                 <p className="mt-3 text-sm leading-6 text-[#a8b5c4]">
                   {description}
                 </p>
@@ -224,15 +231,29 @@ export function CheckoutButton({
                 </div>
               </div>
 
-              <div>
+              <div
+                className={
+                  showPurchaseConsentError
+                    ? "border border-red-300/70 bg-red-950/20 p-4"
+                    : ""
+                }
+              >
                 <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.24em] text-[#7f91a7]">
                   Krävs för köp
                 </p>
                 <label className="flex gap-3 text-sm leading-6 text-[#d7e1eb]">
                   <input
                     checked={acceptedPurchaseConsent}
-                    className="mt-1 size-4 shrink-0 accent-emerald-300"
-                    onChange={(event) => setAcceptedPurchaseConsent(event.target.checked)}
+                    className={`mt-1 size-4 shrink-0 accent-emerald-300 ${
+                      showPurchaseConsentError ? "outline outline-2 outline-red-300" : ""
+                    }`}
+                    onChange={(event) => {
+                      setAcceptedPurchaseConsent(event.target.checked);
+                      if (event.target.checked) {
+                        setShowPurchaseConsentError(false);
+                        setError("");
+                      }
+                    }}
                     type="checkbox"
                   />
                   <span>
@@ -259,6 +280,11 @@ export function CheckoutButton({
                     påbörjats.
                   </span>
                 </label>
+                {showPurchaseConsentError ? (
+                  <p className="mt-3 text-sm font-bold leading-6 text-red-300">
+                    Markera rutan för att fortsätta till betalning.
+                  </p>
+                ) : null}
               </div>
 
               <div>
@@ -284,6 +310,7 @@ export function CheckoutButton({
               Finansanalytik är AI-stödd nyhetsanalys för informationsändamål.
               Det är inte investeringsrådgivning eller en rekommendation att
               köpa eller sälja tillgångar. Betalning hanteras av TVP Byrå.
+              Priset visas i SEK och moms ingår.
             </p>
 
             <div className="mt-6 grid gap-3 sm:grid-cols-[1fr_auto]">

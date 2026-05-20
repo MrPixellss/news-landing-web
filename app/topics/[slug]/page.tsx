@@ -242,6 +242,9 @@ export default async function TopicPage({ params }: TopicPageProps) {
                     priceLabel="49 kr"
                     topicSlug={slug}
                   />
+                  <p className="mt-2 text-xs font-bold uppercase tracking-[0.16em] text-emerald-300">
+                    Moms ingår
+                  </p>
                   <p className="mt-3 text-sm leading-6 text-[#8d9aaa]">
                     Efter betalning skickas rapporten till e-postadressen du
                     anger hos Stripe.
@@ -260,13 +263,26 @@ export default async function TopicPage({ params }: TopicPageProps) {
         </section>
       </div>
       {hasContent ? (
-        <div className="fixed inset-x-0 bottom-0 z-50 border-t border-[#26313d] bg-[#07090b]/95 p-3 shadow-2xl backdrop-blur md:hidden">
-          <div className="mx-auto max-w-md">
-            <p className="mb-2 text-center text-[11px] font-bold uppercase tracking-[0.22em] text-[#7f91a7]">
-              Dagspass - 49 kr
-            </p>
+        <div className="fixed inset-x-0 bottom-0 z-50 border-t border-emerald-300/50 bg-[#07090b]/98 p-4 shadow-[0_-18px_40px_rgba(0,0,0,0.55)] backdrop-blur md:hidden">
+          <div className="mx-auto max-w-md border border-[#26313d] bg-[#0d1117] p-3">
+            <div className="mb-3 flex items-end justify-between gap-3">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-emerald-300">
+                  Dagspass
+                </p>
+                <p className="mt-1 text-sm font-bold text-zinc-50">
+                  Dagens 10 analyser
+                </p>
+              </div>
+              <p className="text-right text-sm font-black text-zinc-50">
+                49 kr
+                <span className="block text-[10px] font-bold uppercase tracking-[0.14em] text-[#8d9aaa]">
+                  moms ingår
+                </span>
+              </p>
+            </div>
             <CheckoutButton
-              buttonClassName="w-full bg-emerald-300 px-5 py-4 text-sm font-black text-[#04100b] transition hover:bg-emerald-200 disabled:cursor-wait disabled:opacity-70"
+              buttonClassName="w-full bg-emerald-300 px-5 py-5 text-sm font-black text-[#04100b] shadow-lg shadow-emerald-950/40 ring-1 ring-emerald-100/40 transition hover:bg-emerald-200 disabled:cursor-wait disabled:opacity-70"
               buttonLabel="Köp dagspass - 49 kr"
               priceLabel="49 kr"
               topicSlug={slug}

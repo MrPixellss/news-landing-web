@@ -294,6 +294,9 @@ export default async function PaidReportPage({ params }: PaidReportPageProps) {
                 <h2 className="mt-3 text-3xl font-bold tracking-[-0.03em]">
                   Månadsaccess - 249 kr/mån
                 </h2>
+                <p className="mt-2 text-sm font-bold text-emerald-300">
+                  249 kr/mån, moms ingår
+                </p>
                 <p className="mt-4 max-w-3xl text-base leading-7 text-[#c7d1dd]">
                   Få dagliga briefings med alla 10 analysområden direkt via
                   e-post. Veckosammanfattning och månadsutsikt kopplas på när
@@ -308,7 +311,7 @@ export default async function PaidReportPage({ params }: PaidReportPageProps) {
                 <CheckoutButton
                   buttonLabel="Starta månadsaccess - 249 kr/mån"
                   checkoutPath="/api/subscription-checkout"
-                  description="Du får månadsaccess med dagliga briefings via e-post. Prenumerationen förnyas månadsvis och hanteras av Stripe."
+                  description="Du får månadsaccess med dagliga briefings via e-post. Prenumerationen förnyas månadsvis och hanteras av Stripe. Moms ingår i priset."
                   priceLabel="249 kr/mån"
                   productName="Månadsaccess"
                   topicSlug={primaryTopic?.slug || "macro"}
