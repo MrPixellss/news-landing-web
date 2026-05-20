@@ -127,14 +127,14 @@ export default async function TopicPage({ params }: TopicPageProps) {
         </section>
 
         <section className="py-8">
-          <article className="border border-[#26313d] bg-[#0d1117] p-6 md:p-8">
+          <article className="border border-[#26313d] bg-[#0d1117] p-6 text-center md:p-8">
             <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
               Snabb slutsats
             </p>
-            <h2 className="mt-4 max-w-5xl text-3xl font-bold leading-tight tracking-[-0.02em] md:text-4xl">
+            <h2 className="mx-auto mt-4 max-w-5xl text-3xl font-bold leading-tight tracking-[-0.02em] md:text-4xl">
               {headline}
             </h2>
-            <p className="mt-6 max-w-4xl text-lg leading-9 text-[#c7d1dd]">
+            <p className="mx-auto mt-6 max-w-4xl text-lg leading-9 text-[#c7d1dd]">
               {preview}
             </p>
           </article>
@@ -171,12 +171,14 @@ export default async function TopicPage({ params }: TopicPageProps) {
             <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
               Förhandsvisning
             </p>
-            <h2 className="mt-4 text-2xl font-bold tracking-[-0.02em]">
-              Öppen del av analysen
-            </h2>
-            <p className="mt-5 max-w-4xl text-lg leading-9 text-[#c7d1dd]">
-              {preview}
-            </p>
+            <div className="mx-auto max-w-4xl text-center">
+              <h2 className="mt-4 text-2xl font-bold tracking-[-0.02em]">
+                Öppen del av analysen
+              </h2>
+              <p className="mt-5 text-lg leading-9 text-[#c7d1dd]">
+                {preview}
+              </p>
+            </div>
 
             <div className="relative mt-7 min-h-[430px] overflow-hidden border border-[#26313d] bg-[#0b0f14]">
               <div className="pointer-events-none select-none space-y-5 p-7 blur-[5px]">
