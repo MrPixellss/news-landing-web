@@ -86,6 +86,8 @@ export type PaidReportResponse = {
     primary_topic_slug: string;
     primary_topic_name: string;
     topic_count: number;
+    has_active_subscription?: boolean;
+    offer_monthly_access?: boolean;
   };
   topics: FullTopicReport[];
 };

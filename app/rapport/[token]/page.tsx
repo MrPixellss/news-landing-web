@@ -224,6 +224,10 @@ export default async function PaidReportPage({ params }: PaidReportPageProps) {
       .filter((topic) => topic.slug !== primaryTopic?.slug)
       .sort((a, b) => topicOrder(a) - topicOrder(b)),
   ];
+  const showMonthlyUpsell =
+    data.access.type !== "monthly_access" &&
+    data.access.has_active_subscription !== true &&
+    data.access.offer_monthly_access !== false;
 
   return (
     <main className="min-h-screen bg-[#07090b] text-zinc-50">
@@ -271,40 +275,42 @@ export default async function PaidReportPage({ params }: PaidReportPageProps) {
           </div>
         </section>
 
-        <section
-          id="manadsaccess"
-          className="border-b border-[#1a222c] py-8"
-        >
-          <div className="grid gap-5 border border-[#26313d] bg-[#0d1117] p-6 md:grid-cols-[1fr_360px] md:p-8">
-            <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
-                Följ marknaden varje dag
-              </p>
-              <h2 className="mt-3 text-3xl font-bold tracking-[-0.03em]">
-                Månadsaccess - 249 kr/mån
-              </h2>
-              <p className="mt-4 max-w-3xl text-base leading-7 text-[#c7d1dd]">
-                Få dagliga briefings med alla 10 analysområden direkt via
-                e-post. Veckosammanfattning och månadsutsikt kopplas på när
-                de publiceras.
-              </p>
+        {showMonthlyUpsell ? (
+          <section
+            id="manadsaccess"
+            className="border-b border-[#1a222c] py-8"
+          >
+            <div className="grid gap-5 border border-[#26313d] bg-[#0d1117] p-6 md:grid-cols-[1fr_360px] md:p-8">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
+                  Följ marknaden varje dag
+                </p>
+                <h2 className="mt-3 text-3xl font-bold tracking-[-0.03em]">
+                  Månadsaccess - 249 kr/mån
+                </h2>
+                <p className="mt-4 max-w-3xl text-base leading-7 text-[#c7d1dd]">
+                  Få dagliga briefings med alla 10 analysområden direkt via
+                  e-post. Veckosammanfattning och månadsutsikt kopplas på när
+                  de publiceras.
+                </p>
+              </div>
+              <div className="border border-[#26313d] bg-[#0b0f14] p-5">
+                <p className="text-sm leading-6 text-[#a8b5c4]">
+                  Ingen användarprofil krävs. Prenumerationen hanteras tryggt i
+                  Stripe och kan sägas upp inför kommande perioder.
+                </p>
+                <CheckoutButton
+                  buttonLabel="Starta månadsaccess - 249 kr/mån"
+                  checkoutPath="/api/subscription-checkout"
+                  description="Du får månadsaccess med dagliga briefings via e-post. Prenumerationen förnyas månadsvis och hanteras av Stripe."
+                  priceLabel="249 kr/mån"
+                  productName="Månadsaccess"
+                  topicSlug={primaryTopic?.slug || "macro"}
+                />
+              </div>
             </div>
-            <div className="border border-[#26313d] bg-[#0b0f14] p-5">
-              <p className="text-sm leading-6 text-[#a8b5c4]">
-                Ingen användarprofil krävs. Prenumerationen hanteras tryggt i
-                Stripe och kan sägas upp inför kommande perioder.
-              </p>
-              <CheckoutButton
-                buttonLabel="Starta månadsaccess - 249 kr/mån"
-                checkoutPath="/api/subscription-checkout"
-                description="Du får månadsaccess med dagliga briefings via e-post. Prenumerationen förnyas månadsvis och hanteras av Stripe."
-                priceLabel="249 kr/mån"
-                productName="Månadsaccess"
-                topicSlug={primaryTopic?.slug || "macro"}
-              />
-            </div>
-          </div>
-        </section>
+          </section>
+        ) : null}
 
         <nav className="border-b border-[#1a222c] py-6">
           <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
