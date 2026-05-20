@@ -119,18 +119,24 @@ export default async function TopicPage({ params }: TopicPageProps) {
   );
 
   return (
-    <main className="min-h-screen bg-[#07090b] text-zinc-50">
+    <main className={`min-h-screen bg-[#07090b] text-zinc-50 ${hasContent ? "pb-28 md:pb-0" : ""}`}>
       <div className="mx-auto max-w-[1440px] px-4 py-6 sm:px-6 lg:px-8">
         <header className="flex items-center gap-3 border-b border-[#1a222c] pb-5">
-          <div className="grid size-10 place-items-center bg-emerald-300 text-sm font-black text-[#06100c]">
-            F
-          </div>
-          <div>
-            <p className="text-lg font-bold leading-tight">Finansanalytik</p>
-            <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
-              Daglig marknadsanalys
-            </p>
-          </div>
+          <Link
+            href="/"
+            className="flex items-center gap-3 transition hover:text-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-300/70"
+            aria-label="Till startsidan"
+          >
+            <span className="grid size-10 place-items-center bg-emerald-300 text-sm font-black text-[#06100c]">
+              F
+            </span>
+            <span>
+              <span className="block text-lg font-bold leading-tight">Finansanalytik</span>
+              <span className="mt-1 block text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
+                Daglig marknadsanalys
+              </span>
+            </span>
+          </Link>
         </header>
 
         <section className="pt-9">
@@ -170,7 +176,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
           {lockedHighlights.length ? (
             <article className="mt-5 border border-[#26313d] bg-[#0d1117] p-6 md:p-8">
               <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
-                I den låsta analysen
+                I hela rapporten
               </p>
               <div className="mt-5 space-y-4">
                 {lockedHighlights.map((highlight, index) => (
@@ -196,7 +202,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
             </p>
             <div className="mx-auto max-w-4xl text-center">
               <h2 className="mt-4 text-2xl font-bold tracking-[-0.02em]">
-                Öppen del av analysen
+                Kort utdrag ur analysen
               </h2>
               <p className="mt-5 text-lg leading-9 text-[#c7d1dd]">
                 {preview}
@@ -253,6 +259,21 @@ export default async function TopicPage({ params }: TopicPageProps) {
           ) : null}
         </section>
       </div>
+      {hasContent ? (
+        <div className="fixed inset-x-0 bottom-0 z-50 border-t border-[#26313d] bg-[#07090b]/95 p-3 shadow-2xl backdrop-blur md:hidden">
+          <div className="mx-auto max-w-md">
+            <p className="mb-2 text-center text-[11px] font-bold uppercase tracking-[0.22em] text-[#7f91a7]">
+              Dagspass - 49 kr
+            </p>
+            <CheckoutButton
+              buttonClassName="w-full bg-emerald-300 px-5 py-4 text-sm font-black text-[#04100b] transition hover:bg-emerald-200 disabled:cursor-wait disabled:opacity-70"
+              buttonLabel="Köp dagspass - 49 kr"
+              priceLabel="49 kr"
+              topicSlug={slug}
+            />
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }

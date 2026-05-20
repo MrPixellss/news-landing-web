@@ -31,15 +31,21 @@ export default async function HomePage() {
     <main className="min-h-screen bg-[#07090b] text-zinc-50">
       <div className="mx-auto max-w-[1440px] px-4 py-6 sm:px-6 lg:px-8">
         <header className="flex items-center gap-3 border-b border-[#1a222c] pb-5">
-          <div className="grid size-10 place-items-center bg-emerald-300 text-sm font-black text-[#06100c]">
-            F
-          </div>
-          <div>
-            <p className="text-lg font-bold leading-tight">Finansanalytik</p>
-            <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
-              Daglig marknadsanalys
-            </p>
-          </div>
+          <Link
+            href="/"
+            className="flex items-center gap-3 transition hover:text-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-300/70"
+            aria-label="Till startsidan"
+          >
+            <span className="grid size-10 place-items-center bg-emerald-300 text-sm font-black text-[#06100c]">
+              F
+            </span>
+            <span>
+              <span className="block text-lg font-bold leading-tight">Finansanalytik</span>
+              <span className="mt-1 block text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
+                Daglig marknadsanalys
+              </span>
+            </span>
+          </Link>
         </header>
 
         <section className="border-b border-[#1a222c] py-10 md:py-14">

@@ -10,6 +10,7 @@ type CheckoutButtonProps = {
   buttonLabel?: string;
   description?: string;
   checkoutPath?: string;
+  buttonClassName?: string;
 };
 
 function displayPrice(priceLabel: string) {
@@ -23,6 +24,7 @@ export function CheckoutButton({
   buttonLabel,
   description = "Du får dagens fullständiga briefing med alla 10 marknadsrapporter levererad via e-post.",
   checkoutPath = "/api/checkout",
+  buttonClassName = "mt-5 w-full bg-emerald-300 px-5 py-4 text-sm font-black text-[#04100b] transition hover:bg-emerald-200 disabled:cursor-wait disabled:opacity-70",
 }: CheckoutButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -81,7 +83,7 @@ export function CheckoutButton({
   return (
     <>
       <button
-        className="mt-5 w-full bg-emerald-300 px-5 py-4 text-sm font-black text-[#04100b] transition hover:bg-emerald-200 disabled:cursor-wait disabled:opacity-70"
+        className={buttonClassName}
         disabled={isLoading}
         onClick={openModal}
         type="button"
