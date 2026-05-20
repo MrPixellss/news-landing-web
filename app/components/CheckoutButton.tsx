@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type CheckoutButtonProps = {
   topicSlug: string;
@@ -12,6 +12,45 @@ type CheckoutButtonProps = {
   checkoutPath?: string;
   buttonClassName?: string;
 };
+
+const TAX_COUNTRIES = [
+  ["SE", "Sverige"],
+  ["NO", "Norge"],
+  ["DK", "Danmark"],
+  ["FI", "Finland"],
+  ["DE", "Tyskland"],
+  ["NL", "Nederländerna"],
+  ["BE", "Belgien"],
+  ["BG", "Bulgarien"],
+  ["CY", "Cypern"],
+  ["FR", "Frankrike"],
+  ["GR", "Grekland"],
+  ["HR", "Kroatien"],
+  ["HU", "Ungern"],
+  ["ES", "Spanien"],
+  ["IT", "Italien"],
+  ["CZ", "Tjeckien"],
+  ["SK", "Slovakien"],
+  ["SI", "Slovenien"],
+  ["PL", "Polen"],
+  ["AT", "Österrike"],
+  ["IE", "Irland"],
+  ["PT", "Portugal"],
+  ["RO", "Rumänien"],
+  ["LU", "Luxemburg"],
+  ["MT", "Malta"],
+  ["EE", "Estland"],
+  ["LV", "Lettland"],
+  ["LT", "Litauen"],
+  ["IS", "Island"],
+  ["LI", "Liechtenstein"],
+  ["GB", "Storbritannien"],
+  ["CH", "Schweiz"],
+  ["US", "USA"],
+  ["CA", "Kanada"],
+] as const;
+
+const TAX_COUNTRY_CODES = new Set<string>(TAX_COUNTRIES.map(([code]) => code));
 
 function displayPrice(priceLabel: string) {
   return priceLabel || "49 kr";
@@ -31,10 +70,34 @@ export function CheckoutButton({
   const [error, setError] = useState("");
   const [acceptedPurchaseConsent, setAcceptedPurchaseConsent] = useState(false);
   const [marketingOptIn, setMarketingOptIn] = useState(false);
+  const [customerCountry, setCustomerCountry] = useState("SE");
+  const [billingPostalCode, setBillingPostalCode] = useState("");
 
   const canCheckout = acceptedPurchaseConsent;
   const visibleButtonLabel =
     buttonLabel || `Köp dagspass - ${displayPrice(priceLabel)}`;
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadCountry() {
+      try {
+        const response = await fetch("/api/geo-country", { cache: "no-store" });
+        const payload = (await response.json()) as { country?: string };
+        const country = payload.country?.trim().toUpperCase();
+        if (isMounted && country && TAX_COUNTRY_CODES.has(country)) {
+          setCustomerCountry(country);
+        }
+      } catch {
+        // Sweden is the primary market and remains the safe fallback.
+      }
+    }
+
+    loadCountry();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   function openModal() {
     setError("");
@@ -61,6 +124,8 @@ export function CheckoutButton({
         body: JSON.stringify({
           topicSlug,
           marketingOptIn,
+          customerCountry,
+          billingPostalCode: billingPostalCode.trim(),
           returnPath: window.location.pathname + window.location.search,
         }),
       });
@@ -120,6 +185,45 @@ export function CheckoutButton({
             </div>
 
             <div className="mt-6 space-y-5">
+              <div>
+                <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.24em] text-[#7f91a7]">
+                  Skatteuppgifter
+                </p>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <label className="block text-sm font-bold text-[#d7e1eb]">
+                    Land
+                    <select
+                      className="mt-2 w-full border border-[#26313d] bg-[#0b0f14] px-3 py-3 text-sm text-[#d7e1eb] outline-none focus:border-emerald-300"
+                      onChange={(event) => setCustomerCountry(event.target.value)}
+                      value={customerCountry}
+                    >
+                      {TAX_COUNTRIES.map(([code, name]) => (
+                        <option key={code} value={code}>
+                          {name}
+                        </option>
+                      ))}
+                    </select>
+                    <span className="mt-2 block text-xs font-normal leading-5 text-[#8d9aaa]">
+                      Förifylls om möjligt. Du kan ändra innan betalning.
+                    </span>
+                  </label>
+                  <label className="block text-sm font-bold text-[#d7e1eb]">
+                    Faktureringspostnummer
+                    <input
+                      className="mt-2 w-full border border-[#26313d] bg-[#0b0f14] px-3 py-3 text-sm text-[#d7e1eb] outline-none placeholder:text-[#596678] focus:border-emerald-300"
+                      maxLength={24}
+                      onChange={(event) => setBillingPostalCode(event.target.value)}
+                      placeholder="Valfritt"
+                      type="text"
+                      value={billingPostalCode}
+                    />
+                    <span className="mt-2 block text-xs font-normal leading-5 text-[#8d9aaa]">
+                      Du kan lämna tomt. Stripe kan fylla i eller fråga vid behov.
+                    </span>
+                  </label>
+                </div>
+              </div>
+
               <div>
                 <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.24em] text-[#7f91a7]">
                   Krävs för köp
