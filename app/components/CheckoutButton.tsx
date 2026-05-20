@@ -9,6 +9,7 @@ type CheckoutButtonProps = {
   productName?: string;
   buttonLabel?: string;
   description?: string;
+  checkoutPath?: string;
 };
 
 function displayPrice(priceLabel: string) {
@@ -21,6 +22,7 @@ export function CheckoutButton({
   productName = "Dagspass",
   buttonLabel,
   description = "Du får dagens fullständiga briefing med alla 10 marknadsrapporter levererad via e-post.",
+  checkoutPath = "/api/checkout",
 }: CheckoutButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -51,10 +53,14 @@ export function CheckoutButton({
     setError("");
 
     try {
-      const response = await fetch("/api/checkout", {
+      const response = await fetch(checkoutPath, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topicSlug, marketingOptIn }),
+        body: JSON.stringify({
+          topicSlug,
+          marketingOptIn,
+          returnPath: window.location.pathname + window.location.search,
+        }),
       });
       const payload = (await response.json()) as {
         checkout_url?: string;

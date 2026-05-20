@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CheckoutButton } from "../../components/CheckoutButton";
 import {
   displayDate,
   getPaidReport,
@@ -266,6 +267,41 @@ export default async function PaidReportPage({ params }: PaidReportPageProps) {
               <p className="mt-3 text-xl font-black">
                 {data.access.topic_count} analyser
               </p>
+            </div>
+          </div>
+        </section>
+
+        <section
+          id="manadsaccess"
+          className="border-b border-[#1a222c] py-8"
+        >
+          <div className="grid gap-5 border border-[#26313d] bg-[#0d1117] p-6 md:grid-cols-[1fr_360px] md:p-8">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
+                Följ marknaden varje dag
+              </p>
+              <h2 className="mt-3 text-3xl font-bold tracking-[-0.03em]">
+                Månadsaccess - 249 kr/mån
+              </h2>
+              <p className="mt-4 max-w-3xl text-base leading-7 text-[#c7d1dd]">
+                Få dagliga briefings med alla 10 analysområden direkt via
+                e-post. Veckosammanfattning och månadsutsikt kopplas på när
+                de publiceras.
+              </p>
+            </div>
+            <div className="border border-[#26313d] bg-[#0b0f14] p-5">
+              <p className="text-sm leading-6 text-[#a8b5c4]">
+                Ingen användarprofil krävs. Prenumerationen hanteras tryggt i
+                Stripe och kan sägas upp inför kommande perioder.
+              </p>
+              <CheckoutButton
+                buttonLabel="Starta månadsaccess - 249 kr/mån"
+                checkoutPath="/api/subscription-checkout"
+                description="Du får månadsaccess med dagliga briefings via e-post. Prenumerationen förnyas månadsvis och hanteras av Stripe."
+                priceLabel="249 kr/mån"
+                productName="Månadsaccess"
+                topicSlug={primaryTopic?.slug || "macro"}
+              />
             </div>
           </div>
         </section>
