@@ -36,4 +36,4 @@ Du kan ändra eller återkalla ditt samtycke via cookieinställningarna på webb
 
 Frågor om cookies skickas till:
 
-info@tvp-byra.se
+support@tvp-byra.se

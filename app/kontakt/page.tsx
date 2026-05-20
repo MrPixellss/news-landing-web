@@ -25,31 +25,20 @@ export default function KontaktPage() {
             <div className="border border-[#26313d] bg-[#0b0f14] p-5">
               <p className="font-bold text-white">TVP Byrå</p>
               <p>Org.nr/personnummer: 960303-6618</p>
-              <p>Korrespondensadress: [Postbox24-adress]</p>
               <p>
                 E-post:{" "}
-                <a className="text-emerald-300" href="mailto:info@tvp-byra.se">
-                  info@tvp-byra.se
+                <a className="text-emerald-300" href="mailto:support@tvp-byra.se">
+                  support@tvp-byra.se
                 </a>
               </p>
               <p>Webbplats/tjänst: finansanalytik.com</p>
             </div>
 
             <p>
-              Korrespondensadressen används endast för skriftlig kommunikation
-              och kundärenden. Den är inte en besöksadress.
-            </p>
-
-            <p>
-              Fysisk post behandlas normalt inom 14 dagar från mottagande. För
-              snabbare hantering rekommenderas e-post.
-            </p>
-
-            <p>
               Frågor om köp, leverans, support, integritet eller villkor skickas
               till{" "}
-              <a className="text-emerald-300" href="mailto:info@tvp-byra.se">
-                info@tvp-byra.se
+              <a className="text-emerald-300" href="mailto:support@tvp-byra.se">
+                support@tvp-byra.se
               </a>
               .
             </p>

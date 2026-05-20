@@ -10,13 +10,8 @@ Tjänsten drivs, säljs och hanteras av:
 
 TVP Byrå  
 Org.nr/personnummer: 960303-6618  
-Korrespondensadress: [lägg till Postbox24-adress]  
-E-post: info@tvp-byra.se  
+E-post: support@tvp-byra.se  
 Webbplats/tjänst: finansanalytik.com
-
-Korrespondensadressen används endast för skriftlig kommunikation och kundärenden. Den är inte en besöksadress.
-
-Fysisk post behandlas normalt inom 14 dagar från mottagande. För snabbare hantering av köp, leverans, support och återbetalningsfrågor rekommenderar vi att du kontaktar oss via e-post.
 
 Betalningar, kvitton, prenumerationer och kundärenden hanteras av TVP Byrå. I betalflöden, kvitton eller kontoutdrag kan TVP Byrå och/eller finansanalytik.com anges som säljare, betalningsmottagare eller referens.
 
@@ -28,7 +23,7 @@ Rapporterna baseras på aktuella nyheter, offentligt tillgängliga källor och A
 
 Vi strävar efter att sammanfatta, omformulera och analysera information och avser inte att återpublicera hela tredjepartsartiklar eller material bakom betalvägg.
 
-Om du anser att något innehåll gör intrång i dina rättigheter, kontakta info@tvp-byra.se så granskar vi ärendet.
+Om du anser att något innehåll gör intrång i dina rättigheter, kontakta support@tvp-byra.se så granskar vi ärendet.
 
 ## 3. Produkter
 
@@ -54,7 +49,7 @@ Stripe kan behandla betalningsuppgifter, faktureringsuppgifter och annan informa
 
 Månadsaccess förnyas automatiskt varje månad tills prenumerationen sägs upp.
 
-Du kan säga upp prenumerationen för kommande betalningsperioder enligt de instruktioner som tillhandahålls vid köp, via Stripe eller genom att kontakta info@tvp-byra.se.
+Du kan säga upp prenumerationen för kommande betalningsperioder enligt de instruktioner som tillhandahålls vid köp, via Stripe eller genom att kontakta support@tvp-byra.se.
 
 Uppsägning påverkar normalt inte redan betald och påbörjad prenumerationsperiod.
 
@@ -64,7 +59,7 @@ Digitalt innehåll levereras normalt omedelbart efter genomförd betalning eller
 
 Genom att köpa dagspass eller starta månadsaccess samtycker du till att vi skickar köpt innehåll och serviceinformation via e-post. Det kan omfatta köpta rapporter, dagliga briefingar, veckosammanfattningar, månadsutsikter, kvitton, betalningsinformation och supportmeddelanden.
 
-Du ansvarar för att ange en korrekt e-postadress. Om du inte får din rapport ska du kontakta info@tvp-byra.se.
+Du ansvarar för att ange en korrekt e-postadress. Om du inte får din rapport ska du kontakta support@tvp-byra.se.
 
 Marknadsföring via e-post skickas endast om du lämnar separat samtycke.
 
@@ -78,7 +73,7 @@ Vid köp ombeds du därför att bekräfta att digitalt innehåll får levereras 
 
 När digitalt innehåll har levererats lämnas normalt ingen återbetalning. Om innehållet inte levereras på grund av tekniskt fel kan vi skicka om rapporten, ge ersättningsåtkomst, förlänga tillgången eller återbetala hela eller delar av betalningen.
 
-Begäran om support eller återbetalning skickas till info@tvp-byra.se. Ange e-postadressen som användes vid köpet, datum för köpet och en kort beskrivning av problemet.
+Begäran om support eller återbetalning skickas till support@tvp-byra.se. Ange e-postadressen som användes vid köpet, datum för köpet och en kort beskrivning av problemet.
 
 ## 8. Användning av innehåll
 
@@ -106,6 +101,4 @@ Vi kan uppdatera dessa villkor. Den senaste versionen publiceras på webbplatsen
 
 Frågor om tjänsten, köp eller villkor skickas till:
 
-info@tvp-byra.se
-
-Fysisk post kan skickas till korrespondensadressen ovan. Fysisk post behandlas normalt inom 14 dagar från mottagande, därför rekommenderas e-post för snabbare hantering.
+support@tvp-byra.se

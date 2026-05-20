@@ -14,23 +14,17 @@ Finansanalytik är produkt-/webbplatsnamnet. TVP Byrå är säljare, tjänstelev
 
 `04-checkout-texter.md` är inte tänkt som separat legal sida. Den innehåller copy för checkout, checkboxar och köpknappar.
 
-## Adressmodell
+## Kontaktuppgifter
 
 På webbplatsen används:
 
 TVP Byrå  
 Org.nr/personnummer: 960303-6618  
-Korrespondensadress: [Postbox24-adress]  
-E-post: info@tvp-byra.se  
+E-post: support@tvp-byra.se  
 Webbplats/tjänst: finansanalytik.com
-
-Korrespondensadressen används endast för skriftlig kommunikation och kundärenden. Den är inte en besöksadress.
-
-Fysisk post behandlas normalt inom 14 dagar från mottagande. För snabbare hantering rekommenderas e-post.
 
 ## Måste fyllas i före live
 
-- Lägg till faktisk Postbox24-adress.
 - Länka `Köpvillkor`, `Integritetspolicy` och `Cookiepolicy` i footer och checkout.
 - Lägg obligatoriska checkboxar i checkout för villkor, immediate delivery och e-postleverans.
 - Lägg separat frivillig checkbox för marknadsföring.

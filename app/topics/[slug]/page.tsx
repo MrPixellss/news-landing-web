@@ -27,6 +27,50 @@ const sectionLabels = new Map([
   ["scenario_map", "Scenarier"],
 ]);
 
+const repeatedSectionLabels = new RegExp(
+  `^(${Array.from(sectionLabels.values()).join("|")})\\s*[:.-]?\\s*`,
+  "i",
+);
+
+function uniqueAnalysisHighlights(
+  fullReportBody: string,
+  preview: string,
+  sections: NonNullable<Awaited<ReturnType<typeof getTopicReport>>>["topic"]["sections"],
+) {
+  const sectionText = sections
+    .flatMap((section) => [
+      section.body || "",
+      ...(Array.isArray(section.items) ? section.items : []),
+    ])
+    .join(" ");
+  const source = [fullReportBody, sectionText, preview].filter(Boolean).join("\n");
+  const candidates = source
+    .replace(/\s+/g, " ")
+    .split(/(?<=[.!?])\s+/)
+    .map((sentence) =>
+      normalizeSwedishCopy(sentence)
+        .replace(repeatedSectionLabels, "")
+        .replace(/^[-•]\s*/, "")
+        .trim(),
+    )
+    .map((sentence) =>
+      sentence.length > 260 ? `${sentence.slice(0, 257).trim()}...` : sentence,
+    )
+    .filter((sentence) => sentence.length >= 80);
+  const seen = new Set<string>();
+
+  return candidates
+    .filter((sentence) => {
+      const key = sentence.toLowerCase().replace(/[^a-zåäö0-9]+/gi, " ").trim();
+      if (!key || seen.has(key)) {
+        return false;
+      }
+      seen.add(key);
+      return true;
+    })
+    .slice(0, 4);
+}
+
 export default async function TopicPage({ params }: TopicPageProps) {
   const { slug } = await params;
   const topic = orderedTopics.find((item) => item.slug === slug);
@@ -68,27 +112,11 @@ export default async function TopicPage({ params }: TopicPageProps) {
   const lockedParagraphs = reportParagraphs.length
     ? reportParagraphs.slice(0, 4)
     : [preview];
-  const sectionSummaries = sections
-    .map((section, index) => {
-      const rawSummary = normalizeSwedishCopy(
-        [
-          section.body,
-          Array.isArray(section.items) ? section.items[0] : "",
-        ]
-          .filter(Boolean)
-          .join(" "),
-      );
-
-      return {
-        key: section.id || section.title || `section-${index}`,
-        title:
-          sectionLabels.get(section.id || "") ||
-          section.title ||
-          "Analysdel",
-        summary: shortPreview(rawSummary, 1),
-      };
-    })
-    .filter((section) => section.summary);
+  const lockedHighlights = uniqueAnalysisHighlights(
+    fullReportBody,
+    preview,
+    sections,
+  );
 
   return (
     <main className="min-h-screen bg-[#07090b] text-zinc-50">
@@ -139,27 +167,22 @@ export default async function TopicPage({ params }: TopicPageProps) {
             </p>
           </article>
 
-          {sectionSummaries.length ? (
+          {lockedHighlights.length ? (
             <article className="mt-5 border border-[#26313d] bg-[#0d1117] p-6 md:p-8">
               <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
                 I den låsta analysen
               </p>
               <div className="mt-5 space-y-4">
-                {sectionSummaries.map((section, index) => (
+                {lockedHighlights.map((highlight, index) => (
                   <div
-                    key={section.key}
+                    key={highlight}
                     className="grid gap-4 border-l-2 border-emerald-300/70 bg-[#0b0f14] p-4 sm:grid-cols-[42px_minmax(0,1fr)]"
                   >
                     <span className="font-mono text-sm font-bold text-emerald-300">
                       {String(index + 1).padStart(2, "0")}
                     </span>
-                    <span>
-                      <span className="block text-base font-black text-white">
-                        {section.title}
-                      </span>
-                      <span className="mt-2 block text-sm leading-6 text-[#a8b5c4]">
-                        {section.summary}
-                      </span>
+                    <span className="text-base leading-7 text-[#c7d1dd]">
+                      {highlight}
                     </span>
                   </div>
                 ))}

@@ -11,15 +11,9 @@ type Block =
   | { type: "p"; text: string }
   | { type: "ul"; items: string[] };
 
-function normalizeLegalText(text: string) {
-  return text
-    .replaceAll("[lägg till Postbox24-adress]", "[Postbox24-adress]")
-    .replaceAll("[lÃ¤gg till Postbox24-adress]", "[Postbox24-adress]");
-}
-
 function parseMarkdown(markdown: string) {
   const blocks: Block[] = [];
-  const lines = normalizeLegalText(markdown).split(/\r?\n/);
+  const lines = markdown.split(/\r?\n/);
   let paragraph: string[] = [];
   let list: string[] = [];
 

@@ -41,6 +41,13 @@ export default async function ThankYouPage({ searchParams }: ThankYouPageProps) 
             Kontrollera inkorgen. Om mejlet inte syns direkt, kontrollera även
             skräppost eller kampanjfliken.
           </p>
+          <p className="mt-4 text-base leading-7 text-[#c7d1dd]">
+            Vid frågor kontaktar du oss på{" "}
+            <a className="text-emerald-300" href="mailto:support@tvp-byra.se">
+              support@tvp-byra.se
+            </a>
+            .
+          </p>
         </div>
       </div>
     </main>

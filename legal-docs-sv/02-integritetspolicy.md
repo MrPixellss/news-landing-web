@@ -10,13 +10,8 @@ TVP Byrå driver tjänsten och är personuppgiftsansvarig för behandlingen av p
 
 TVP Byrå  
 Org.nr/personnummer: 960303-6618  
-Korrespondensadress: [lägg till Postbox24-adress]  
-E-post: info@tvp-byra.se  
+E-post: support@tvp-byra.se  
 Webbplats/tjänst: finansanalytik.com
-
-Korrespondensadressen används endast för skriftlig kommunikation och kundärenden. Den är inte en besöksadress.
-
-Fysisk post behandlas normalt inom 14 dagar från mottagande. För snabbare hantering av integritets- och supportärenden rekommenderar vi att du kontaktar oss via e-post.
 
 ## 2. Personuppgifter vi behandlar
 
@@ -58,7 +53,7 @@ Behandlingen sker med följande rättsliga grunder:
 
 Rapporter och serviceinformation som hör till ett köp eller en aktiv prenumeration skickas som en del av tjänsten.
 
-Marknadsföring via e-post skickas endast om du uttryckligen har samtyckt till det. Du kan när som helst återkalla ditt samtycke till marknadsföring genom avregistreringslänk eller genom att kontakta info@tvp-byra.se.
+Marknadsföring via e-post skickas endast om du uttryckligen har samtyckt till det. Du kan när som helst återkalla ditt samtycke till marknadsföring genom avregistreringslänk eller genom att kontakta support@tvp-byra.se.
 
 ## 6. Betalningar via Stripe
 
@@ -96,11 +91,9 @@ Enligt GDPR har du rätt att begära:
 - invändning mot viss behandling
 - återkallelse av samtycke
 
-Kontakta info@tvp-byra.se för att utöva dina rättigheter.
+Kontakta support@tvp-byra.se för att utöva dina rättigheter.
 
 Du har även rätt att lämna klagomål till Integritetsskyddsmyndigheten.
-
-Du kan även kontakta oss via korrespondensadressen ovan. Fysisk post behandlas normalt inom 14 dagar från mottagande, därför rekommenderas e-post för snabbare hantering.
 
 ## 10. Ändringar
 
