@@ -215,6 +215,22 @@ export default async function PaidReportPage({ params }: PaidReportPageProps) {
   }
 
   const reportDate = displayDate(data.date);
+  const reportType = data.access.report_type || "daily";
+  const reportTitle = normalizeSwedishCopy(data.report_title);
+  const heroTitle =
+    reportType === "weekly" || reportType === "monthly"
+      ? reportTitle || "Periodrapport + prognos"
+      : "Dagens analyspaket är upplåst";
+  const logoSubtitle =
+    reportType === "weekly"
+      ? "Veckorapport"
+      : reportType === "monthly"
+        ? "Månadsutsikt"
+        : "Daglig marknadsanalys";
+  const introFallback =
+    reportType === "weekly" || reportType === "monthly"
+      ? "Här finns periodrapporten för din månadsaccess, med samlad analys och prognos för alla områden."
+      : "Här finns hela dagens analys, byggd på primärkällor som har passerat kvalitetssil, ämnesstyrning och analytikerregler.";
   const primaryTopic =
     data.topics.find((topic) => topic.slug === data.access.primary_topic_slug) ??
     data.topics[0];
@@ -244,7 +260,7 @@ export default async function PaidReportPage({ params }: PaidReportPageProps) {
             <span>
               <span className="block text-lg font-bold leading-tight">Finansanalytik</span>
               <span className="mt-1 block text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
-                Daglig marknadsanalys
+                {logoSubtitle}
               </span>
             </span>
           </Link>
@@ -255,11 +271,11 @@ export default async function PaidReportPage({ params }: PaidReportPageProps) {
             {reportDate}
           </p>
           <h1 className="mt-5 max-w-5xl text-[44px] font-bold leading-[0.94] tracking-[-0.04em] sm:text-6xl lg:text-[76px]">
-            Dagens analyspaket är upplåst
+            {heroTitle}
           </h1>
           <p className="mt-6 max-w-4xl text-lg leading-8 text-[#c7d1dd]">
             {normalizeSwedishCopy(data.report_intro) ||
-              "Här finns hela dagens analys, byggd på primärkällor som har passerat kvalitetssil, ämnesstyrning och analytikerregler."}
+              introFallback}
           </p>
           <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <div className="border border-[#26313d] bg-[#0d1117] p-5">
@@ -299,8 +315,8 @@ export default async function PaidReportPage({ params }: PaidReportPageProps) {
                 </p>
                 <p className="mt-4 max-w-3xl text-base leading-7 text-[#c7d1dd]">
                   Få dagliga briefings med alla 10 analysområden direkt via
-                  e-post. Veckosammanfattning och månadsutsikt kopplas på när
-                  de publiceras.
+                  e-post. Veckosammanfattning och månadsutsikt ingår när de
+                  publiceras.
                 </p>
               </div>
               <div className="border border-[#26313d] bg-[#0b0f14] p-5">

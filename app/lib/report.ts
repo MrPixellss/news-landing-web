@@ -83,6 +83,7 @@ export type PaidReportResponse = {
   weekly_cta_enabled: boolean;
   access: {
     type: string;
+    report_type?: string;
     primary_topic_slug: string;
     primary_topic_name: string;
     topic_count: number;
