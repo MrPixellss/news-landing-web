@@ -4,6 +4,7 @@ export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as {
     topicSlug?: string;
     marketingOptIn?: boolean;
+    customerEmail?: string;
     customerCountry?: string;
     billingPostalCode?: string;
     returnPath?: string;
@@ -25,6 +26,7 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         topic_slug: topicSlug,
         marketing_opt_in: Boolean(body?.marketingOptIn),
+        customer_email: body?.customerEmail,
         customer_country: body?.customerCountry,
         billing_postal_code: body?.billingPostalCode,
         return_path: returnPath,

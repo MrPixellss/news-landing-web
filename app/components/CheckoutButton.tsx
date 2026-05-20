@@ -68,6 +68,17 @@ export function CheckoutButton({
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState("");
+  const [customerEmail, setCustomerEmail] = useState(() => {
+    if (typeof window === "undefined") {
+      return "";
+    }
+    try {
+      return window.localStorage.getItem("finansanalytik_checkout_email") || "";
+    } catch {
+      return "";
+    }
+  });
+  const [showCustomerEmailError, setShowCustomerEmailError] = useState(false);
   const [acceptedPurchaseConsent, setAcceptedPurchaseConsent] = useState(false);
   const [showPurchaseConsentError, setShowPurchaseConsentError] = useState(false);
   const [marketingOptIn, setMarketingOptIn] = useState(false);
@@ -78,6 +89,10 @@ export function CheckoutButton({
   const priceWithTax = `${displayPrice(priceLabel)}, moms ingår`;
   const visibleButtonLabel =
     buttonLabel || `Köp dagspass - ${displayPrice(priceLabel)}`;
+  const normalizedCustomerEmail = customerEmail.trim().toLowerCase();
+  const isCustomerEmailValid = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(
+    normalizedCustomerEmail,
+  );
 
   useEffect(() => {
     let isMounted = true;
@@ -103,12 +118,19 @@ export function CheckoutButton({
 
   function openModal() {
     setError("");
+    setShowCustomerEmailError(false);
     setShowPurchaseConsentError(false);
     setIsModalOpen(true);
   }
 
   async function startCheckout() {
     if (isLoading) {
+      return;
+    }
+
+    if (!isCustomerEmailValid) {
+      setShowCustomerEmailError(true);
+      setError("Ange en giltig e-postadress för leverans.");
       return;
     }
 
@@ -128,6 +150,7 @@ export function CheckoutButton({
         body: JSON.stringify({
           topicSlug,
           marketingOptIn,
+          customerEmail: normalizedCustomerEmail,
           customerCountry,
           billingPostalCode: billingPostalCode.trim(),
           returnPath: window.location.pathname + window.location.search,
@@ -140,6 +163,15 @@ export function CheckoutButton({
 
       if (!response.ok || !payload.checkout_url) {
         throw new Error(payload.error || "Betalningen kunde inte startas.");
+      }
+
+      try {
+        window.localStorage.setItem(
+          "finansanalytik_checkout_email",
+          normalizedCustomerEmail,
+        );
+      } catch {
+        // Do not block checkout if persistence is unavailable.
       }
 
       window.location.href = payload.checkout_url;
@@ -192,6 +224,44 @@ export function CheckoutButton({
             </div>
 
             <div className="mt-6 space-y-5">
+              <div
+                className={
+                  showCustomerEmailError
+                    ? "border border-red-300/70 bg-red-950/20 p-4"
+                    : ""
+                }
+              >
+                <label className="block text-sm font-bold text-[#d7e1eb]">
+                  E-post för leverans
+                  <input
+                    autoComplete="email"
+                    className={`mt-2 w-full border bg-[#0b0f14] px-3 py-3 text-sm text-[#d7e1eb] outline-none placeholder:text-[#596678] focus:border-emerald-300 ${
+                      showCustomerEmailError
+                        ? "border-red-300"
+                        : "border-[#26313d]"
+                    }`}
+                    onChange={(event) => {
+                      setCustomerEmail(event.target.value);
+                      if (showCustomerEmailError) {
+                        setShowCustomerEmailError(false);
+                        setError("");
+                      }
+                    }}
+                    placeholder="namn@exempel.se"
+                    type="email"
+                    value={customerEmail}
+                  />
+                  <span className="mt-2 block text-xs font-normal leading-5 text-[#8d9aaa]">
+                    Vi använder samma e-post hos Stripe och för rapportleverans.
+                  </span>
+                </label>
+                {showCustomerEmailError ? (
+                  <p className="mt-3 text-sm font-bold leading-6 text-red-300">
+                    Ange en giltig e-postadress för att fortsätta.
+                  </p>
+                ) : null}
+              </div>
+
               <div>
                 <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.24em] text-[#7f91a7]">
                   Skatteuppgifter
