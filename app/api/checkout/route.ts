@@ -3,15 +3,22 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as {
     topicSlug?: string;
+    product?: string;
     marketingOptIn?: boolean;
     customerEmail?: string;
     customerCountry?: string;
     billingPostalCode?: string;
+    returnPath?: string;
   } | null;
-  const topicSlug = body?.topicSlug?.trim();
+  const product = (body?.product || "day_pass").trim();
+  const topicSlug = body?.topicSlug?.trim() || "macro";
+  const returnPath =
+    body?.returnPath?.trim().startsWith("/") && !body.returnPath.trim().startsWith("//")
+      ? body.returnPath.trim()
+      : "/";
 
-  if (!topicSlug) {
-    return NextResponse.json({ error: "Saknat analysområde." }, { status: 400 });
+  if (!["day_pass", "monthly_access", "half_year_access"].includes(product)) {
+    return NextResponse.json({ error: "Okänd produkt." }, { status: 400 });
   }
 
   const baseUrl =
@@ -19,15 +26,21 @@ export async function POST(request: Request) {
     "https://financial-analyst-api-vjrq.onrender.com";
 
   try {
-    const response = await fetch(`${baseUrl}/api/payments/create-checkout-session`, {
+    const backendPath =
+      product === "monthly_access"
+        ? "/api/subscriptions/create-checkout-session"
+        : "/api/payments/create-checkout-session";
+    const response = await fetch(`${baseUrl}${backendPath}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         topic_slug: topicSlug,
+        product,
         marketing_opt_in: Boolean(body?.marketingOptIn),
         customer_email: body?.customerEmail,
         customer_country: body?.customerCountry,
         billing_postal_code: body?.billingPostalCode,
+        return_path: returnPath,
       }),
       cache: "no-store",
     });

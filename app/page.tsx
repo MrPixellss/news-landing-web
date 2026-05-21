@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CheckoutButton } from "./components/CheckoutButton";
 import { FreeReportForm } from "./components/FreeReportForm";
+import { PricingSection } from "./components/PricingSection";
 import {
   displayDate,
   getTodayTeaser,
@@ -254,59 +255,7 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section id="pricing" className="border-b border-[#1a222c] py-10">
-          <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
-            Priser
-          </p>
-          <h2 className="mt-2 text-3xl font-bold tracking-[-0.03em] md:text-4xl">
-            Börja gratis, uppgradera när analysen skapar värde
-          </h2>
-          <div className="mt-6 grid gap-4 lg:grid-cols-4">
-            <div className="border border-emerald-300/60 bg-[#0d1117] p-6">
-              <h3 className="text-2xl font-bold">Free</h3>
-              <p className="mt-2 text-3xl font-black">0 kr</p>
-              <p className="mt-4 text-sm leading-6 text-[#c7d1dd]">
-                1 gratis fullständig rapport via e-post.
-              </p>
-              <a
-                href="#gratis-rapport"
-                className="mt-6 block bg-emerald-300 px-4 py-3 text-center text-sm font-black text-[#06100c] transition hover:bg-emerald-200"
-              >
-                Få gratisrapport
-              </a>
-            </div>
-            <div className="border border-[#26313d] bg-[#0d1117] p-6">
-              <h3 className="text-2xl font-bold">Day Pass</h3>
-              <p className="mt-2 text-3xl font-black">49 kr</p>
-              <p className="mt-1 text-sm font-bold text-emerald-300">moms ingår</p>
-              <p className="mt-4 text-sm leading-6 text-[#c7d1dd]">
-                Dagens fullständiga analyspaket med 10 områden.
-              </p>
-            </div>
-            <div className="border border-[#26313d] bg-[#0d1117] p-6">
-              <h3 className="text-2xl font-bold">Monthly Access</h3>
-              <p className="mt-2 text-3xl font-black">249 kr/mån</p>
-              <p className="mt-1 text-sm font-bold text-emerald-300">moms ingår</p>
-              <p className="mt-4 text-sm leading-6 text-[#c7d1dd]">
-                Dagliga rapporter, veckosammanfattning och månadsutsikt med prognos.
-              </p>
-            </div>
-            <div className="border border-[#26313d] bg-[#0d1117] p-6">
-              <h3 className="text-2xl font-bold">Team</h3>
-              <p className="mt-2 text-3xl font-black">Kontakta oss</p>
-              <p className="mt-4 text-sm leading-6 text-[#c7d1dd]">
-                För företag, CFO:er, analytiker och mindre team som vill ha flera
-                mottagare, faktura och senare anpassad bevakning.
-              </p>
-              <Link
-                href="/kontakt"
-                className="mt-6 block border border-[#26313d] px-4 py-3 text-center text-sm font-black text-white transition hover:border-emerald-300 hover:text-emerald-300"
-              >
-                Kontakta oss
-              </Link>
-            </div>
-          </div>
-        </section>
+        <PricingSection primaryTopicSlug={primaryTopic.slug} />
       </div>
     </main>
   );

@@ -134,6 +134,7 @@ export function FreeReportForm({
 
       {message ? (
         <p
+          aria-live="polite"
           className={[
             "mt-4 border px-4 py-3 text-sm font-bold leading-6",
             status === "error"

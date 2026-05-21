@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 type CheckoutButtonProps = {
   topicSlug: string;
   priceLabel: string;
+  product?: "day_pass" | "monthly_access" | "half_year_access";
   productName?: string;
   buttonLabel?: string;
   description?: string;
@@ -59,6 +60,7 @@ function displayPrice(priceLabel: string) {
 export function CheckoutButton({
   topicSlug,
   priceLabel,
+  product = "day_pass",
   productName = "Dagspass",
   buttonLabel,
   description = "Du får dagens fullständiga briefing med alla 10 marknadsrapporter levererad via e-post.",
@@ -149,6 +151,7 @@ export function CheckoutButton({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           topicSlug,
+          product,
           marketingOptIn,
           customerEmail: normalizedCustomerEmail,
           customerCountry,
@@ -403,7 +406,7 @@ export function CheckoutButton({
             </div>
 
             {error ? (
-              <p className="mt-3 text-sm font-semibold leading-6 text-red-300">
+              <p aria-live="polite" className="mt-3 text-sm font-semibold leading-6 text-red-300">
                 {error}
               </p>
             ) : null}
