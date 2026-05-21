@@ -85,19 +85,17 @@ export default async function TopicPage({ params }: TopicPageProps) {
     getTopicReport(slug),
   ]);
   const block = data.blocks.find((item) => item.slug === slug);
-  const freshBlock = data.is_fresh !== false ? block : undefined;
-  const freshTopicReport = topicReport?.is_fresh !== false ? topicReport : null;
-  const reportTopic = freshTopicReport?.topic;
-  const hasContent = Boolean(reportTopic || freshBlock);
+  const latestTopicReport = topicReport?.topic ? topicReport : null;
+  const reportTopic = latestTopicReport?.topic;
+  const hasContent = Boolean(reportTopic || block);
   const reportDate = displayDate(
-    freshTopicReport?.date ||
-      (data.is_fresh !== false ? data.date : data.expected_date || data.date),
+    latestTopicReport?.date || data.date || data.expected_date,
   );
   const headline =
-    normalizeSwedishCopy(reportTopic?.headline || freshBlock?.headline) ||
+    normalizeSwedishCopy(reportTopic?.headline || block?.headline) ||
     "Analytiken för området bearbetas";
   const fullReportBody =
-    normalizeSwedishCopy(reportTopic?.full_report_body || freshBlock?.teaser) ||
+    normalizeSwedishCopy(reportTopic?.full_report_body || block?.teaser) ||
     "";
   const reportParagraphs = fullReportBody
     .split(/\n{2,}/)
@@ -105,7 +103,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
     .filter(Boolean);
   const sections = reportTopic?.sections || [];
   const previewSource = normalizeSwedishCopy(
-    reportTopic?.teaser || freshBlock?.teaser || fullReportBody,
+    reportTopic?.teaser || block?.teaser || fullReportBody,
   );
   const preview =
     shortPreview(previewSource, 3) ||

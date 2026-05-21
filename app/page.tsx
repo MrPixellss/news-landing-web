@@ -32,13 +32,15 @@ function teaserBullets(headline: string, teaser: string) {
 
 export default async function HomePage() {
   const data = await getTodayTeaser();
-  const hasFreshReport = data.is_fresh !== false && data.blocks.length > 0;
+  const hasBlocks = data.blocks.length > 0;
+  const hasFreshReport = data.is_fresh !== false && hasBlocks;
   const blocksBySlug = new Map(
-    hasFreshReport ? data.blocks.map((block) => [block.slug, block]) : [],
+    hasBlocks ? data.blocks.map((block) => [block.slug, block]) : [],
   );
   const reportDate = displayDate(
-    hasFreshReport ? data.date : data.expected_date || data.date,
+    hasBlocks ? data.date : data.expected_date || data.date,
   );
+  const reportLabel = hasFreshReport ? "Dagens rapport" : "Senaste briefing";
   const primaryTopic = orderedTopics[0];
 
   return (
@@ -74,7 +76,7 @@ export default async function HomePage() {
               {reportDate}
             </p>
             <h1 className="mt-5 max-w-5xl text-[44px] font-bold leading-[0.94] tracking-[-0.04em] sm:text-6xl lg:text-[82px]">
-              Få dagens finansiella analys gratis
+              Få en fullständig marknadsanalys gratis
             </h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-[#c7d1dd]">
               En komplett svensk marknadsbriefing med 10 analysområden, byggd
@@ -111,7 +113,7 @@ export default async function HomePage() {
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
               <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
-                Dagens rapport
+                {reportLabel}
               </p>
               <h2 className="mt-2 max-w-3xl text-3xl font-bold tracking-[-0.03em] md:text-4xl">
                 10 ämnen, varje ämne med teaser, teser och låst fullanalys
