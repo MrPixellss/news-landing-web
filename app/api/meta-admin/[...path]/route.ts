@@ -1,10 +1,22 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import {
+  getMetaAdminDashboardSecret,
+  isMetaAdminSessionTokenValid,
+  META_ADMIN_COOKIE,
+} from "../../../lib/adminDashboardAuth";
 
 type RouteContext = {
   params: Promise<{ path?: string[] }>;
 };
 
-async function forwardMetaAdminRequest(request: Request, context: RouteContext) {
+async function forwardMetaAdminRequest(request: NextRequest, context: RouteContext) {
+  const dashboardSecret = getMetaAdminDashboardSecret();
+  const sessionToken = request.cookies.get(META_ADMIN_COOKIE)?.value;
+
+  if (!isMetaAdminSessionTokenValid(sessionToken, dashboardSecret)) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
   const { path = [] } = await context.params;
   const adminKey = request.headers.get("x-admin-api-key")?.trim();
 
@@ -46,10 +58,10 @@ async function forwardMetaAdminRequest(request: Request, context: RouteContext) 
   }
 }
 
-export async function GET(request: Request, context: RouteContext) {
+export async function GET(request: NextRequest, context: RouteContext) {
   return forwardMetaAdminRequest(request, context);
 }
 
-export async function POST(request: Request, context: RouteContext) {
+export async function POST(request: NextRequest, context: RouteContext) {
   return forwardMetaAdminRequest(request, context);
 }

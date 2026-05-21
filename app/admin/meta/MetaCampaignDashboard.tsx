@@ -223,12 +223,22 @@ export function MetaCampaignDashboard() {
     <main className="min-h-screen bg-[#07090b] px-4 py-8 text-zinc-50 sm:px-6 lg:px-8">
       <section className="mx-auto max-w-[1440px]">
         <div className="border-b border-[#26313d] pb-6">
-          <p className="text-[11px] font-black uppercase tracking-[0.28em] text-emerald-300">
-            Intern admin
-          </p>
-          <h1 className="mt-3 text-4xl font-black tracking-[-0.03em] md:text-6xl">
-            Campaign Drafts
-          </h1>
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p className="text-[11px] font-black uppercase tracking-[0.28em] text-emerald-300">
+                Intern admin
+              </p>
+              <h1 className="mt-3 text-4xl font-black tracking-[-0.03em] md:text-6xl">
+                Campaign Drafts
+              </h1>
+            </div>
+            <a
+              className="border border-[#26313d] px-4 py-3 text-xs font-black uppercase tracking-[0.14em] text-[#d7e1eb]"
+              href="/admin/meta/logout"
+            >
+              Logga ut
+            </a>
+          </div>
           <p className="mt-4 max-w-4xl text-base leading-7 text-[#a8b5c4]">
             AI får bara skapa förslag. Meta-kampanjer skapas först efter approve
             och alltid i pausat läge. Publish kräver manuell bekräftelse.
