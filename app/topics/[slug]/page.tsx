@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CheckoutButton } from "../../components/CheckoutButton";
+import { FreeReportForm } from "../../components/FreeReportForm";
 import {
   displayDate,
   getTopicReport,
@@ -245,6 +246,16 @@ export default async function TopicPage({ params }: TopicPageProps) {
                   <p className="mt-2 text-xs font-bold uppercase tracking-[0.16em] text-emerald-300">
                     Moms ingår
                   </p>
+                  <div className="my-4 flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-[#7f91a7]">
+                    <span className="h-px flex-1 bg-[#26313d]" />
+                    <span>eller testa först</span>
+                    <span className="h-px flex-1 bg-[#26313d]" />
+                  </div>
+                  <FreeReportForm
+                    compact
+                    sourcePath={`/topics/${slug}`}
+                    topicSlug={slug}
+                  />
                   <p className="mt-3 text-sm leading-6 text-[#8d9aaa]">
                     Efter betalning skickas rapporten till e-postadressen du
                     anger hos Stripe.

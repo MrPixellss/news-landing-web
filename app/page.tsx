@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { CheckoutButton } from "./components/CheckoutButton";
+import { FreeReportForm } from "./components/FreeReportForm";
 import {
   displayDate,
   getTodayTeaser,
@@ -10,6 +12,24 @@ import {
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
+function teaserBullets(headline: string, teaser: string) {
+  const candidates = [headline, ...teaser.split(/(?<=[.!?])\s+/)]
+    .map((item) => normalizeSwedishCopy(item).replace(/\s+/g, " ").trim())
+    .filter((item) => item.length >= 28);
+  const seen = new Set<string>();
+
+  return candidates
+    .filter((item) => {
+      const key = item.toLowerCase();
+      if (seen.has(key)) {
+        return false;
+      }
+      seen.add(key);
+      return true;
+    })
+    .slice(0, 3);
+}
+
 export default async function HomePage() {
   const data = await getTodayTeaser();
   const hasFreshReport = data.is_fresh !== false && data.blocks.length > 0;
@@ -19,18 +39,12 @@ export default async function HomePage() {
   const reportDate = displayDate(
     hasFreshReport ? data.date : data.expected_date || data.date,
   );
-  const focusItems = orderedTopics
-    .map((topic) => ({
-      topic,
-      block: blocksBySlug.get(topic.slug),
-    }))
-    .filter((item) => item.block)
-    .slice(0, 3);
+  const primaryTopic = orderedTopics[0];
 
   return (
     <main className="min-h-screen bg-[#07090b] text-zinc-50">
       <div className="mx-auto max-w-[1440px] px-4 py-6 sm:px-6 lg:px-8">
-        <header className="flex items-center gap-3 border-b border-[#1a222c] pb-5">
+        <header className="flex items-center justify-between gap-4 border-b border-[#1a222c] pb-5">
           <Link
             href="/"
             className="flex items-center gap-3 transition hover:text-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-300/70"
@@ -46,112 +60,249 @@ export default async function HomePage() {
               </span>
             </span>
           </Link>
+          <a
+            href="#pricing"
+            className="hidden border border-[#26313d] px-4 py-3 text-sm font-bold text-[#d7e1eb] transition hover:border-emerald-300 hover:text-emerald-300 sm:inline-flex"
+          >
+            Priser
+          </a>
         </header>
 
-        <section className="border-b border-[#1a222c] py-10 md:py-14">
-          <p className="font-mono text-sm font-bold tracking-[0.28em] text-emerald-300">
-            {reportDate}
-          </p>
-          <h1 className="mt-5 max-w-5xl text-[44px] font-bold leading-[0.94] tracking-[-0.04em] sm:text-6xl lg:text-[82px]">
-            {hasFreshReport ? data.title : "Dagens analys förbereds"}
-          </h1>
-          <p className="mt-6 max-w-3xl text-lg leading-8 text-[#c7d1dd]">
-            {hasFreshReport
-              ? normalizeSwedishCopy(data.intro)
-              : "Analysen visas här när dagens primärkällor har passerat kvalitetssil, ämnesstyrning och analytikerregler."}
-          </p>
-        </section>
-
-        <section className="py-9">
+        <section className="grid gap-8 border-b border-[#1a222c] py-10 lg:grid-cols-[minmax(0,1fr)_460px] lg:items-center lg:py-14">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
-              I fokus idag
+            <p className="font-mono text-sm font-bold tracking-[0.28em] text-emerald-300">
+              {reportDate}
             </p>
-            <h2 className="mt-2 text-2xl font-bold tracking-[-0.02em]">
-              Dagens tre viktigaste områden
-            </h2>
+            <h1 className="mt-5 max-w-5xl text-[44px] font-bold leading-[0.94] tracking-[-0.04em] sm:text-6xl lg:text-[82px]">
+              Få dagens finansiella analys gratis
+            </h1>
+            <p className="mt-6 max-w-3xl text-lg leading-8 text-[#c7d1dd]">
+              En komplett svensk marknadsbriefing med 10 analysområden, byggd
+              på primärkällor, kvalitetssil och regelstyrd analytik. Inte
+              investeringsrådgivning.
+            </p>
+            <div className="mt-7 grid gap-3 sm:grid-cols-3">
+              {["Primärkällor sparas", "10 dagliga områden", "Moms ingår i priser"].map((item) => (
+                <div key={item} className="border border-[#26313d] bg-[#0d1117] p-4">
+                  <p className="text-sm font-black text-emerald-300">{item}</p>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div className="mt-5 grid gap-3 lg:grid-cols-3">
-            {(focusItems.length
-              ? focusItems
-              : orderedTopics.slice(0, 3).map((topic) => ({ topic, block: null }))
-            ).map(({ topic, block }, index) => (
-              <Link
-                key={topic.slug}
-                href={`/topics/${topic.slug}`}
-                className="grid min-h-[150px] grid-cols-[46px_1fr] gap-4 border border-[#26313d] bg-[#0d1117] p-5 transition hover:border-emerald-300/60 hover:bg-[#111820] focus:outline-none focus:ring-2 focus:ring-emerald-300/70"
-              >
-                <span
-                  className={[
-                    "grid size-[46px] place-items-center text-sm font-black text-[#06100c]",
-                    index === 0
-                      ? "bg-emerald-300"
-                      : index === 1
-                        ? "bg-sky-300"
-                        : "bg-[#e4c369]",
-                  ].join(" ")}
-                >
-                  {index + 1}
-                </span>
-                <span>
-                  <span className="block text-lg font-bold leading-snug">
-                    {normalizeSwedishCopy(block?.headline) || topic.name}
-                  </span>
-                  <span className="mt-3 block text-sm leading-6 text-[#a8b5c4]">
-                    {shortPreview(normalizeSwedishCopy(block?.teaser), 1) ||
-                      "Analysen publiceras när tillräckligt många signaler har passerat reglerna."}
-                  </span>
-                </span>
-              </Link>
-            ))}
+          <div id="gratis-rapport" className="border border-[#26313d] bg-[#0d1117] p-5 md:p-6">
+            <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
+              Gratis prov
+            </p>
+            <h2 className="mt-3 text-3xl font-bold tracking-[-0.03em]">
+              Få en fullständig rapport via e-post
+            </h2>
+            <p className="mt-3 text-base leading-7 text-[#c7d1dd]">
+              Ange e-post och godkänn utskick. Du får ett komplett dagligt
+              analyspaket en gång, plus möjlighet att avregistrera dig direkt.
+            </p>
+            <div className="mt-5">
+              <FreeReportForm sourcePath="/" topicSlug={primaryTopic.slug} />
+            </div>
           </div>
         </section>
 
-        <section className="pb-14">
-          <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
-              Analysområden
+        <section className="border-b border-[#1a222c] py-10">
+          <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
+                Dagens rapport
+              </p>
+              <h2 className="mt-2 max-w-3xl text-3xl font-bold tracking-[-0.03em] md:text-4xl">
+                10 ämnen, varje ämne med teaser, teser och låst fullanalys
+              </h2>
+            </div>
+            <p className="max-w-md text-sm leading-6 text-[#a8b5c4]">
+              Full rapport kan fås gratis en gång via e-post eller köpas som
+              dagspass för 49 kr.
             </p>
-            <h2 className="mt-2 text-2xl font-bold tracking-[-0.02em]">
-              Alla dagliga analysområden
-            </h2>
           </div>
 
-          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
             {orderedTopics.map((topic, index) => {
               const block = blocksBySlug.get(topic.slug);
               const headline =
                 normalizeSwedishCopy(block?.headline) ||
-                "Analytiken för området bearbetas";
+                "Dagens signaler sammanställs";
               const preview =
-                shortPreview(normalizeSwedishCopy(block?.teaser)) ||
-                "När signalerna är klara visas en kort förhandsvisning här.";
+                shortPreview(normalizeSwedishCopy(block?.teaser), 2) ||
+                "När dagens källor har passerat kvalitetssil visas ett kort utdrag ur analysen här.";
+              const bullets = teaserBullets(headline, preview);
 
               return (
-                <Link
+                <article
                   key={topic.slug}
-                  href={`/topics/${topic.slug}`}
-                  className="group flex min-h-[254px] flex-col border border-[#26313d] bg-[#0d1117] p-5 transition hover:-translate-y-0.5 hover:border-emerald-300/60 hover:bg-[#111820] focus:outline-none focus:ring-2 focus:ring-emerald-300/70"
+                  className="flex min-h-[420px] flex-col border border-[#26313d] bg-[#0d1117] p-5"
                 >
                   <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
                     Område {String(index + 1).padStart(2, "0")}
                   </p>
-                  <h3 className="mt-6 min-h-12 text-xl font-bold leading-tight tracking-[-0.02em]">
+                  <h3 className="mt-5 text-xl font-bold leading-tight tracking-[-0.02em]">
                     {topic.name}
                   </h3>
-                  <p className="mt-5 text-[15px] font-bold leading-6">
+                  <p className="mt-5 text-base font-black leading-6">
                     {headline}
                   </p>
-                  <p className="mt-3 line-clamp-3 text-sm leading-6 text-[#a8b5c4]">
+                  <ul className="mt-4 space-y-3">
+                    {bullets.map((item) => (
+                      <li
+                        key={item}
+                        className="border-l-2 border-emerald-300/70 pl-3 text-sm leading-6 text-[#c7d1dd]"
+                      >
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="mt-4 line-clamp-4 text-sm leading-6 text-[#a8b5c4]">
                     {preview}
                   </p>
-                  <p className="mt-auto pt-5 text-sm font-bold text-emerald-300 transition group-hover:text-emerald-200">
-                    Läs förhandsvisning →
-                  </p>
-                </Link>
+                  <div className="relative mt-5 h-20 overflow-hidden border border-[#1f2934] bg-[#0b0f14]">
+                    <div className="space-y-2 p-4 blur-[4px]">
+                      <p className="h-3 w-11/12 bg-[#314052]" />
+                      <p className="h-3 w-10/12 bg-[#314052]" />
+                      <p className="h-3 w-8/12 bg-[#314052]" />
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#0b0f14]" />
+                  </div>
+                  <div className="mt-auto grid gap-2 pt-5">
+                    <a
+                      href="#gratis-rapport"
+                      className="border border-emerald-300/70 px-4 py-3 text-center text-sm font-black text-emerald-300 transition hover:bg-emerald-300 hover:text-[#06100c]"
+                    >
+                      Få hela gratis
+                    </a>
+                    <CheckoutButton
+                      buttonClassName="w-full border border-[#26313d] bg-[#111820] px-4 py-3 text-sm font-black text-white transition hover:border-emerald-300 hover:text-emerald-300 disabled:cursor-wait disabled:opacity-70"
+                      buttonLabel="Köp dagspass - 49 kr"
+                      priceLabel="49 kr"
+                      topicSlug={topic.slug}
+                    />
+                    <Link
+                      href={`/topics/${topic.slug}`}
+                      className="text-center text-sm font-bold text-[#a8b5c4] transition hover:text-emerald-300"
+                    >
+                      Läs förhandsvisning →
+                    </Link>
+                  </div>
+                </article>
               );
             })}
+          </div>
+        </section>
+
+        <section className="grid gap-5 border-b border-[#1a222c] py-10 lg:grid-cols-3">
+          <div className="lg:col-span-1">
+            <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
+              För vem
+            </p>
+            <h2 className="mt-2 text-3xl font-bold tracking-[-0.03em]">
+              Byggt för marknadsöverblick, inte köp- eller säljsignaler
+            </h2>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2 lg:col-span-2">
+            {[
+              "Privata investerare som följer räntor, börs och risk.",
+              "Aktiva marknadsföljare som vill spara tid varje morgon.",
+              "Företagare och CFO:er som påverkas av makro, valuta och kredit.",
+              "Rådgivare och analytiker som behöver snabb marknadsöverblick.",
+            ].map((item) => (
+              <div key={item} className="border border-[#26313d] bg-[#0d1117] p-5">
+                <p className="text-base font-bold leading-7 text-[#d7e1eb]">{item}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="grid gap-5 border-b border-[#1a222c] py-10 lg:grid-cols-3">
+          <div className="border border-[#26313d] bg-[#0d1117] p-6">
+            <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
+              Källor
+            </p>
+            <h3 className="mt-3 text-2xl font-bold">Primärkällor först</h3>
+            <p className="mt-4 text-base leading-7 text-[#c7d1dd]">
+              Centralbanker, myndigheter, regulatorer, bolagsinformation och
+              sparade originalkällor prioriteras i analysflödet.
+            </p>
+          </div>
+          <div className="border border-[#26313d] bg-[#0d1117] p-6">
+            <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
+              Metodik
+            </p>
+            <h3 className="mt-3 text-2xl font-bold">Regelstyrd pipeline</h3>
+            <p className="mt-4 text-base leading-7 text-[#c7d1dd]">
+              Dokument passerar kvalitetssil, ämnesstyrning och analytikerregler
+              innan rapporten sammanställs.
+            </p>
+          </div>
+          <div className="border border-[#26313d] bg-[#0d1117] p-6">
+            <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
+              Viktigt
+            </p>
+            <h3 className="mt-3 text-2xl font-bold">Inte rådgivning</h3>
+            <p className="mt-4 text-base leading-7 text-[#c7d1dd]">
+              Finansanalytik är informations- och utbildningsmaterial. Det är
+              inte investeringsrådgivning eller en rekommendation att köpa eller
+              sälja tillgångar.
+            </p>
+          </div>
+        </section>
+
+        <section id="pricing" className="border-b border-[#1a222c] py-10">
+          <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
+            Priser
+          </p>
+          <h2 className="mt-2 text-3xl font-bold tracking-[-0.03em] md:text-4xl">
+            Börja gratis, uppgradera när analysen skapar värde
+          </h2>
+          <div className="mt-6 grid gap-4 lg:grid-cols-4">
+            <div className="border border-emerald-300/60 bg-[#0d1117] p-6">
+              <h3 className="text-2xl font-bold">Free</h3>
+              <p className="mt-2 text-3xl font-black">0 kr</p>
+              <p className="mt-4 text-sm leading-6 text-[#c7d1dd]">
+                1 gratis fullständig rapport via e-post.
+              </p>
+              <a
+                href="#gratis-rapport"
+                className="mt-6 block bg-emerald-300 px-4 py-3 text-center text-sm font-black text-[#06100c] transition hover:bg-emerald-200"
+              >
+                Få gratisrapport
+              </a>
+            </div>
+            <div className="border border-[#26313d] bg-[#0d1117] p-6">
+              <h3 className="text-2xl font-bold">Day Pass</h3>
+              <p className="mt-2 text-3xl font-black">49 kr</p>
+              <p className="mt-1 text-sm font-bold text-emerald-300">moms ingår</p>
+              <p className="mt-4 text-sm leading-6 text-[#c7d1dd]">
+                Dagens fullständiga analyspaket med 10 områden.
+              </p>
+            </div>
+            <div className="border border-[#26313d] bg-[#0d1117] p-6">
+              <h3 className="text-2xl font-bold">Monthly Access</h3>
+              <p className="mt-2 text-3xl font-black">249 kr/mån</p>
+              <p className="mt-1 text-sm font-bold text-emerald-300">moms ingår</p>
+              <p className="mt-4 text-sm leading-6 text-[#c7d1dd]">
+                Dagliga rapporter, veckosammanfattning och månadsutsikt med prognos.
+              </p>
+            </div>
+            <div className="border border-[#26313d] bg-[#0d1117] p-6">
+              <h3 className="text-2xl font-bold">Team</h3>
+              <p className="mt-2 text-3xl font-black">Kontakta oss</p>
+              <p className="mt-4 text-sm leading-6 text-[#c7d1dd]">
+                För företag, CFO:er, analytiker och mindre team som vill ha flera
+                mottagare, faktura och senare anpassad bevakning.
+              </p>
+              <Link
+                href="/kontakt"
+                className="mt-6 block border border-[#26313d] px-4 py-3 text-center text-sm font-black text-white transition hover:border-emerald-300 hover:text-emerald-300"
+              >
+                Kontakta oss
+              </Link>
+            </div>
           </div>
         </section>
       </div>
