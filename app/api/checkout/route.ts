@@ -1,4 +1,9 @@
 import { NextResponse } from "next/server";
+import {
+  isValidCheckoutEmail,
+  normalizeCheckoutEmail,
+  normalizeCheckoutTopicSlug,
+} from "../../lib/checkout";
 
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as {
@@ -11,7 +16,8 @@ export async function POST(request: Request) {
     returnPath?: string;
   } | null;
   const product = (body?.product || "day_pass").trim();
-  const topicSlug = body?.topicSlug?.trim() || "macro";
+  const topicSlug = normalizeCheckoutTopicSlug(body?.topicSlug);
+  const customerEmail = normalizeCheckoutEmail(body?.customerEmail);
   const returnPath =
     body?.returnPath?.trim().startsWith("/") && !body.returnPath.trim().startsWith("//")
       ? body.returnPath.trim()
@@ -19,6 +25,13 @@ export async function POST(request: Request) {
 
   if (!["day_pass", "monthly_access", "half_year_access"].includes(product)) {
     return NextResponse.json({ error: "Okänd produkt." }, { status: 400 });
+  }
+
+  if (!isValidCheckoutEmail(customerEmail)) {
+    return NextResponse.json(
+      { error: "Ange en giltig e-postadress för leverans." },
+      { status: 400 },
+    );
   }
 
   const baseUrl =
@@ -37,7 +50,7 @@ export async function POST(request: Request) {
         topic_slug: topicSlug,
         product,
         marketing_opt_in: Boolean(body?.marketingOptIn),
-        customer_email: body?.customerEmail,
+        customer_email: customerEmail,
         customer_country: body?.customerCountry,
         billing_postal_code: body?.billingPostalCode,
         return_path: returnPath,

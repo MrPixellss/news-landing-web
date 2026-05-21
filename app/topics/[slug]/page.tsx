@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CheckoutButton } from "../../components/CheckoutButton";
@@ -19,6 +20,90 @@ type TopicPageProps = {
     slug: string;
   }>;
 };
+
+const topicSeoDescriptions = new Map([
+  [
+    "macro",
+    "Daglig svensk makroanalys om inflation, tillväxt, konjunktur, räntespann och marknadens riskaptit.",
+  ],
+  [
+    "central-banks-rates",
+    "Analys av centralbanker, styrräntor, inflationssignaler och hur räntebanan påverkar svenska investerare.",
+  ],
+  [
+    "stocks",
+    "Daglig börsanalys om aktier, sektorer, vinstförväntningar, multiplar och marknadens viktigaste risksignaler.",
+  ],
+  [
+    "bonds",
+    "Analys av obligationsmarknad, kreditspreadar, duration, finansieringsrisk och räntedrivna marknadssignaler.",
+  ],
+  [
+    "fx",
+    "Daglig analys av valutor, växelkurser, kronan, euro, dollar och kapitalflöden som påverkar marknaden.",
+  ],
+  [
+    "commodities-energy",
+    "Analys av råvaror och energi med fokus på olja, gas, el, lagerdata, geopolitik och inflationspåverkan.",
+  ],
+  [
+    "crypto",
+    "Daglig analys av krypto och digitala tillgångar med fokus på riskaptit, reglering, likviditet och marknadssignaler.",
+  ],
+  [
+    "banking-credit",
+    "Analys av banker, kredit, bolåneräntor, utlåning, kapitalrisk och finansiell stabilitet.",
+  ],
+  [
+    "regulation-fincrime",
+    "Analys av finansiell reglering, tillsyn, penningtvätt, sanktionsrisk och regulatoriska beslut.",
+  ],
+  [
+    "geopolitics-risks",
+    "Analys av geopolitik, konflikter, handelsrisk, försörjningskedjor och hur riskbilden påverkar marknader.",
+  ],
+]);
+
+export async function generateMetadata({
+  params,
+}: TopicPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const topic = orderedTopics.find((item) => item.slug === slug);
+
+  if (!topic) {
+    return {
+      title: "Marknadsområde saknas",
+      description: "Det begärda marknadsområdet kunde inte hittas.",
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
+  }
+
+  const description =
+    topicSeoDescriptions.get(slug) ||
+    `Daglig svensk marknadsanalys inom ${topic.name.toLowerCase()} baserad på primärkällor, nyheter och regelstyrd analys.`;
+
+  return {
+    title: `${topic.name} - daglig analys`,
+    description,
+    alternates: {
+      canonical: `/topics/${slug}`,
+    },
+    openGraph: {
+      type: "article",
+      url: `/topics/${slug}`,
+      title: `${topic.name} - daglig analys`,
+      description,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${topic.name} - daglig analys`,
+      description,
+    },
+  };
+}
 
 const sectionLabels = new Map([
   ["executive_view", "Slutsats"],

@@ -1,4 +1,9 @@
 import { NextResponse } from "next/server";
+import {
+  isValidCheckoutEmail,
+  normalizeCheckoutEmail,
+  normalizeCheckoutTopicSlug,
+} from "../../lib/checkout";
 
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as {
@@ -9,11 +14,19 @@ export async function POST(request: Request) {
     billingPostalCode?: string;
     returnPath?: string;
   } | null;
-  const topicSlug = body?.topicSlug?.trim() || "macro";
+  const topicSlug = normalizeCheckoutTopicSlug(body?.topicSlug);
+  const customerEmail = normalizeCheckoutEmail(body?.customerEmail);
   const returnPath =
     body?.returnPath?.trim().startsWith("/") && !body.returnPath.trim().startsWith("//")
       ? body.returnPath.trim()
       : "/";
+
+  if (!isValidCheckoutEmail(customerEmail)) {
+    return NextResponse.json(
+      { error: "Ange en giltig e-postadress för leverans." },
+      { status: 400 },
+    );
+  }
 
   const baseUrl =
     process.env.NEXT_PUBLIC_API_BASE_URL ??
@@ -26,7 +39,7 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         topic_slug: topicSlug,
         marketing_opt_in: Boolean(body?.marketingOptIn),
-        customer_email: body?.customerEmail,
+        customer_email: customerEmail,
         customer_country: body?.customerCountry,
         billing_postal_code: body?.billingPostalCode,
         return_path: returnPath,

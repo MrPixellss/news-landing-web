@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { CheckoutButton } from "./components/CheckoutButton";
 import { FreeReportForm } from "./components/FreeReportForm";
@@ -12,6 +13,21 @@ import {
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
+
+export const metadata: Metadata = {
+  title: "AI-stödd daglig marknadsanalys",
+  description:
+    "Få en svensk morgonbrief med 10 marknadsområden, 3 gratis signaler via e-post och full dagsrapport med analys av primärkällor.",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    url: "/",
+    title: "Finansanalytik - AI-stödd daglig marknadsanalys",
+    description:
+      "Svenska morgonbriefs med makro, räntor, aktier, valutor, råvaror, kredit, krypto och geopolitisk risk.",
+  },
+};
 
 function teaserBullets(headline: string, teaser: string) {
   const candidates = [headline, ...teaser.split(/(?<=[.!?])\s+/)]
