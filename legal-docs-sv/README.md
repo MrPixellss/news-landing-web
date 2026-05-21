@@ -20,6 +20,7 @@ På webbplatsen används:
 
 TVP Byrå  
 Org.nr/personnummer: 960303-6618  
+Korrespondensadress: Box 4061, Hallonbergsplan 5-7, 174 52 Sundbyberg, Sverige  
 E-post: support@tvp-byra.se  
 Webbplats/tjänst: finansanalytik.com
 

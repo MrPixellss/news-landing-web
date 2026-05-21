@@ -10,6 +10,7 @@ TVP Byrå driver tjänsten och är personuppgiftsansvarig för behandlingen av p
 
 TVP Byrå  
 Org.nr/personnummer: 960303-6618  
+Korrespondensadress: Box 4061, Hallonbergsplan 5-7, 174 52 Sundbyberg, Sverige  
 E-post: support@tvp-byra.se  
 Webbplats/tjänst: finansanalytik.com
 
@@ -94,6 +95,8 @@ Enligt GDPR har du rätt att begära:
 Kontakta support@tvp-byra.se för att utöva dina rättigheter.
 
 Du har även rätt att lämna klagomål till Integritetsskyddsmyndigheten.
+
+Fysisk post till korrespondensadressen behandlas normalt inom 14 dagar från mottagande. För snabbare hantering rekommenderas e-post.
 
 ## 10. Ändringar
 

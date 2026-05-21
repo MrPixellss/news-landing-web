@@ -26,6 +26,10 @@ export default function KontaktPage() {
               <p className="font-bold text-white">TVP Byrå</p>
               <p>Org.nr/personnummer: 960303-6618</p>
               <p>
+                Korrespondensadress: Box 4061, Hallonbergsplan 5-7, 174 52
+                Sundbyberg, Sverige
+              </p>
+              <p>
                 E-post:{" "}
                 <a className="text-emerald-300" href="mailto:support@tvp-byra.se">
                   support@tvp-byra.se
@@ -41,6 +45,10 @@ export default function KontaktPage() {
                 support@tvp-byra.se
               </a>
               .
+            </p>
+            <p>
+              Fysisk post behandlas normalt inom 14 dagar från mottagande. För
+              snabbare hantering rekommenderas e-post.
             </p>
           </div>
 
