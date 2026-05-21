@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
+import { trackMetaEvent } from "../lib/tracking";
 
 type FreeReportFormProps = {
   topicSlug?: string;
@@ -80,6 +81,10 @@ export function FreeReportForm({
 
       setStatus("sent");
       setMessage(payload.message || "Rapporten har skickats till din e-postadress.");
+      trackMetaEvent("Lead", {
+        email: cleanEmail,
+        eventSourceUrl: window.location.href,
+      });
     } catch {
       setStatus("error");
       setMessage("Rapporten kunde inte skickas just nu.");

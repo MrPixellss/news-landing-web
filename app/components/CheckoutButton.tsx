@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { metaTrackingContext, trackMetaEvent } from "../lib/tracking";
 
 type CheckoutButtonProps = {
   topicSlug: string;
@@ -144,6 +145,7 @@ export function CheckoutButton({
 
     setIsLoading(true);
     setError("");
+    const tracking = metaTrackingContext("InitiateCheckout");
 
     try {
       const response = await fetch(checkoutPath, {
@@ -157,6 +159,7 @@ export function CheckoutButton({
           customerCountry,
           billingPostalCode: billingPostalCode.trim(),
           returnPath: window.location.pathname + window.location.search,
+          ...tracking,
         }),
       });
       const payload = (await response.json()) as {
@@ -176,6 +179,13 @@ export function CheckoutButton({
       } catch {
         // Do not block checkout if persistence is unavailable.
       }
+
+      trackMetaEvent("InitiateCheckout", {
+        email: normalizedCustomerEmail,
+        eventSourceUrl: window.location.href,
+        eventId: tracking.trackingEventId,
+        currency: "SEK",
+      });
 
       window.location.href = payload.checkout_url;
     } catch (err) {

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CheckoutButton } from "../../components/CheckoutButton";
 import { FreeReportForm } from "../../components/FreeReportForm";
+import { TrackingEvent } from "../../components/TrackingEvent";
 import {
   displayDate,
   getTopicReport,
@@ -204,6 +205,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
 
   return (
     <main className={`min-h-screen bg-[#07090b] text-zinc-50 ${hasContent ? "pb-28 md:pb-0" : ""}`}>
+      <TrackingEvent eventName="ViewContent" />
       <div className="mx-auto max-w-[1440px] px-4 py-6 sm:px-6 lg:px-8">
         <header className="flex items-center gap-3 border-b border-[#1a222c] pb-5">
           <Link

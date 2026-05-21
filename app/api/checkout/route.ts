@@ -14,6 +14,10 @@ export async function POST(request: Request) {
     customerCountry?: string;
     billingPostalCode?: string;
     returnPath?: string;
+    trackingMarketingConsent?: boolean;
+    trackingEventId?: string;
+    trackingFbp?: string;
+    trackingFbc?: string;
   } | null;
   const product = (body?.product || "day_pass").trim();
   const topicSlug = normalizeCheckoutTopicSlug(body?.topicSlug);
@@ -54,6 +58,10 @@ export async function POST(request: Request) {
         customer_country: body?.customerCountry,
         billing_postal_code: body?.billingPostalCode,
         return_path: returnPath,
+        tracking_marketing_consent: Boolean(body?.trackingMarketingConsent),
+        tracking_event_id: body?.trackingEventId,
+        tracking_fbp: body?.trackingFbp,
+        tracking_fbc: body?.trackingFbc,
       }),
       cache: "no-store",
     });
