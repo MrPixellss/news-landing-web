@@ -15,6 +15,7 @@ type TrackingOptions = {
   currency?: string;
   eventSourceUrl?: string;
   eventId?: string;
+  skipServer?: boolean;
 };
 
 type MetaTrackingContext = {
@@ -27,6 +28,7 @@ type MetaTrackingContext = {
 declare global {
   interface Window {
     fbq?: (...args: unknown[]) => void;
+    dataLayer?: unknown[];
   }
 }
 
@@ -106,12 +108,38 @@ export function trackMetaEvent(eventName: string, options: TrackingOptions = {})
     { eventID: id },
   );
 
-  fetch("/api/meta-event", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-    keepalive: true,
-  }).catch(() => {
-    // Tracking must never block the product flow.
-  });
+  if (!options.skipServer) {
+    fetch("/api/meta-event", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      keepalive: true,
+    }).catch(() => {
+      // Tracking must never block the product flow.
+    });
+  }
+}
+
+export function trackProductEvent(
+  eventName: string,
+  properties: Record<string, unknown> = {},
+) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const payload = {
+    event: eventName,
+    event_name: eventName,
+    page: window.location.pathname + window.location.search + window.location.hash,
+    timestamp: new Date().toISOString(),
+    ...properties,
+  };
+
+  window.dataLayer?.push(payload);
+  window.dispatchEvent(
+    new CustomEvent("finansanalytik:event", {
+      detail: payload,
+    }),
+  );
 }

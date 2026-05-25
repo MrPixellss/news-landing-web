@@ -8,6 +8,15 @@ export async function POST(request: Request) {
     consentVersion?: string;
     sourcePath?: string;
     topicSlug?: string;
+    utmSource?: string;
+    utmMedium?: string;
+    utmCampaign?: string;
+    utmContent?: string;
+    trackingMarketingConsent?: boolean;
+    trackingEventId?: string;
+    trackingFbp?: string;
+    trackingFbc?: string;
+    eventSourceUrl?: string;
   } | null;
 
   const baseUrl =
@@ -44,6 +53,15 @@ export async function POST(request: Request) {
         consent_version: body?.consentVersion,
         source_path: body?.sourcePath,
         topic_slug: body?.topicSlug,
+        utm_source: body?.utmSource,
+        utm_medium: body?.utmMedium,
+        utm_campaign: body?.utmCampaign,
+        utm_content: body?.utmContent,
+        tracking_marketing_consent: Boolean(body?.trackingMarketingConsent),
+        tracking_event_id: body?.trackingEventId,
+        tracking_fbp: body?.trackingFbp,
+        tracking_fbc: body?.trackingFbc,
+        event_source_url: body?.eventSourceUrl,
       }),
       cache: "no-store",
     });

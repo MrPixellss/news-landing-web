@@ -103,8 +103,8 @@ export function MetaCampaignDashboard() {
   const [status, setStatus] = useState<Record<string, unknown> | null>(null);
   const [drafts, setDrafts] = useState<MetaDraft[]>([]);
   const [leads, setLeads] = useState<MetaLead[]>([]);
-  const [budget, setBudget] = useState(150);
-  const [duration, setDuration] = useState(7);
+  const [budget, setBudget] = useState(100);
+  const [duration, setDuration] = useState(3);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -451,7 +451,7 @@ export function MetaCampaignDashboard() {
                           }}
                           type="button"
                         >
-                          Publish
+                          Publish after owner approval
                         </button>
                         <button
                           className="border border-[#26313d] px-4 py-3 text-xs font-black text-[#d7e1eb] disabled:opacity-50"

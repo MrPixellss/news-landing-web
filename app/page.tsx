@@ -93,15 +93,20 @@ export default async function HomePage() {
               {reportDate}
             </p>
             <h1 className="mt-5 max-w-5xl text-[44px] font-bold leading-[0.94] tracking-[-0.04em] sm:text-6xl lg:text-[82px]">
-              Få en fullständig marknadsanalys gratis
+              Få dagens marknadsbild gratis
             </h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-[#c7d1dd]">
-              En komplett svensk marknadsbriefing med 10 analysområden, byggd
-              på primärkällor, kvalitetssil och regelstyrd analytik. Inte
-              investeringsrådgivning.
+              En komplett svensk marknadsbrief med 10 analysområden, byggd på
+              primärkällor och daglig data. Skickas direkt till din e-post.
             </p>
-            <div className="mt-7 grid gap-3 sm:grid-cols-3">
-              {["Primärkällor sparas", "10 dagliga områden", "Moms ingår i priser"].map((item) => (
+            <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {[
+                "10 områden i en samlad rapport",
+                "Makro, ränta, börs, valutor, råvaror och riskbild",
+                "Byggd på nyheter, offentliga källor och primärdata",
+                "Inte investeringsrådgivning",
+                "1 gratisrapport per e-postadress",
+              ].map((item) => (
                 <div key={item} className="border border-[#26313d] bg-[#0d1117] p-4">
                   <p className="text-sm font-black text-emerald-300">{item}</p>
                 </div>
@@ -111,14 +116,14 @@ export default async function HomePage() {
 
           <div id="gratis-rapport" className="border border-[#26313d] bg-[#0d1117] p-5 md:p-6">
             <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
-              Gratis prov
+              Gratisrapport
             </p>
             <h2 className="mt-3 text-3xl font-bold tracking-[-0.03em]">
-              Få en fullständig rapport via e-post
+              Få dagens marknadsbild gratis
             </h2>
             <p className="mt-3 text-base leading-7 text-[#c7d1dd]">
-              Ange e-post och godkänn utskick. Du får ett komplett dagligt
-              analyspaket en gång, plus möjlighet att avregistrera dig direkt.
+              Ange e-post och godkänn utskick. Rapporten skickas direkt och
+              innehåller dagens samlade marknadsbild med 10 analysområden.
             </p>
             <div className="mt-5">
               <FreeReportForm sourcePath="/" topicSlug={primaryTopic.slug} />
