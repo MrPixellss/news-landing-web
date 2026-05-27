@@ -1,0 +1,163 @@
+GOOGLE SEARCH TEST G1 - FINANSANALYTIK
+
+Статус: подготовлено после апрува, не запущено.
+Цель: получить бесплатные регистрации на gratisrapport из Google Search.
+Позиционирование: Finansanalytik - svensk marknadsbrief / analysmedia, не инвестиционный советник.
+
+1. Что запускаем
+
+Тип кампании:
+- Google Search only.
+- Без Display Network.
+- Без Performance Max на первом тесте.
+
+Гео:
+- Sweden.
+
+Язык:
+- Swedish.
+
+Бюджет:
+- 300-500 kr общий тестовый бюджет.
+- Рекомендация старта: 100 kr/day на 3-5 дней.
+
+Страница:
+- https://finansanalytik.com/?utm_source=google&utm_medium=paid_search&utm_campaign=google_search_g1_gratisrapport&utm_content={creative}#gratis-rapport
+
+Главная конверсия:
+- Успешная бесплатная регистрация на отчет.
+
+2. Трекинг перед запуском
+
+В Vercel должны быть добавлены:
+- NEXT_PUBLIC_GOOGLE_ADS_ID=AW-XXXXXXXXXX
+- NEXT_PUBLIC_GOOGLE_ADS_LEAD_CONVERSION_LABEL=conversion_label_from_google_ads
+
+Сайт уже умеет:
+- грузить Google tag только после cookie consent;
+- отправлять Google Ads conversion после успешной бесплатной регистрации;
+- сохранять UTM в backend через free-report flow.
+
+Не запускать Google Search без conversion label, иначе Google будет оптимизироваться по кликам, а не по email-заявкам.
+
+3. Структура кампании
+
+Campaign name:
+- Finansanalytik - Gratisrapport - Google Search - SE - G1
+
+Ad group 1:
+- Marknadsbrief / marknadsrapport
+
+Ключевые слова, phrase match:
+- "marknadsanalys"
+- "marknadsrapport"
+- "marknadsbrev"
+- "morgonbrief"
+- "marknadsöverblick"
+- "marknadsläge idag"
+- "ekonominyheter"
+- "makroanalys"
+- "börsnyheter"
+- "finansiellt nyhetsbrev"
+
+Ключевые слова, exact match:
+- [marknadsanalys]
+- [marknadsrapport]
+- [morgonbrief]
+- [marknadsöverblick]
+- [marknadsläge idag]
+
+Минус-слова:
+- aktietips
+- köpa aktier
+- sälja aktier
+- trading
+- trading signaler
+- investeringsrådgivning
+- finansiell rådgivning
+- personlig rådgivning
+- garanterad avkastning
+- bli rik
+- crypto
+- kryptovaluta
+- bitcoin
+- lån
+- privatlån
+- skulder
+- casino
+- forex trading
+
+4. Объявления
+
+Responsive Search Ad 1 - Gratisrapport
+
+Headlines:
+- Få dagens marknadsbild gratis
+- Svensk marknadsbrief via e-post
+- 10 analysområden i en rapport
+- Daglig marknadsanalys
+- Finansanalytik
+- Makro, ränta, börs och riskbild
+- Marknadsöverblick för Sverige
+
+Descriptions:
+- Få en kort svensk marknadsbrief med 10 analysområden. Skickas direkt till din e-post.
+- Finansanalytik samlar dagens marknadsbild i en strukturerad rapport. Inte investeringsrådgivning.
+- För dig som följer ekonomi i jobbet och vill få en snabb överblick utan att läsa 10 källor.
+
+Final URL:
+- https://finansanalytik.com/?utm_source=google&utm_medium=paid_search&utm_campaign=google_search_g1_gratisrapport&utm_content=gratisrapport#gratis-rapport
+
+Responsive Search Ad 2 - Problem/Solution
+
+Headlines:
+- Slipp samla marknaden själv
+- En morgonbrief för marknaden
+- Få marknadsläget på ett ställe
+- Svensk analysbrief varje dag
+- Kort rapport via e-post
+- 10 områden i samma brief
+- Marknadsöverblick utan brus
+
+Descriptions:
+- Makro, ränta, börs, valutor, råvaror och riskbild samlat i en svensk morgonbrief.
+- Prova Finansanalytik med en gratisrapport. Byggt som analysmedia, inte personlig rådgivning.
+- Få dagens samlade marknadsbild och avgör själv om full rapport är värd att läsa.
+
+Final URL:
+- https://finansanalytik.com/?utm_source=google&utm_medium=paid_search&utm_campaign=google_search_g1_gratisrapport&utm_content=problem_solution#gratis-rapport
+
+5. Compliance
+
+Нельзя использовать:
+- обещание дохода;
+- "köp/sälj";
+- "signaler";
+- "slå marknaden";
+- "bli rik";
+- персональные советы;
+- заявления, что сервис помогает принимать инвестиционные решения.
+
+Можно использовать:
+- analysmedia;
+- marknadsbrief;
+- marknadsöverblick;
+- dagens marknadsbild;
+- 10 analysområden;
+- inte investeringsrådgivning.
+
+6. Правило оценки
+
+Первые 100-150 kr:
+- если есть клики, но нет регистраций, проверяем страницу и поисковые запросы;
+- если клики дорогие и нерелевантные, режем ключи и добавляем минус-слова;
+- если есть регистрация дешевле Meta Test 1, продолжаем еще 2-3 дня.
+
+Минимальный успех:
+- цена email-регистрации ниже 110 kr.
+
+Хороший результат:
+- цена email-регистрации 40-80 kr.
+
+Отличный результат:
+- цена email-регистрации ниже 40 kr.

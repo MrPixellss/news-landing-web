@@ -28,6 +28,7 @@ type MetaTrackingContext = {
 declare global {
   interface Window {
     fbq?: (...args: unknown[]) => void;
+    gtag?: (...args: unknown[]) => void;
     dataLayer?: unknown[];
   }
 }
@@ -118,6 +119,25 @@ export function trackMetaEvent(eventName: string, options: TrackingOptions = {})
       // Tracking must never block the product flow.
     });
   }
+}
+
+export function trackGoogleAdsLeadConversion(options: Pick<TrackingOptions, "eventId"> = {}) {
+  if (typeof window === "undefined" || !marketingConsentGranted()) {
+    return;
+  }
+
+  const googleAdsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
+  const leadConversionLabel = process.env.NEXT_PUBLIC_GOOGLE_ADS_LEAD_CONVERSION_LABEL;
+  if (!googleAdsId || !leadConversionLabel) {
+    return;
+  }
+
+  window.gtag?.("event", "conversion", {
+    send_to: `${googleAdsId}/${leadConversionLabel}`,
+    value: 1,
+    currency: "SEK",
+    transaction_id: options.eventId || eventId("google_ads_lead"),
+  });
 }
 
 export function trackProductEvent(

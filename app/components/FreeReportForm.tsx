@@ -3,7 +3,12 @@
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import { CheckoutButton } from "./CheckoutButton";
-import { metaTrackingContext, trackMetaEvent, trackProductEvent } from "../lib/tracking";
+import {
+  metaTrackingContext,
+  trackGoogleAdsLeadConversion,
+  trackMetaEvent,
+  trackProductEvent,
+} from "../lib/tracking";
 
 type FreeReportFormProps = {
   topicSlug?: string;
@@ -151,6 +156,9 @@ export function FreeReportForm({
         eventSourceUrl,
         eventId: tracking.trackingEventId,
         skipServer: true,
+      });
+      trackGoogleAdsLeadConversion({
+        eventId: tracking.trackingEventId,
       });
     } catch {
       setStatus("error");
