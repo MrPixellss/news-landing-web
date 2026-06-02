@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 type MetaAd = {
   angle?: string;
@@ -49,18 +49,14 @@ type MetaLead = {
   created_at?: string;
 };
 
-const ADMIN_KEY_STORAGE = "finansanalytik_admin_api_key";
-
 async function apiRequest<T>(
   path: string,
-  adminKey: string,
   options: RequestInit = {},
 ): Promise<T> {
   const response = await fetch(`/api/meta-admin${path}`, {
     ...options,
     headers: {
       "Content-Type": "application/json",
-      "X-Admin-API-Key": adminKey,
       ...(options.headers || {}),
     },
     cache: "no-store",
@@ -99,7 +95,6 @@ function StatusBadge({ status }: { status?: string }) {
 }
 
 export function MetaCampaignDashboard() {
-  const [adminKey, setAdminKey] = useState("");
   const [status, setStatus] = useState<Record<string, unknown> | null>(null);
   const [drafts, setDrafts] = useState<MetaDraft[]>([]);
   const [leads, setLeads] = useState<MetaLead[]>([]);
@@ -110,30 +105,18 @@ export function MetaCampaignDashboard() {
   const [isLoading, setIsLoading] = useState(false);
   const [performanceByDraft, setPerformanceByDraft] = useState<Record<number, unknown>>({});
 
-  const canUse = useMemo(() => adminKey.trim().length > 0, [adminKey]);
-
   useEffect(() => {
-    const timer = window.setTimeout(() => {
-      try {
-        setAdminKey(window.localStorage.getItem(ADMIN_KEY_STORAGE) || "");
-      } catch {
-        setAdminKey("");
-      }
-    }, 0);
-    return () => window.clearTimeout(timer);
+    refresh();
   }, []);
 
-  async function refresh(nextKey = adminKey) {
-    if (!nextKey.trim()) {
-      return;
-    }
+  async function refresh() {
     setIsLoading(true);
     setError("");
     try {
       const [statusPayload, draftPayload, leadPayload] = await Promise.all([
-        apiRequest<Record<string, unknown>>("/meta/admin/status", nextKey),
-        apiRequest<MetaDraft[]>("/meta/campaign-drafts", nextKey),
-        apiRequest<MetaLead[]>("/meta/leads", nextKey),
+        apiRequest<Record<string, unknown>>("/meta/admin/status"),
+        apiRequest<MetaDraft[]>("/meta/campaign-drafts"),
+        apiRequest<MetaLead[]>("/meta/leads"),
       ]);
       setStatus(statusPayload);
       setDrafts(draftPayload);
@@ -146,25 +129,12 @@ export function MetaCampaignDashboard() {
     }
   }
 
-  function saveKey() {
-    try {
-      window.localStorage.setItem(ADMIN_KEY_STORAGE, adminKey.trim());
-    } catch {
-      // Do not block admin work if local storage is unavailable.
-    }
-    refresh(adminKey.trim());
-  }
-
   async function createDraft(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!canUse) {
-      setError("Ange admin key först.");
-      return;
-    }
     setIsLoading(true);
     setError("");
     try {
-      await apiRequest<MetaDraft>("/meta/campaign-drafts", adminKey, {
+      await apiRequest<MetaDraft>("/meta/campaign-drafts", {
         method: "POST",
         body: JSON.stringify({
           goal: "lead_generation",
@@ -189,7 +159,7 @@ export function MetaCampaignDashboard() {
     setIsLoading(true);
     setError("");
     try {
-      await apiRequest(path, adminKey, {
+      await apiRequest(path, {
         method: "POST",
         body: JSON.stringify(body),
       });
@@ -208,7 +178,6 @@ export function MetaCampaignDashboard() {
     try {
       const payload = await apiRequest<Record<string, unknown>>(
         `/meta/campaign-drafts/${draftId}/performance`,
-        adminKey,
       );
       setPerformanceByDraft((current) => ({ ...current, [draftId]: payload }));
       setMessage("Performance hämtad.");
@@ -245,35 +214,18 @@ export function MetaCampaignDashboard() {
           </p>
         </div>
 
-        <div className="mt-6 grid gap-4 border border-[#26313d] bg-[#0d1117] p-4 lg:grid-cols-[minmax(0,1fr)_auto]">
-          <label className="block text-sm font-bold text-[#d7e1eb]">
-            Admin API key
-            <input
-              className="mt-2 w-full border border-[#26313d] bg-[#07090b] px-3 py-3 text-sm text-white outline-none focus:border-emerald-300"
-              onChange={(event) => setAdminKey(event.target.value)}
-              placeholder="Klistra in admin key"
-              type="password"
-              value={adminKey}
-            />
-          </label>
-          <div className="flex items-end gap-2">
-            <button
-              className="bg-emerald-300 px-5 py-3 text-sm font-black text-[#06100c] disabled:opacity-60"
-              disabled={isLoading || !canUse}
-              onClick={saveKey}
-              type="button"
-            >
-              Spara och ladda
-            </button>
-            <button
-              className="border border-[#26313d] px-5 py-3 text-sm font-black text-[#d7e1eb] disabled:opacity-60"
-              disabled={isLoading || !canUse}
-              onClick={() => refresh()}
-              type="button"
-            >
-              Uppdatera
-            </button>
-          </div>
+        <div className="mt-6 flex flex-col gap-4 border border-[#26313d] bg-[#0d1117] p-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm leading-6 text-[#c7d1dd]">
+            Adminåtkomst körs via server-session. Backend-nyckeln finns bara i servermiljön och sparas inte i webbläsaren.
+          </p>
+          <button
+            className="border border-[#26313d] px-5 py-3 text-sm font-black text-[#d7e1eb] disabled:opacity-60"
+            disabled={isLoading}
+            onClick={() => refresh()}
+            type="button"
+          >
+            Uppdatera
+          </button>
         </div>
 
         {message ? (
@@ -323,7 +275,7 @@ export function MetaCampaignDashboard() {
               </div>
               <button
                 className="mt-5 w-full bg-emerald-300 px-5 py-4 text-sm font-black text-[#06100c] disabled:opacity-60"
-                disabled={isLoading || !canUse}
+                disabled={isLoading}
                 type="submit"
               >
                 Skapa draft

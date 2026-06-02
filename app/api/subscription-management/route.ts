@@ -45,6 +45,8 @@ export async function POST(request: Request) {
     action?: string;
     token?: string;
     email?: string;
+    turnstileToken?: string;
+    companyWebsite?: string;
   } | null;
   const action = (body?.action || "").trim();
 
@@ -58,7 +60,11 @@ export async function POST(request: Request) {
       const response = await fetch(`${API_BASE_URL}/api/subscriptions/manage/request-link`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({
+          email,
+          turnstile_token: body?.turnstileToken,
+          honeypot: body?.companyWebsite,
+        }),
         cache: "no-store",
       });
       const payload = await response.json().catch(() => ({}));

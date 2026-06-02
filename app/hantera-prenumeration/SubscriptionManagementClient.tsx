@@ -2,6 +2,12 @@
 
 import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import {
+  isTurnstileEnabled,
+  readTurnstileToken,
+  resetTurnstile,
+  TurnstileField,
+} from "../components/TurnstileField";
 
 type SubscriptionPayload = {
   product_name: string;
@@ -119,15 +125,30 @@ export default function SubscriptionManagementClient({ token }: { token: string 
 
   async function requestLink(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const companyWebsite = String(formData.get("companyWebsite") || "").trim();
+    const turnstileToken = readTurnstileToken(form);
     setSubmitting(true);
     setRequestMessage("");
     setError("");
+
+    if (isTurnstileEnabled() && !turnstileToken) {
+      setSubmitting(false);
+      setError("BekrÃ¤fta sÃ¤kerhetskontrollen fÃ¶r att fortsÃ¤tta.");
+      return;
+    }
 
     try {
       const response = await fetch("/api/subscription-management", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "request_link", email }),
+        body: JSON.stringify({
+          action: "request_link",
+          email,
+          turnstileToken,
+          companyWebsite,
+        }),
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) {
@@ -138,6 +159,7 @@ export default function SubscriptionManagementClient({ token }: { token: string 
           "Om en aktiv prenumeration finns för den angivna e-postadressen skickar vi en säker länk.",
       );
     } catch (cause) {
+      resetTurnstile();
       setError(cause instanceof Error ? cause.message : "Länken kunde inte skickas.");
     } finally {
       setSubmitting(false);
@@ -318,6 +340,14 @@ export default function SubscriptionManagementClient({ token }: { token: string 
               </p>
               <form onSubmit={requestLink} className="mt-6 grid gap-3 sm:grid-cols-[1fr_auto]">
                 <input
+                  aria-hidden="true"
+                  autoComplete="off"
+                  className="hidden"
+                  name="companyWebsite"
+                  tabIndex={-1}
+                  type="text"
+                />
+                <input
                   type="email"
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
@@ -332,6 +362,9 @@ export default function SubscriptionManagementClient({ token }: { token: string 
                 >
                   Skicka länk
                 </button>
+                <div className="sm:col-span-2">
+                  <TurnstileField />
+                </div>
               </form>
               {requestMessage ? (
                 <p className="mt-4 text-base leading-7 text-emerald-300">{requestMessage}</p>

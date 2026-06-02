@@ -18,17 +18,25 @@ async function forwardMetaAdminRequest(request: NextRequest, context: RouteConte
   }
 
   const { path = [] } = await context.params;
-  const adminKey = request.headers.get("x-admin-api-key")?.trim();
+  const backendPath = path.join("/");
+  const isAllowedPath = path[0] === "meta" || backendPath === "ai/meta/propose-creatives";
+  if (!isAllowedPath) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
 
+  const adminKey =
+    process.env.BACKEND_ADMIN_API_KEY?.trim() ||
+    process.env.ADMIN_API_KEY?.trim() ||
+    "";
   if (!adminKey) {
-    return NextResponse.json({ error: "Admin API key saknas." }, { status: 401 });
+    return NextResponse.json({ error: "Backend admin key saknas i servermiljÃ¶n." }, { status: 503 });
   }
 
   const baseUrl =
     process.env.NEXT_PUBLIC_API_BASE_URL ??
     "https://financial-analyst-api-vjrq.onrender.com";
   const sourceUrl = new URL(request.url);
-  const targetUrl = `${baseUrl.replace(/\/$/, "")}/api/${path.join("/")}${sourceUrl.search}`;
+  const targetUrl = `${baseUrl.replace(/\/$/, "")}/api/${backendPath}${sourceUrl.search}`;
   const method = request.method.toUpperCase();
   const body = method === "GET" || method === "HEAD" ? undefined : await request.text();
   const contentType = request.headers.get("content-type") || "application/json";

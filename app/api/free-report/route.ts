@@ -17,6 +17,8 @@ export async function POST(request: Request) {
     trackingFbp?: string;
     trackingFbc?: string;
     eventSourceUrl?: string;
+    turnstileToken?: string;
+    companyWebsite?: string;
   } | null;
 
   const baseUrl =
@@ -62,6 +64,8 @@ export async function POST(request: Request) {
         tracking_fbp: body?.trackingFbp,
         tracking_fbc: body?.trackingFbc,
         event_source_url: body?.eventSourceUrl,
+        turnstile_token: body?.turnstileToken,
+        honeypot: body?.companyWebsite,
       }),
       cache: "no-store",
     });

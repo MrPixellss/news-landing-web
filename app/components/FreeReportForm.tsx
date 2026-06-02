@@ -9,6 +9,12 @@ import {
   trackMetaEvent,
   trackProductEvent,
 } from "../lib/tracking";
+import {
+  isTurnstileEnabled,
+  readTurnstileToken,
+  resetTurnstile,
+  TurnstileField,
+} from "./TurnstileField";
 
 type FreeReportFormProps = {
   topicSlug?: string;
@@ -65,8 +71,12 @@ export function FreeReportForm({
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
     const cleanEmail = email.trim().toLowerCase();
     const activeSourcePath = currentSourcePath(sourcePath);
+    const companyWebsite = String(formData.get("companyWebsite") || "").trim();
+    const turnstileToken = readTurnstileToken(form);
 
     if (!validEmail(cleanEmail)) {
       setStatus("error");
@@ -84,6 +94,17 @@ export function FreeReportForm({
       setMessage("Du behöver godkänna e-postsamtycket för att få gratisrapporten.");
       trackProductEvent("free_report_submit_error", {
         reason: "missing_consent",
+        topic_slug: topicSlug,
+        source_path: activeSourcePath,
+      });
+      return;
+    }
+
+    if (isTurnstileEnabled() && !turnstileToken) {
+      setStatus("error");
+      setMessage("BekrÃ¤fta sÃ¤kerhetskontrollen fÃ¶r att fortsÃ¤tta.");
+      trackProductEvent("free_report_submit_error", {
+        reason: "missing_turnstile",
         topic_slug: topicSlug,
         source_path: activeSourcePath,
       });
@@ -109,6 +130,8 @@ export function FreeReportForm({
           ...readUtmParams(),
           ...tracking,
           eventSourceUrl,
+          turnstileToken,
+          companyWebsite,
         }),
       });
       const payload = (await response.json().catch(() => ({}))) as {
@@ -121,6 +144,7 @@ export function FreeReportForm({
       if (!response.ok) {
         setStatus("error");
         setMessage(payload.error || "Rapporten kunde inte skickas just nu.");
+        resetTurnstile();
         trackProductEvent("free_report_submit_error", {
           reason: payload.error || "backend_error",
           topic_slug: topicSlug,
@@ -163,6 +187,7 @@ export function FreeReportForm({
     } catch {
       setStatus("error");
       setMessage("Rapporten kunde inte skickas just nu.");
+      resetTurnstile();
       trackProductEvent("free_report_submit_error", {
         reason: "network_error",
         topic_slug: topicSlug,
@@ -239,6 +264,14 @@ export function FreeReportForm({
       onSubmit={submit}
     >
       <div className={compact ? "grid gap-3" : "grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]"}>
+        <input
+          aria-hidden="true"
+          autoComplete="off"
+          className="hidden"
+          name="companyWebsite"
+          tabIndex={-1}
+          type="text"
+        />
         <label className="sr-only" htmlFor={`free-report-email-${topicSlug}`}>
           E-postadress
         </label>
@@ -275,6 +308,8 @@ export function FreeReportForm({
           .
         </span>
       </label>
+
+      <TurnstileField compact={compact} />
 
       {message ? (
         <p
