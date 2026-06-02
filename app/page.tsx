@@ -17,7 +17,7 @@ export const revalidate = 0;
 export const metadata: Metadata = {
   title: "AI-stödd daglig marknadsanalys",
   description:
-    "Få en svensk morgonbrief med 10 marknadsområden, 3 gratis signaler via e-post och full dagsrapport med analys av primärkällor.",
+    "Få dagens marknadsbild gratis: en svensk morgonbrief med 10 analysområden, primärkällor och tydlig riskbild direkt till din e-post.",
   alternates: {
     canonical: "/",
   },
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     url: "/",
     title: "Finansanalytik - AI-stödd daglig marknadsanalys",
     description:
-      "Svenska morgonbriefs med makro, räntor, aktier, valutor, råvaror, kredit, krypto och geopolitisk risk.",
+      "Få dagens marknadsbild gratis: en svensk morgonbrief med 10 analysområden och tydlig riskbild direkt till din e-post.",
     images: [
       {
         url: "/og-finansanalytik.png",

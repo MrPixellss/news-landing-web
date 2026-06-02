@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     template: "%s | Finansanalytik",
   },
   description:
-    "AI-stödd svensk marknadsanalys med dagliga rapporter, sparade primärkällor och regelstyrd analys för makro, räntor, aktier, valutor och risk.",
+    "Daglig svensk marknadsbrief med makro, räntor, börs, valutor, råvaror och riskbild samlat i en kort rapport baserad på primärkällor.",
   icons: {
     icon: [
       { url: "/favicon.ico" },
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     url: "https://finansanalytik.com",
     title: "Finansanalytik - daglig marknadsanalys för Sverige",
     description:
-      "Dagliga svenska marknadsbriefings baserade på primärkällor, nyhetsflöden och regelstyrd analys.",
+      "Daglig svensk marknadsbrief med makro, räntor, börs, valutor, råvaror och riskbild samlat i en kort rapport.",
     images: [
       {
         url: "/og-finansanalytik.png",
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Finansanalytik - daglig marknadsanalys för Sverige",
     description:
-      "Dagliga svenska marknadsbriefings baserade på primärkällor, nyhetsflöden och regelstyrd analys.",
+      "Daglig svensk marknadsbrief med makro, räntor, börs, valutor, råvaror och riskbild samlat i en kort rapport.",
     images: ["/og-finansanalytik.png"],
   },
 };

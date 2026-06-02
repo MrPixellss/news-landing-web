@@ -13,8 +13,9 @@ export function SiteFooter() {
         <div>
           <p className="text-base font-bold">Finansanalytik</p>
           <p className="mt-2 max-w-xl text-sm leading-6 text-[#8d9aaa]">
-            Finansanalytik är en digital tjänst som drivs, säljs och hanteras
-            av TVP Byrå. Betalning och prenumeration hanteras av TVP Byrå.
+            Daglig svensk marknadsbrief som samlar makro, räntor, börs,
+            valutor, råvaror och riskbild i en kort rapport baserad på
+            primärkällor och data.
           </p>
         </div>
 
