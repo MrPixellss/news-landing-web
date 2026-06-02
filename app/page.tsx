@@ -26,6 +26,14 @@ export const metadata: Metadata = {
     title: "Finansanalytik - AI-stödd daglig marknadsanalys",
     description:
       "Svenska morgonbriefs med makro, räntor, aktier, valutor, råvaror, kredit, krypto och geopolitisk risk.",
+    images: [
+      {
+        url: "/og-finansanalytik.png",
+        width: 1200,
+        height: 630,
+        alt: "Finansanalytik daglig marknadsanalys",
+      },
+    ],
   },
 };
 
