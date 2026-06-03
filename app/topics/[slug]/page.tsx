@@ -20,6 +20,7 @@ type TopicPageProps = {
   params: Promise<{
     slug: string;
   }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
 const topicSeoDescriptions = new Map([
@@ -158,8 +159,38 @@ function uniqueAnalysisHighlights(
     .slice(0, 4);
 }
 
-export default async function TopicPage({ params }: TopicPageProps) {
+function searchParamValue(
+  params: Record<string, string | string[] | undefined>,
+  key: string,
+) {
+  const value = params[key];
+  return (Array.isArray(value) ? value[0] : value || "").toLowerCase().trim();
+}
+
+function isFreeReportEmailVisit(
+  params: Record<string, string | string[] | undefined>,
+) {
+  const utmSource = searchParamValue(params, "utm_source");
+  const utmMedium = searchParamValue(params, "utm_medium");
+  const utmCampaign = searchParamValue(params, "utm_campaign");
+  const utmContent = searchParamValue(params, "utm_content");
+
+  if (utmSource !== "email") {
+    return false;
+  }
+
+  return (
+    utmMedium === "free_followup" ||
+    utmMedium === "free_report" ||
+    utmCampaign.includes("free_report") ||
+    utmContent.startsWith("followup_")
+  );
+}
+
+export default async function TopicPage({ params, searchParams }: TopicPageProps) {
   const { slug } = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : {};
+  const hideFreeReportOffer = isFreeReportEmailVisit(resolvedSearchParams);
   const topic = orderedTopics.find((item) => item.slug === slug);
 
   if (!topic) {
@@ -331,16 +362,25 @@ export default async function TopicPage({ params }: TopicPageProps) {
                   <p className="mt-2 text-xs font-bold uppercase tracking-[0.16em] text-emerald-300">
                     Moms ingår
                   </p>
-                  <div className="my-4 flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-[#7f91a7]">
-                    <span className="h-px flex-1 bg-[#26313d]" />
-                    <span>eller testa först</span>
-                    <span className="h-px flex-1 bg-[#26313d]" />
-                  </div>
-                  <FreeReportForm
-                    compact
-                    sourcePath={`/topics/${slug}`}
-                    topicSlug={slug}
-                  />
+                  {hideFreeReportOffer ? (
+                    <p className="mt-4 border border-[#26313d] bg-[#0b0f14] p-4 text-sm font-bold leading-6 text-[#c7d1dd]">
+                      Du har redan fått gratisrapporten via e-post. Nästa steg
+                      är att låsa upp hela dagens analyspaket.
+                    </p>
+                  ) : (
+                    <>
+                      <div className="my-4 flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-[#7f91a7]">
+                        <span className="h-px flex-1 bg-[#26313d]" />
+                        <span>eller testa först</span>
+                        <span className="h-px flex-1 bg-[#26313d]" />
+                      </div>
+                      <FreeReportForm
+                        compact
+                        sourcePath={`/topics/${slug}`}
+                        topicSlug={slug}
+                      />
+                    </>
+                  )}
                   <p className="mt-3 text-sm leading-6 text-[#8d9aaa]">
                     Efter betalning skickas rapporten till e-postadressen du
                     anger hos Stripe.
