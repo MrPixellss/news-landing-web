@@ -120,6 +120,66 @@ const repeatedSectionLabels = new RegExp(
   "i",
 );
 
+function sentenceKey(value: string) {
+  return value.toLowerCase().replace(/[^a-zåäö0-9]+/gi, " ").trim();
+}
+
+function looksBrokenPublicSentence(value: string, headline = "") {
+  const lower = value.toLowerCase();
+  const key = sentenceKey(value);
+  const headlineKey = sentenceKey(headline);
+
+  return (
+    value.length > 260 ||
+    key === headlineKey ||
+    lower.includes("kärnan är den kan") ||
+    lower.includes("marknadseffekten är att") ||
+    lower.includes("; marknads") ||
+    lower.includes(" current ") ||
+    lower.includes(" investors ") ||
+    lower.includes("the first market impact") ||
+    lower.split(";").length > 1 ||
+    lower.split(",").length > 5
+  );
+}
+
+function cleanPublicSentence(value: string, headline = "") {
+  const sentence = normalizeSwedishCopy(value)
+    .replace(repeatedSectionLabels, "")
+    .replace(/^[-•]\s*/, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (sentence.length < 60 || looksBrokenPublicSentence(sentence, headline)) {
+    return "";
+  }
+
+  return sentence.length > 240 ? `${sentence.slice(0, 237).trim()}...` : sentence;
+}
+
+function fallbackPreview(topicName: string) {
+  return `Dagens analys sammanfattar de viktigaste signalerna inom ${topicName.toLowerCase()} och visar vad som kan påverka riskbilden under dagen.`;
+}
+
+function fallbackHighlights(topicName: string) {
+  const normalizedTopic = topicName.toLowerCase();
+  return [
+    `Vilka signaler som driver dagens bild inom ${normalizedTopic}.`,
+    "Hur rörelser i räntor, valuta, aktier och råvaror hänger ihop.",
+    "Vilka datapunkter som kan bekräfta eller försvaga huvudscenariot.",
+    "Vad som är värt att följa innan nästa marknadsöppning.",
+  ];
+}
+
+function safePublicPreview(topicName: string, headline: string, source: string) {
+  const candidate = source
+    .split(/(?<=[.!?])\s+/)
+    .map((sentence) => cleanPublicSentence(sentence, headline))
+    .find(Boolean);
+
+  return candidate || fallbackPreview(topicName);
+}
+
 function uniqueAnalysisHighlights(
   fullReportBody: string,
   preview: string,
@@ -214,10 +274,6 @@ export default async function TopicPage({ params, searchParams }: TopicPageProps
   const fullReportBody =
     normalizeSwedishCopy(reportTopic?.full_report_body || block?.teaser) ||
     "";
-  const reportParagraphs = fullReportBody
-    .split(/\n{2,}/)
-    .map((item) => item.trim())
-    .filter(Boolean);
   const sections = reportTopic?.sections || [];
   const previewSource = normalizeSwedishCopy(
     reportTopic?.teaser || block?.teaser || fullReportBody,
@@ -225,14 +281,18 @@ export default async function TopicPage({ params, searchParams }: TopicPageProps
   const preview =
     shortPreview(previewSource, 3) ||
     "Områdets analys visas här när tillräckligt många signaler har passerat reglerna.";
-  const lockedParagraphs = reportParagraphs.length
-    ? reportParagraphs.slice(0, 4)
-    : [preview];
   const lockedHighlights = uniqueAnalysisHighlights(
     fullReportBody,
     preview,
     sections,
   );
+  const publicPreview = safePublicPreview(topic.name, headline, preview || previewSource);
+  const publicHighlightsRaw = lockedHighlights.filter(
+    (highlight) => !looksBrokenPublicSentence(highlight, headline),
+  );
+  const publicHighlights =
+    publicHighlightsRaw.length >= 3 ? publicHighlightsRaw : fallbackHighlights(topic.name);
+  const publicLockedParagraphs = publicHighlights.slice(0, 4);
 
   return (
     <main className={`min-h-screen bg-[#07090b] text-zinc-50 ${hasContent ? "pb-28 md:pb-0" : ""}`}>
@@ -286,17 +346,17 @@ export default async function TopicPage({ params, searchParams }: TopicPageProps
               {headline}
             </h2>
             <p className="mx-auto mt-6 max-w-4xl text-lg leading-9 text-[#c7d1dd]">
-              {preview}
+              {publicPreview}
             </p>
           </article>
 
-          {lockedHighlights.length ? (
+          {publicHighlights.length ? (
             <article className="mt-5 border border-[#26313d] bg-[#0d1117] p-6 md:p-8">
               <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
                 I hela rapporten
               </p>
               <div className="mt-5 space-y-4">
-                {lockedHighlights.map((highlight, index) => (
+                {publicHighlights.map((highlight, index) => (
                   <div
                     key={highlight}
                     className="grid gap-4 border-l-2 border-emerald-300/70 bg-[#0b0f14] p-4 sm:grid-cols-[42px_minmax(0,1fr)]"
@@ -322,13 +382,13 @@ export default async function TopicPage({ params, searchParams }: TopicPageProps
                 Kort utdrag ur analysen
               </h2>
               <p className="mt-5 text-lg leading-9 text-[#c7d1dd]">
-                {preview}
+                {publicPreview}
               </p>
             </div>
 
             <div className="relative mt-7 min-h-[430px] overflow-hidden border border-[#26313d] bg-[#0b0f14]">
               <div className="pointer-events-none select-none space-y-5 p-7 blur-[5px]">
-                {lockedParagraphs.map((paragraph) => (
+                {publicLockedParagraphs.map((paragraph) => (
                   <p
                     key={paragraph}
                     className="text-base leading-8 text-[#d4dce6]"
@@ -336,7 +396,7 @@ export default async function TopicPage({ params, searchParams }: TopicPageProps
                     {paragraph}
                   </p>
                 ))}
-                {lockedParagraphs.map((paragraph) => (
+                {publicLockedParagraphs.map((paragraph) => (
                   <p
                     key={`locked-repeat-${paragraph}`}
                     className="text-base leading-8 text-[#d4dce6]"
