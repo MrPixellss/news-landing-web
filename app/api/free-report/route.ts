@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isValidCheckoutEmail, normalizeCheckoutEmail } from "../../lib/checkout";
 
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as {
@@ -20,6 +21,11 @@ export async function POST(request: Request) {
     turnstileToken?: string;
     companyWebsite?: string;
   } | null;
+  const email = normalizeCheckoutEmail(body?.email);
+
+  if (!isValidCheckoutEmail(email)) {
+    return NextResponse.json({ error: "Ange en giltig e-postadress." }, { status: 400 });
+  }
 
   const baseUrl =
     process.env.NEXT_PUBLIC_API_BASE_URL ??
@@ -49,7 +55,7 @@ export async function POST(request: Request) {
       method: "POST",
       headers: forwardedHeaders,
       body: JSON.stringify({
-        email: body?.email,
+        email,
         consent_accepted: Boolean(body?.consentAccepted),
         consent_text: body?.consentText,
         consent_version: body?.consentVersion,

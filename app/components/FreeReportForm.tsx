@@ -156,8 +156,24 @@ export function FreeReportForm({
       if (payload.already_sent || payload.status === "already_sent") {
         setStatus("already");
         setMessage(payload.message || "Gratisrapporten har redan skickats till den här e-postadressen.");
-        trackProductEvent("free_report_submit_success", {
-          result: "already_sent",
+        resetTurnstile();
+        trackProductEvent("free_report_duplicate", {
+          result: "blocked",
+          topic_slug: topicSlug,
+          source_path: activeSourcePath,
+        });
+        return;
+      }
+
+      if (payload.status === "unsubscribed") {
+        setStatus("error");
+        setMessage(
+          payload.message ||
+            "E-postadressen är avregistrerad. Kontakta support@tvp-byra.se om du vill aktivera utskick igen.",
+        );
+        resetTurnstile();
+        trackProductEvent("free_report_submit_error", {
+          reason: "unsubscribed",
           topic_slug: topicSlug,
           source_path: activeSourcePath,
         });
@@ -194,6 +210,71 @@ export function FreeReportForm({
         source_path: activeSourcePath,
       });
     }
+  }
+
+  if (status === "already") {
+    return (
+      <div
+        className={[
+          "border border-amber-300/45 bg-[#0b0f14]",
+          compact ? "p-4" : "p-5 md:p-6",
+        ].join(" ")}
+      >
+        <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-amber-200">
+          Gratisrapport redan använd
+        </p>
+        <h3 className="mt-3 text-2xl font-bold tracking-[-0.02em]">
+          Den här e-postadressen har redan fått gratisrapporten.
+        </h3>
+        <p className="mt-3 text-base leading-7 text-[#c7d1dd]">
+          {message ||
+            "Gratisrapporten kan bara skickas en gång per e-postadress. Vill du läsa vidare kan du välja betald access nedan."}
+        </p>
+        <div className="mt-5 grid gap-3">
+          <CheckoutButton
+            buttonClassName="w-full bg-emerald-300 px-5 py-4 text-sm font-black text-[#04100b] transition hover:bg-emerald-200 disabled:cursor-wait disabled:opacity-70"
+            buttonLabel="Starta månadsaccess - 249 kr/mån"
+            onOpen={() =>
+              trackProductEvent("free_report_duplicate_monthly_click", {
+                topic_slug: topicSlug,
+                source_path: currentSourcePath(sourcePath),
+                placement: "free_report_duplicate",
+              })
+            }
+            priceLabel="249 kr/mån"
+            product="monthly_access"
+            productName="Månadsaccess"
+            topicSlug={topicSlug}
+          />
+          <CheckoutButton
+            buttonClassName="w-full border border-[#26313d] px-5 py-3 text-sm font-black text-[#c7d1dd] transition hover:border-emerald-300 hover:text-emerald-300 disabled:cursor-wait disabled:opacity-70"
+            buttonLabel="Läs bara dagens rapport - 49 kr"
+            onOpen={() =>
+              trackProductEvent("free_report_duplicate_daypass_click", {
+                topic_slug: topicSlug,
+                source_path: currentSourcePath(sourcePath),
+                placement: "free_report_duplicate",
+              })
+            }
+            priceLabel="49 kr"
+            product="day_pass"
+            productName="Dagsrapport"
+            topicSlug={topicSlug}
+          />
+          <button
+            className="text-sm font-bold text-[#8fa1b5] underline-offset-4 transition hover:text-emerald-300 hover:underline"
+            type="button"
+            onClick={() => {
+              setStatus("idle");
+              setMessage("");
+              resetTurnstile();
+            }}
+          >
+            Använd en annan e-postadress
+          </button>
+        </div>
+      </div>
+    );
   }
 
   if (status === "sent") {
