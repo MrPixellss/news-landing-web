@@ -1,7 +1,11 @@
+"use client";
+
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { useEffect, useRef } from "react";
 
 import { CheckoutButton } from "./CheckoutButton";
+import { trackProductEvent } from "../lib/tracking";
 
 type PlanCardProps = {
   title: string;
@@ -15,19 +19,20 @@ type PlanCardProps = {
   secondaryText: string;
   action: ReactNode;
   featured?: boolean;
+  muted?: boolean;
 };
 
 const comparisonRows = [
-  ["Fullständig rapport", "1 gång", "Dagens rapport", "Ja", "Ja", "Ja"],
-  ["Dagliga rapporter", "Nej", "Nej", "Ja", "Ja", "Ja"],
+  ["Fullständig rapport", "1 gång", "Ja", "Ja", "Dagens rapport", "Ja"],
+  ["Dagliga rapporter", "Nej", "Ja", "Ja", "Nej", "Ja"],
   ["10 analysområden", "Ja", "Ja", "Ja", "Ja", "Ja"],
-  ["Veckosammanfattning", "Nej", "Nej", "Ja", "Ja", "Ja"],
-  ["Månadsutsikt", "Nej", "Nej", "Ja", "Ja", "Ja"],
-  ["Arkivatkomst", "Nej", "Dagens rapport", "När tillgängligt", "När tillgängligt", "Ja"],
+  ["Veckosammanfattning", "Nej", "Ja", "Ja", "Nej", "Ja"],
+  ["Månadsutsikt", "Nej", "Ja", "Ja", "Nej", "Ja"],
+  ["Arkivatkomst", "Nej", "När tillgängligt", "När tillgängligt", "Dagens rapport", "Ja"],
   ["E-postleverans", "Ja", "Ja", "Ja", "Ja", "Ja"],
   ["Flera mottagare", "Nej", "Nej", "Nej", "Nej", "Ja"],
-  ["Engångsbetalning", "Nej", "Ja", "Nej", "Ja", "Vid behov"],
-  ["Prenumeration", "Nej", "Nej", "Ja", "Nej", "Avtal"],
+  ["Engångsbetalning", "Nej", "Nej", "Ja", "Ja", "Vid behov"],
+  ["Prenumeration", "Nej", "Ja", "Nej", "Nej", "Avtal"],
   ["Faktura", "Nej", "Nej", "Nej", "Nej", "Ja"],
 ];
 
@@ -71,6 +76,7 @@ function PlanCard({
   secondaryText,
   action,
   featured = false,
+  muted = false,
 }: PlanCardProps) {
   return (
     <article
@@ -78,7 +84,9 @@ function PlanCard({
         "flex min-h-[520px] flex-col border p-5 md:p-6",
         featured
           ? "border-emerald-300 bg-[#101821] shadow-[0_0_0_1px_rgba(52,211,153,0.35)]"
-          : "border-[#26313d] bg-[#0d1117]",
+          : muted
+            ? "border-[#1f2934] bg-[#0b0f14]"
+            : "border-[#26313d] bg-[#0d1117]",
       ].join(" ")}
     >
       <div className="flex min-h-8 flex-wrap items-center gap-2">
@@ -121,22 +129,50 @@ function PlanCard({
 }
 
 export function PricingSection({ primaryTopicSlug }: { primaryTopicSlug: string }) {
+  const sectionRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const node = sectionRef.current;
+    if (!node) {
+      return;
+    }
+
+    let tracked = false;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!tracked && entry?.isIntersecting) {
+          tracked = true;
+          trackProductEvent("pricing_view", {
+            source: "pricing",
+          });
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.35 },
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section id="pricing" className="border-b border-[#1a222c] py-10">
+    <section ref={sectionRef} id="pricing" className="border-b border-[#1a222c] py-10">
       <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
             Priser
           </p>
           <h2 className="mt-2 max-w-3xl text-3xl font-bold tracking-[-0.03em] md:text-4xl">
-            Välj hur du vill använda Finansanalytik
+            Börja gratis, följ marknaden löpande när du är redo
           </h2>
           <p className="mt-4 max-w-4xl text-base leading-7 text-[#c7d1dd]">
-            Börja med en gratis rapport, köp tillgång för en dag eller välj längre access om du vill följa marknaden löpande.
+            Gratisrapporten visar produkten. Månadsaccess är huvudvägen för dig
+            som vill få marknadsbilden varje morgon.
           </p>
         </div>
         <p className="max-w-xl border border-[#26313d] bg-[#0d1117] p-4 text-sm font-bold leading-6 text-[#d7e1eb]">
-          Alla rapporter bygger på primärkällor, regelstyrd analys och tydliga marknadssignaler. Inte investeringsrådgivning.
+          Alla rapporter bygger på primärkällor, regelstyrd analys och tydliga
+          marknadssignaler. Inte investeringsrådgivning.
         </p>
       </div>
 
@@ -157,6 +193,12 @@ export function PricingSection({ primaryTopicSlug }: { primaryTopicSlug: string 
             <a
               className="block border border-emerald-300/70 px-4 py-3 text-center text-sm font-black text-emerald-300 transition hover:bg-emerald-300 hover:text-[#06100c]"
               href="#gratis-rapport"
+              onClick={() =>
+                trackProductEvent("free_report_pricing_click", {
+                  source: "pricing",
+                  product: "free_report",
+                })
+              }
             >
               Få gratisrapport
             </a>
@@ -164,49 +206,34 @@ export function PricingSection({ primaryTopicSlug }: { primaryTopicSlug: string 
         />
 
         <PlanCard
-          title="Dagsrapport"
-          price="49 kr"
-          priceNote="moms ingår"
-          audience="För dig som vill läsa dagens fulla analys utan abonnemang."
-          features={[
-            "Dagens kompletta marknadsbriefing",
-            "10 analysområden",
-            "Full analys, inte bara förhandsvisning",
-            "Leverans via e-post",
-            "Tillgång till dagens rapport",
-          ]}
-          condition="Gäller endast dagens rapport."
-          secondaryText="Engångsbetalning. Ingen prenumeration."
-          action={
-            <CheckoutButton
-              buttonLabel="Köp dagens rapport"
-              priceLabel="49 kr"
-              product="day_pass"
-              productName="Dagsrapport"
-              topicSlug={primaryTopicSlug}
-            />
-          }
-        />
-
-        <PlanCard
           title="Månadsaccess"
           price="249 kr/mån"
           priceNote="moms ingår"
-          badge="Populärast"
-          audience="För dig som vill följa marknaden varje dag och få löpande signaler."
+          badge="Bäst att börja med"
+          audience="För dig som vill få marknadsbilden varje morgon utan att binda upp dig."
           features={[
             "Dagliga fullständiga rapporter",
             "Veckosammanfattning",
-            "Månadsutsikt med prognos",
+            "Månadsutsikt",
             "E-postleverans",
-            "Löpande tillgång under aktiv period",
+            "Avsluta när du vill",
           ]}
-          condition="Avsluta när du vill."
-          secondaryText="Bäst för löpande marknadsbevakning."
+          condition="Prenumeration månadsvis. Avsluta inför nästa period."
+          secondaryText="Huvudvägen för löpande marknadsöverblick."
+          featured
           action={
             <CheckoutButton
               buttonLabel="Starta månadsaccess"
               description="Du får dagliga fullständiga rapporter, veckosammanfattning och månadsutsikt via e-post under aktiv period."
+              onOpen={() =>
+                trackProductEvent("monthly_click", {
+                  product: "monthly_access",
+                  productName: "Månadsaccess",
+                  priceLabel: "249 kr/mån",
+                  topicSlug: primaryTopicSlug,
+                  source: "pricing",
+                })
+              }
               priceLabel="249 kr/mån"
               product="monthly_access"
               productName="Månadsaccess"
@@ -218,27 +245,71 @@ export function PricingSection({ primaryTopicSlug }: { primaryTopicSlug: string 
         <PlanCard
           title="Halvårsaccess"
           price="1 199 kr"
-          priceNote="för 6 månader, motsvarar 199 kr/mån, moms ingår"
+          priceNote="för 6 månader, moms ingår"
           badge="Mest värde"
           secondaryBadge="Spara cirka 20%"
-          audience="För dig som använder marknadsanalys regelbundet och vill ha lägre månadskostnad."
+          audience="För dig som vill följa marknaden löpande och få lägre effektiv månadskostnad."
           features={[
             "Allt i Månadsaccess",
             "6 månaders tillgång",
+            "Lägre effektiv månadskostnad",
             "Prioriterad e-postleverans",
             "Arkivatkomst när tillgängligt",
-            "Lägre effektiv månadskostnad",
           ]}
           condition="Engångsbetalning för 6 månaders access."
-          secondaryText="Spara cirka 20% jämfört med månadsaccess."
-          featured
+          secondaryText="Value-offer för dig som redan vet att du vill följa rapporterna löpande."
           action={
             <CheckoutButton
               buttonLabel="Välj halvårsaccess"
               description="Du får 6 månaders tillgång till Finansanalytik med dagliga rapporter, veckosammanfattning och månadsutsikt via e-post."
+              onOpen={() =>
+                trackProductEvent("halfyear_click", {
+                  product: "half_year_access",
+                  productName: "Halvårsaccess",
+                  priceLabel: "1 199 kr",
+                  topicSlug: primaryTopicSlug,
+                  source: "pricing",
+                })
+              }
               priceLabel="1 199 kr"
               product="half_year_access"
               productName="Halvårsaccess"
+              topicSlug={primaryTopicSlug}
+            />
+          }
+        />
+
+        <PlanCard
+          title="Dagsrapport"
+          price="49 kr"
+          priceNote="moms ingår"
+          audience="För dig som bara vill läsa dagens rapport en gång."
+          features={[
+            "Dagens kompletta marknadsbriefing",
+            "10 analysområden",
+            "Full analys, inte bara förhandsvisning",
+            "Leverans via e-post",
+            "Ingen prenumeration",
+          ]}
+          condition="Gäller endast dagens rapport."
+          secondaryText="Fallback för engångsläsning."
+          muted
+          action={
+            <CheckoutButton
+              buttonClassName="mt-5 w-full border border-[#26313d] bg-[#111820] px-5 py-4 text-sm font-black text-[#d7e1eb] transition hover:border-emerald-300 hover:text-emerald-300 disabled:cursor-wait disabled:opacity-70"
+              buttonLabel="Köp dagens rapport"
+              onOpen={() =>
+                trackProductEvent("daypass_click", {
+                  product: "day_pass",
+                  productName: "Dagsrapport",
+                  priceLabel: "49 kr",
+                  topicSlug: primaryTopicSlug,
+                  source: "pricing",
+                })
+              }
+              priceLabel="49 kr"
+              product="day_pass"
+              productName="Dagsrapport"
               topicSlug={primaryTopicSlug}
             />
           }
@@ -276,20 +347,20 @@ export function PricingSection({ primaryTopicSlug }: { primaryTopicSlug: string 
               <tr className="border-b border-[#26313d] text-[#d7e1eb]">
                 <th className="py-3 pr-4 font-black">Ingår</th>
                 <th className="px-4 py-3 font-black">Gratisrapport</th>
+                <th className="px-4 py-3 font-black text-emerald-300">Månadsaccess</th>
+                <th className="px-4 py-3 font-black">Halvårsaccess</th>
                 <th className="px-4 py-3 font-black">Dagsrapport</th>
-                <th className="px-4 py-3 font-black">Månadsaccess</th>
-                <th className="px-4 py-3 font-black text-emerald-300">Halvårsaccess</th>
                 <th className="pl-4 py-3 font-black">Företag</th>
               </tr>
             </thead>
             <tbody>
-              {comparisonRows.map(([label, free, day, month, halfYear, business]) => (
+              {comparisonRows.map(([label, free, month, halfYear, day, business]) => (
                 <tr key={label} className="border-b border-[#1a222c] last:border-b-0">
                   <td className="py-3 pr-4 font-bold text-[#d7e1eb]">{label}</td>
                   <td className="px-4 py-3 text-[#a8b5c4]">{free}</td>
+                  <td className="px-4 py-3 font-bold text-[#d7e1eb]">{month}</td>
+                  <td className="px-4 py-3 text-[#a8b5c4]">{halfYear}</td>
                   <td className="px-4 py-3 text-[#a8b5c4]">{day}</td>
-                  <td className="px-4 py-3 text-[#a8b5c4]">{month}</td>
-                  <td className="px-4 py-3 font-bold text-[#d7e1eb]">{halfYear}</td>
                   <td className="pl-4 py-3 text-[#a8b5c4]">{business}</td>
                 </tr>
               ))}

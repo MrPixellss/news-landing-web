@@ -355,20 +355,41 @@ export default async function TopicPage({ params, searchParams }: TopicPageProps
                     Få hela denna analys och dagens övriga 9 marknadsrapporter.
                     Ingen prenumeration krävs.
                   </p>
-                  <CheckoutButton
-                    priceLabel="49 kr"
-                    topicSlug={slug}
-                  />
-                  <p className="mt-2 text-xs font-bold uppercase tracking-[0.16em] text-emerald-300">
-                    Moms ingår
-                  </p>
                   {hideFreeReportOffer ? (
-                    <p className="mt-4 border border-[#26313d] bg-[#0b0f14] p-4 text-sm font-bold leading-6 text-[#c7d1dd]">
-                      Du har redan fått gratisrapporten via e-post. Nästa steg
-                      är att låsa upp hela dagens analyspaket.
-                    </p>
+                    <>
+                      <CheckoutButton
+                        buttonLabel="Starta månadsaccess - 249 kr/mån"
+                        description="Du får dagliga fullständiga rapporter, veckosammanfattning och månadsutsikt via e-post under aktiv period."
+                        priceLabel="249 kr/mån"
+                        product="monthly_access"
+                        productName="Månadsaccess"
+                        topicSlug={slug}
+                      />
+                      <p className="mt-2 text-xs font-bold uppercase tracking-[0.16em] text-emerald-300">
+                        Moms ingår
+                      </p>
+                      <p className="mt-4 border border-[#26313d] bg-[#0b0f14] p-4 text-sm font-bold leading-6 text-[#c7d1dd]">
+                        Du har redan fått gratisrapporten via e-post. Nästa
+                        steg är löpande access till hela analyspaketet.
+                      </p>
+                      <CheckoutButton
+                        buttonClassName="mt-3 w-full border border-[#26313d] px-5 py-3 text-sm font-black text-[#c7d1dd] transition hover:border-emerald-300 hover:text-emerald-300 disabled:cursor-wait disabled:opacity-70"
+                        buttonLabel="Läs bara dagens rapport - 49 kr"
+                        priceLabel="49 kr"
+                        product="day_pass"
+                        productName="Dagsrapport"
+                        topicSlug={slug}
+                      />
+                    </>
                   ) : (
                     <>
+                      <CheckoutButton
+                        priceLabel="49 kr"
+                        topicSlug={slug}
+                      />
+                      <p className="mt-2 text-xs font-bold uppercase tracking-[0.16em] text-emerald-300">
+                        Moms ingår
+                      </p>
                       <div className="my-4 flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-[#7f91a7]">
                         <span className="h-px flex-1 bg-[#26313d]" />
                         <span>eller testa först</span>

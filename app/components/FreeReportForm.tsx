@@ -198,60 +198,114 @@ export function FreeReportForm({
 
   if (status === "sent") {
     return (
-      <div
-        className={[
-          "border border-emerald-300/50 bg-[#0b0f14]",
-          compact ? "p-4" : "p-5 md:p-6",
-        ].join(" ")}
-      >
-        <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-emerald-300">
-          Rapporten är skickad
-        </p>
-        <h3 className="mt-3 text-2xl font-bold tracking-[-0.02em]">
-          Din kostnadsfria marknadsbrief har skickats till din e-post.
-        </h3>
-        <p className="mt-3 text-base leading-7 text-[#c7d1dd]">
-          Den innehåller dagens samlade marknadsbild och analyser inom 10 områden.
-        </p>
-        <ul className="mt-4 grid gap-2 text-sm leading-6 text-[#a8b5c4]">
-          {[
-            "Dagens huvudbild",
-            "10 analysområden",
-            "Kort sammanfattning per område",
-            "Tillgång till full rapport via länk",
-          ].map((item) => (
-            <li key={item} className="border-l-2 border-emerald-300/70 pl-3">
-              {item}
-            </li>
-          ))}
-        </ul>
-        <div className="mt-5 grid gap-3">
+      <>
+        <div
+          className={[
+            "border border-emerald-300/50 bg-[#0b0f14]",
+            compact ? "p-4" : "p-5 md:p-6",
+          ].join(" ")}
+        >
+          <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-emerald-300">
+            Rapporten är skickad
+          </p>
+          <h3 className="mt-3 text-2xl font-bold tracking-[-0.02em]">
+            Din kostnadsfria marknadsbrief har skickats till din e-post.
+          </h3>
+          <p className="mt-3 text-base leading-7 text-[#c7d1dd]">
+            Den innehåller dagens samlade marknadsbild och analyser inom 10 områden.
+          </p>
+          <ul className="mt-4 grid gap-2 text-sm leading-6 text-[#a8b5c4]">
+            {[
+              "Dagens huvudbild",
+              "10 analysområden",
+              "Kort sammanfattning per område",
+              "Tillgång till full rapport via länk",
+            ].map((item) => (
+              <li key={item} className="border-l-2 border-emerald-300/70 pl-3">
+                {item}
+              </li>
+            ))}
+          </ul>
+          <div className="mt-5 grid gap-3">
+            <p className="text-sm leading-6 text-[#c7d1dd]">
+              Vill du få marknadsbilden varje morgon? Månadsaccess ger dig
+              dagliga rapporter, veckosammanfattning och månadsutsikt. Avsluta
+              när du vill.
+            </p>
+            <CheckoutButton
+              buttonClassName="w-full bg-emerald-300 px-5 py-4 text-sm font-black text-[#04100b] transition hover:bg-emerald-200 disabled:cursor-wait disabled:opacity-70"
+              buttonLabel="Starta månadsaccess - 249 kr/mån"
+              onOpen={() =>
+                trackProductEvent("thank_you_monthly_click", {
+                  topic_slug: topicSlug,
+                  source_path: currentSourcePath(sourcePath),
+                  placement: "free_report_success",
+                })
+              }
+              priceLabel="249 kr/mån"
+              product="monthly_access"
+              productName="Månadsaccess"
+              topicSlug={topicSlug}
+            />
+            <div className="border border-[#26313d] bg-[#07090b] p-4">
+              <p className="text-sm leading-6 text-[#a8b5c4]">
+                För dig som vill följa marknaden löpande och spara cirka 20%
+                jämfört med månadsaccess.
+              </p>
+              <CheckoutButton
+                buttonClassName="mt-3 w-full border border-emerald-300/70 px-5 py-4 text-sm font-black text-emerald-300 transition hover:bg-emerald-300 hover:text-[#04100b] disabled:cursor-wait disabled:opacity-70"
+                buttonLabel="Välj halvårsaccess - 1 199 kr"
+                onOpen={() =>
+                  trackProductEvent("thank_you_halfyear_click", {
+                    topic_slug: topicSlug,
+                    source_path: currentSourcePath(sourcePath),
+                  })
+                }
+                priceLabel="1 199 kr"
+                product="half_year_access"
+                productName="Halvårsaccess"
+                topicSlug={topicSlug}
+              />
+            </div>
+            <CheckoutButton
+              buttonClassName="w-full border border-[#26313d] px-5 py-3 text-sm font-black text-[#c7d1dd] transition hover:border-emerald-300 hover:text-emerald-300 disabled:cursor-wait disabled:opacity-70"
+              buttonLabel="Läs bara dagens rapport - 49 kr"
+              onOpen={() => {
+                trackProductEvent("day_pass_click_from_thank_you", {
+                  topic_slug: topicSlug,
+                  source_path: currentSourcePath(sourcePath),
+                });
+                trackProductEvent("thank_you_daypass_click", {
+                  topic_slug: topicSlug,
+                  source_path: currentSourcePath(sourcePath),
+                });
+              }}
+              priceLabel="49 kr"
+              product="day_pass"
+              productName="Dagsrapport"
+              topicSlug={topicSlug}
+            />
+          </div>
+        </div>
+        <div className="h-24 md:hidden" />
+        <div className="fixed inset-x-0 bottom-0 z-50 border-t border-emerald-300/50 bg-[#07090b]/98 p-4 shadow-[0_-18px_40px_rgba(0,0,0,0.55)] backdrop-blur md:hidden">
           <CheckoutButton
             buttonClassName="w-full bg-emerald-300 px-5 py-4 text-sm font-black text-[#04100b] transition hover:bg-emerald-200 disabled:cursor-wait disabled:opacity-70"
-            buttonLabel="Läs dagens fullständiga analys - 49 kr"
+            buttonLabel="Starta månadsaccess"
             onOpen={() =>
-              trackProductEvent("day_pass_click_from_thank_you", {
+              trackProductEvent("thank_you_monthly_click", {
                 topic_slug: topicSlug,
                 source_path: currentSourcePath(sourcePath),
+                placement: "mobile_sticky",
               })
             }
-            priceLabel="49 kr"
+            priceLabel="249 kr/mån"
+            product="monthly_access"
+            productName="Månadsaccess"
             topicSlug={topicSlug}
           />
-          <Link
-            className="border border-[#26313d] px-5 py-4 text-center text-sm font-black text-[#d7e1eb] transition hover:border-emerald-300 hover:text-emerald-300"
-            href="/#pricing"
-            onClick={() =>
-              trackProductEvent("monthly_click_from_thank_you", {
-                topic_slug: topicSlug,
-                source_path: currentSourcePath(sourcePath),
-              })
-            }
-          >
-            Se månadsaccess
-          </Link>
         </div>
-      </div>
+      </>
     );
   }
 

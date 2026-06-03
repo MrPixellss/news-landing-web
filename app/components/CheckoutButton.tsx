@@ -2,7 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { metaTrackingContext, trackMetaEvent } from "../lib/tracking";
+import {
+  metaTrackingContext,
+  trackMetaEvent,
+  trackProductEvent,
+} from "../lib/tracking";
 
 type CheckoutButtonProps = {
   topicSlug: string;
@@ -99,6 +103,19 @@ export function CheckoutButton({
     normalizedCustomerEmail,
   );
 
+  function trackingPayload() {
+    return {
+      product,
+      productName,
+      priceLabel,
+      topicSlug,
+      sourcePath:
+        typeof window === "undefined"
+          ? ""
+          : window.location.pathname + window.location.search + window.location.hash,
+    };
+  }
+
   useEffect(() => {
     let isMounted = true;
 
@@ -127,6 +144,7 @@ export function CheckoutButton({
     setShowCustomerEmailError(false);
     setShowPurchaseConsentError(false);
     setIsModalOpen(true);
+    trackProductEvent("checkout_open", trackingPayload());
   }
 
   async function startCheckout() {
@@ -137,12 +155,20 @@ export function CheckoutButton({
     if (!isCustomerEmailValid) {
       setShowCustomerEmailError(true);
       setError("Ange en giltig e-postadress för leverans.");
+      trackProductEvent("checkout_error", {
+        ...trackingPayload(),
+        reason: "invalid_email",
+      });
       return;
     }
 
     if (!canCheckout) {
       setShowPurchaseConsentError(true);
       setError("Du behöver godkänna de obligatoriska villkoren före betalning.");
+      trackProductEvent("checkout_error", {
+        ...trackingPayload(),
+        reason: "missing_purchase_consent",
+      });
       return;
     }
 
@@ -190,9 +216,19 @@ export function CheckoutButton({
         currency: "SEK",
       });
 
+      trackProductEvent("stripe_redirect", {
+        ...trackingPayload(),
+        checkoutUrlCreated: true,
+      });
       window.location.href = payload.checkout_url;
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Betalningen kunde inte startas.");
+      const message = err instanceof Error ? err.message : "Betalningen kunde inte startas.";
+      setError(message);
+      trackProductEvent("checkout_error", {
+        ...trackingPayload(),
+        reason: "backend_or_stripe_error",
+        message,
+      });
       setIsLoading(false);
     }
   }
@@ -406,7 +442,7 @@ export function CheckoutButton({
                 onClick={startCheckout}
                 type="button"
               >
-                {isLoading ? "Skickar till Stripe..." : "Fortsätt till Stripe"}
+                {isLoading ? "Skickar till Stripe..." : "Fortsätt till säker betalning"}
               </button>
               <button
                 className="border border-[#26313d] px-5 py-4 text-sm font-black text-[#d7e1eb] hover:border-emerald-300"

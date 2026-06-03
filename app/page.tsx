@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CheckoutButton } from "./components/CheckoutButton";
 import { FreeReportForm } from "./components/FreeReportForm";
+import { MobileStickyCta } from "./components/MobileStickyCta";
 import { PricingSection } from "./components/PricingSection";
 import {
   displayDate,
@@ -37,13 +38,48 @@ export const metadata: Metadata = {
   },
 };
 
+const teaserFallbacks = [
+  "Dagens signaler sammanställs från flera källor.",
+  "Fokus ligger på vad som förändrats och varför det kan påverka riskbilden.",
+  "Full analys finns i rapporten.",
+];
+
+function normalizeTeaserSentence(value: string) {
+  return normalizeSwedishCopy(value)
+    .replace(/\s*;\s*marknadseffekten är att\s*/gi, ". ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function looksBrokenTeaserSentence(value: string, headline: string) {
+  const lower = value.toLowerCase();
+  const headlineKey = headline.toLowerCase().replace(/[^a-zåäö0-9]+/gi, " ").trim();
+  const valueKey = lower.replace(/[^a-zåäö0-9]+/gi, " ").trim();
+
+  return (
+    value.length > 170 ||
+    valueKey === headlineKey ||
+    lower.includes("kärnan är den kan") ||
+    lower.includes("marknadseffekten är att") ||
+    lower.includes("current rule-based") ||
+    lower.includes("the first market impact") ||
+    lower.includes("investors may") ||
+    lower.includes("english") ||
+    lower.split(",").length > 4
+  );
+}
+
 function teaserBullets(headline: string, teaser: string) {
-  const candidates = [headline, ...teaser.split(/(?<=[.!?])\s+/)]
-    .map((item) => normalizeSwedishCopy(item).replace(/\s+/g, " ").trim())
-    .filter((item) => item.length >= 28);
+  const candidates = teaser.split(/(?<=[.!?])\s+/)
+    .map(normalizeTeaserSentence)
+    .filter((item) => item.length >= 28 && !looksBrokenTeaserSentence(item, headline));
+  const normalizedFallbacks = teaserFallbacks.filter(
+    (item) => !looksBrokenTeaserSentence(item, headline),
+  );
+  const source = candidates.length ? candidates : normalizedFallbacks;
   const seen = new Set<string>();
 
-  return candidates
+  return source
     .filter((item) => {
       const key = item.toLowerCase();
       if (seen.has(key)) {
@@ -52,7 +88,7 @@ function teaserBullets(headline: string, teaser: string) {
       seen.add(key);
       return true;
     })
-    .slice(0, 3);
+    .slice(0, 1);
 }
 
 export default async function HomePage() {
@@ -69,7 +105,7 @@ export default async function HomePage() {
   const primaryTopic = orderedTopics[0];
 
   return (
-    <main className="min-h-screen bg-[#07090b] text-zinc-50">
+    <main className="min-h-screen bg-[#07090b] pb-24 text-zinc-50 md:pb-0">
       <div className="mx-auto max-w-[1440px] px-4 py-6 sm:px-6 lg:px-8">
         <header className="flex items-center justify-between gap-4 border-b border-[#1a222c] pb-5">
           <Link
@@ -286,6 +322,12 @@ export default async function HomePage() {
 
         <PricingSection primaryTopicSlug={primaryTopic.slug} />
       </div>
+      <MobileStickyCta
+        eventName="mobile_free_report_sticky_click"
+        hideWhenVisibleSelector="#gratis-rapport"
+        href="#gratis-rapport"
+        label="Få gratisrapport"
+      />
     </main>
   );
 }
