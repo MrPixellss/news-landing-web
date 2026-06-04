@@ -56,11 +56,16 @@ function teaserKey(value: string) {
 }
 
 function looksBrokenTeaserSentence(value: string, headline: string) {
+  const trimmed = value.trim();
   const lower = value.toLowerCase();
   const headlineKey = teaserKey(headline);
   const valueKey = teaserKey(value);
+  const startsLikeSentence = /^[A-ZÅÄÖ0-9]/.test(trimmed);
+  const endsLikeSentence = /[.!?]$/.test(trimmed);
 
   return (
+    !startsLikeSentence ||
+    !endsLikeSentence ||
     value.length > 170 ||
     valueKey === headlineKey ||
     lower.includes("kärnan är den kan") ||
