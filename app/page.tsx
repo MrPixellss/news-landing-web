@@ -51,44 +51,49 @@ function normalizeTeaserSentence(value: string) {
     .trim();
 }
 
+function teaserKey(value: string) {
+  return value.toLowerCase().replace(/[^a-zåäö0-9]+/gi, " ").trim();
+}
+
 function looksBrokenTeaserSentence(value: string, headline: string) {
   const lower = value.toLowerCase();
-  const headlineKey = headline.toLowerCase().replace(/[^a-zåäö0-9]+/gi, " ").trim();
-  const valueKey = lower.replace(/[^a-zåäö0-9]+/gi, " ").trim();
+  const headlineKey = teaserKey(headline);
+  const valueKey = teaserKey(value);
 
   return (
     value.length > 170 ||
     valueKey === headlineKey ||
     lower.includes("kärnan är den kan") ||
+    lower.includes("kärnan är") ||
+    lower.includes("; marknadseffekten") ||
     lower.includes("marknadseffekten är att") ||
+    lower.includes("marknadseffekten") ||
     lower.includes("current rule-based") ||
     lower.includes("the first market impact") ||
     lower.includes("investors may") ||
     lower.includes("english") ||
+    lower.split(";").length > 1 ||
     lower.split(",").length > 4
   );
 }
 
-function teaserBullets(headline: string, teaser: string) {
-  const candidates = teaser.split(/(?<=[.!?])\s+/)
+function safeTeaserSentences(headline: string, teaser: string) {
+  const candidates = normalizeSwedishCopy(teaser).split(/(?<=[.!?])\s+/)
     .map(normalizeTeaserSentence)
     .filter((item) => item.length >= 28 && !looksBrokenTeaserSentence(item, headline));
-  const normalizedFallbacks = teaserFallbacks.filter(
-    (item) => !looksBrokenTeaserSentence(item, headline),
-  );
-  const source = candidates.length ? candidates : normalizedFallbacks;
+  const source = [...candidates, ...teaserFallbacks];
   const seen = new Set<string>();
 
   return source
     .filter((item) => {
-      const key = item.toLowerCase();
+      const key = teaserKey(item);
       if (seen.has(key)) {
         return false;
       }
       seen.add(key);
       return true;
     })
-    .slice(0, 1);
+    .slice(0, 3);
 }
 
 export default async function HomePage() {
@@ -197,10 +202,12 @@ export default async function HomePage() {
               const headline =
                 normalizeSwedishCopy(block?.headline) ||
                 "Dagens signaler sammanställs";
-              const preview =
-                shortPreview(normalizeSwedishCopy(block?.teaser), 2) ||
-                "När dagens källor har passerat kvalitetssil visas ett kort utdrag ur analysen här.";
-              const bullets = teaserBullets(headline, preview);
+              const safeSentences = safeTeaserSentences(
+                headline,
+                normalizeSwedishCopy(block?.teaser),
+              );
+              const bullets = safeSentences.slice(0, 2);
+              const preview = shortPreview(safeSentences[2] || teaserFallbacks[2], 2);
 
               return (
                 <article
@@ -226,7 +233,7 @@ export default async function HomePage() {
                       </li>
                     ))}
                   </ul>
-                  <p className="mt-4 line-clamp-4 text-sm leading-6 text-[#a8b5c4]">
+                  <p className="mt-4 line-clamp-2 text-sm leading-6 text-[#a8b5c4]">
                     {preview}
                   </p>
                   <div className="relative mt-5 h-20 overflow-hidden border border-[#1f2934] bg-[#0b0f14]">
@@ -244,9 +251,15 @@ export default async function HomePage() {
                     >
                       Få hela gratis
                     </a>
+                    <a
+                      href="#pricing"
+                      className="text-center text-sm font-black text-emerald-300 transition hover:text-emerald-200"
+                    >
+                      Se månadsaccess
+                    </a>
                     <CheckoutButton
-                      buttonClassName="w-full border border-[#26313d] bg-[#111820] px-4 py-3 text-sm font-black text-white transition hover:border-emerald-300 hover:text-emerald-300 disabled:cursor-wait disabled:opacity-70"
-                      buttonLabel="Köp dagspass - 49 kr"
+                      buttonClassName="w-full border border-[#26313d] px-4 py-3 text-sm font-black text-[#8d9aaa] transition hover:border-emerald-300 hover:text-emerald-300 disabled:cursor-wait disabled:opacity-70"
+                      buttonLabel="Läs dagens rapport - 49 kr"
                       priceLabel="49 kr"
                       topicSlug={topic.slug}
                     />

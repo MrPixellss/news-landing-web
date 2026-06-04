@@ -22,20 +22,6 @@ type PlanCardProps = {
   muted?: boolean;
 };
 
-const comparisonRows = [
-  ["Fullständig rapport", "1 gång", "Ja", "Ja", "Dagens rapport", "Ja"],
-  ["Dagliga rapporter", "Nej", "Ja", "Ja", "Nej", "Ja"],
-  ["10 analysområden", "Ja", "Ja", "Ja", "Ja", "Ja"],
-  ["Veckosammanfattning", "Nej", "Ja", "Ja", "Nej", "Ja"],
-  ["Månadsutsikt", "Nej", "Ja", "Ja", "Nej", "Ja"],
-  ["Arkivatkomst", "Nej", "När tillgängligt", "När tillgängligt", "Dagens rapport", "Ja"],
-  ["E-postleverans", "Ja", "Ja", "Ja", "Ja", "Ja"],
-  ["Flera mottagare", "Nej", "Nej", "Nej", "Nej", "Ja"],
-  ["Engångsbetalning", "Nej", "Nej", "Ja", "Ja", "Vid behov"],
-  ["Prenumeration", "Nej", "Ja", "Nej", "Nej", "Avtal"],
-  ["Faktura", "Nej", "Nej", "Nej", "Nej", "Ja"],
-];
-
 const faqItems = [
   {
     question: "Är detta investeringsrådgivning?",
@@ -157,8 +143,8 @@ export function PricingSection({ primaryTopicSlug }: { primaryTopicSlug: string 
 
   return (
     <section ref={sectionRef} id="pricing" className="border-b border-[#1a222c] py-10">
-      <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
-        <div>
+      <div>
+        <div className="max-w-4xl">
           <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
             Priser
           </p>
@@ -166,14 +152,13 @@ export function PricingSection({ primaryTopicSlug }: { primaryTopicSlug: string 
             Börja gratis, följ marknaden löpande när du är redo
           </h2>
           <p className="mt-4 max-w-4xl text-base leading-7 text-[#c7d1dd]">
-            Gratisrapporten visar produkten. Månadsaccess är huvudvägen för dig
-            som vill få marknadsbilden varje morgon.
+            Gratisrapporten visar kvaliteten. Månadsaccess är enklaste vägen att
+            få marknadsbilden varje morgon. Halvårsaccess ger lägre
+            månadskostnad för dig som vill följa marknaden löpande. Alla
+            rapporter bygger på primärkällor och regelstyrd analys. Inte
+            investeringsrådgivning.
           </p>
         </div>
-        <p className="max-w-xl border border-[#26313d] bg-[#0d1117] p-4 text-sm font-bold leading-6 text-[#d7e1eb]">
-          Alla rapporter bygger på primärkällor, regelstyrd analys och tydliga
-          marknadssignaler. Inte investeringsrådgivning.
-        </p>
       </div>
 
       <div className="mt-7 grid gap-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
@@ -340,32 +325,100 @@ export function PricingSection({ primaryTopicSlug }: { primaryTopicSlug: string 
       </div>
 
       <div className="mt-8 border border-[#26313d] bg-[#0d1117] p-4 md:p-6">
-        <h3 className="text-2xl font-bold tracking-[-0.02em]">Jämför alternativen</h3>
-        <div className="mt-5 overflow-x-auto">
-          <table className="w-full min-w-[980px] border-collapse text-left text-sm">
-            <thead>
-              <tr className="border-b border-[#26313d] text-[#d7e1eb]">
-                <th className="py-3 pr-4 font-black">Ingår</th>
-                <th className="px-4 py-3 font-black">Gratisrapport</th>
-                <th className="px-4 py-3 font-black text-emerald-300">Månadsaccess</th>
-                <th className="px-4 py-3 font-black">Halvårsaccess</th>
-                <th className="px-4 py-3 font-black">Dagsrapport</th>
-                <th className="pl-4 py-3 font-black">Företag</th>
-              </tr>
-            </thead>
-            <tbody>
-              {comparisonRows.map(([label, free, month, halfYear, day, business]) => (
-                <tr key={label} className="border-b border-[#1a222c] last:border-b-0">
-                  <td className="py-3 pr-4 font-bold text-[#d7e1eb]">{label}</td>
-                  <td className="px-4 py-3 text-[#a8b5c4]">{free}</td>
-                  <td className="px-4 py-3 font-bold text-[#d7e1eb]">{month}</td>
-                  <td className="px-4 py-3 text-[#a8b5c4]">{halfYear}</td>
-                  <td className="px-4 py-3 text-[#a8b5c4]">{day}</td>
-                  <td className="pl-4 py-3 text-[#a8b5c4]">{business}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <h3 className="text-2xl font-bold tracking-[-0.02em]">
+          Vilket alternativ passar dig?
+        </h3>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          <article className="flex min-h-[250px] flex-col border border-emerald-300/60 bg-[#101821] p-5">
+            <span className="w-fit border border-emerald-300 bg-emerald-300 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-[#06100c]">
+              Bäst att börja med
+            </span>
+            <h4 className="mt-4 text-xl font-black">Månadsaccess</h4>
+            <p className="mt-3 text-sm leading-6 text-[#c7d1dd]">
+              För dig som vill få rapporten varje morgon och kunna avsluta när du
+              vill.
+            </p>
+            <div className="mt-auto pt-5">
+              <CheckoutButton
+                buttonLabel="Starta månadsaccess"
+                description="Du får dagliga fullständiga rapporter, veckosammanfattning och månadsutsikt via e-post under aktiv period."
+                onOpen={() =>
+                  trackProductEvent("monthly_click", {
+                    product: "monthly_access",
+                    productName: "Månadsaccess",
+                    priceLabel: "249 kr/mån",
+                    topicSlug: primaryTopicSlug,
+                    source: "pricing_choice",
+                  })
+                }
+                priceLabel="249 kr/mån"
+                product="monthly_access"
+                productName="Månadsaccess"
+                topicSlug={primaryTopicSlug}
+              />
+            </div>
+          </article>
+
+          <article className="flex min-h-[250px] flex-col border border-[#334253] bg-[#0f151d] p-5">
+            <span className="w-fit border border-emerald-300/70 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-emerald-300">
+              Mest värde
+            </span>
+            <h4 className="mt-4 text-xl font-black">Halvårsaccess</h4>
+            <p className="mt-3 text-sm leading-6 text-[#c7d1dd]">
+              För dig som redan vet att du vill följa marknaden löpande och vill
+              spara cirka 20%.
+            </p>
+            <div className="mt-auto pt-5">
+              <CheckoutButton
+                buttonClassName="w-full border border-emerald-300/70 px-5 py-4 text-sm font-black text-emerald-300 transition hover:bg-emerald-300 hover:text-[#06100c] disabled:cursor-wait disabled:opacity-70"
+                buttonLabel="Välj halvårsaccess"
+                description="Du får 6 månaders tillgång till Finansanalytik med dagliga rapporter, veckosammanfattning och månadsutsikt via e-post."
+                onOpen={() =>
+                  trackProductEvent("halfyear_click", {
+                    product: "half_year_access",
+                    productName: "Halvårsaccess",
+                    priceLabel: "1 199 kr",
+                    topicSlug: primaryTopicSlug,
+                    source: "pricing_choice",
+                  })
+                }
+                priceLabel="1 199 kr"
+                product="half_year_access"
+                productName="Halvårsaccess"
+                topicSlug={primaryTopicSlug}
+              />
+            </div>
+          </article>
+
+          <article className="flex min-h-[250px] flex-col border border-[#1f2934] bg-[#0b0f14] p-5">
+            <span className="w-fit border border-[#334253] px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-[#8d9aaa]">
+              Endast idag
+            </span>
+            <h4 className="mt-4 text-xl font-black text-[#d7e1eb]">Dagsrapport</h4>
+            <p className="mt-3 text-sm leading-6 text-[#a8b5c4]">
+              För dig som bara vill läsa dagens rapport en gång utan
+              abonnemang.
+            </p>
+            <div className="mt-auto pt-5">
+              <CheckoutButton
+                buttonClassName="w-full border border-[#26313d] px-5 py-4 text-sm font-black text-[#c7d1dd] transition hover:border-emerald-300 hover:text-emerald-300 disabled:cursor-wait disabled:opacity-70"
+                buttonLabel="Köp dagens rapport"
+                onOpen={() =>
+                  trackProductEvent("daypass_click", {
+                    product: "day_pass",
+                    productName: "Dagsrapport",
+                    priceLabel: "49 kr",
+                    topicSlug: primaryTopicSlug,
+                    source: "pricing_choice",
+                  })
+                }
+                priceLabel="49 kr"
+                product="day_pass"
+                productName="Dagsrapport"
+                topicSlug={primaryTopicSlug}
+              />
+            </div>
+          </article>
         </div>
       </div>
 

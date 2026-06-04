@@ -235,11 +235,8 @@ function isFreeReportEmailVisit(
   const utmCampaign = searchParamValue(params, "utm_campaign");
   const utmContent = searchParamValue(params, "utm_content");
 
-  if (utmSource !== "email") {
-    return false;
-  }
-
   return (
+    utmSource === "email" ||
     utmMedium === "free_followup" ||
     utmMedium === "free_report" ||
     utmCampaign.includes("free_report") ||
@@ -293,6 +290,12 @@ export default async function TopicPage({ params, searchParams }: TopicPageProps
   const publicHighlights =
     publicHighlightsRaw.length >= 3 ? publicHighlightsRaw : fallbackHighlights(topic.name);
   const publicLockedParagraphs = publicHighlights.slice(0, 4);
+  const lockedCtaTitle = hideFreeReportOffer
+    ? "Fortsätt med löpande marknadsaccess"
+    : "Lås upp dagens fullständiga briefing";
+  const lockedCtaDescription = hideFreeReportOffer
+    ? "Du har redan fått gratisrapporten. Månadsaccess ger hela marknadsbilden varje morgon och inkluderar dagens övriga 9 marknadsrapporter."
+    : "Få hela denna analys och dagens övriga 9 marknadsrapporter. Ingen prenumeration krävs.";
 
   return (
     <main className={`min-h-screen bg-[#07090b] text-zinc-50 ${hasContent ? "pb-28 md:pb-0" : ""}`}>
@@ -409,11 +412,10 @@ export default async function TopicPage({ params, searchParams }: TopicPageProps
               <div className="absolute inset-0 grid place-items-center p-5">
                 <div className="w-full max-w-sm border border-emerald-300/55 bg-[#07090b]/95 p-5 text-center shadow-2xl">
                   <p className="text-xl font-black">
-                    Lås upp dagens fullständiga briefing
+                    {lockedCtaTitle}
                   </p>
                   <p className="mt-3 text-sm leading-6 text-[#a8b5c4]">
-                    Få hela denna analys och dagens övriga 9 marknadsrapporter.
-                    Ingen prenumeration krävs.
+                    {lockedCtaDescription}
                   </p>
                   {hideFreeReportOffer ? (
                     <>
@@ -428,6 +430,15 @@ export default async function TopicPage({ params, searchParams }: TopicPageProps
                       <p className="mt-2 text-xs font-bold uppercase tracking-[0.16em] text-emerald-300">
                         Moms ingår
                       </p>
+                      <CheckoutButton
+                        buttonClassName="mt-3 w-full border border-emerald-300/70 px-5 py-3 text-sm font-black text-emerald-300 transition hover:bg-emerald-300 hover:text-[#06100c] disabled:cursor-wait disabled:opacity-70"
+                        buttonLabel="Välj halvårsaccess - 1 199 kr"
+                        description="Du får 6 månaders tillgång till Finansanalytik med dagliga rapporter, veckosammanfattning och månadsutsikt via e-post."
+                        priceLabel="1 199 kr"
+                        product="half_year_access"
+                        productName="Halvårsaccess"
+                        topicSlug={slug}
+                      />
                       <p className="mt-4 border border-[#26313d] bg-[#0b0f14] p-4 text-sm font-bold leading-6 text-[#c7d1dd]">
                         Du har redan fått gratisrapporten via e-post. Nästa
                         steg är löpande access till hela analyspaketet.
@@ -485,25 +496,37 @@ export default async function TopicPage({ params, searchParams }: TopicPageProps
             <div className="mb-3 flex items-end justify-between gap-3">
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-emerald-300">
-                  Dagspass
+                  {hideFreeReportOffer ? "Månadsaccess" : "Dagspass"}
                 </p>
                 <p className="mt-1 text-sm font-bold text-zinc-50">
-                  Dagens 10 analyser
+                  {hideFreeReportOffer ? "Dagliga rapporter" : "Dagens 10 analyser"}
                 </p>
               </div>
               <p className="text-right text-sm font-black text-zinc-50">
-                49 kr
+                {hideFreeReportOffer ? "249 kr/mån" : "49 kr"}
                 <span className="block text-[10px] font-bold uppercase tracking-[0.14em] text-[#8d9aaa]">
                   moms ingår
                 </span>
               </p>
             </div>
-            <CheckoutButton
-              buttonClassName="w-full bg-emerald-300 px-5 py-5 text-sm font-black text-[#04100b] shadow-lg shadow-emerald-950/40 ring-1 ring-emerald-100/40 transition hover:bg-emerald-200 disabled:cursor-wait disabled:opacity-70"
-              buttonLabel="Köp dagspass - 49 kr"
-              priceLabel="49 kr"
-              topicSlug={slug}
-            />
+            {hideFreeReportOffer ? (
+              <CheckoutButton
+                buttonClassName="w-full bg-emerald-300 px-5 py-5 text-sm font-black text-[#04100b] shadow-lg shadow-emerald-950/40 ring-1 ring-emerald-100/40 transition hover:bg-emerald-200 disabled:cursor-wait disabled:opacity-70"
+                buttonLabel="Starta månadsaccess - 249 kr/mån"
+                description="Du får dagliga fullständiga rapporter, veckosammanfattning och månadsutsikt via e-post under aktiv period."
+                priceLabel="249 kr/mån"
+                product="monthly_access"
+                productName="Månadsaccess"
+                topicSlug={slug}
+              />
+            ) : (
+              <CheckoutButton
+                buttonClassName="w-full bg-emerald-300 px-5 py-5 text-sm font-black text-[#04100b] shadow-lg shadow-emerald-950/40 ring-1 ring-emerald-100/40 transition hover:bg-emerald-200 disabled:cursor-wait disabled:opacity-70"
+                buttonLabel="Köp dagspass - 49 kr"
+                priceLabel="49 kr"
+                topicSlug={slug}
+              />
+            )}
           </div>
         </div>
       ) : null}
