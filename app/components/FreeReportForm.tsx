@@ -261,17 +261,6 @@ export function FreeReportForm({
             productName="Dagsrapport"
             topicSlug={topicSlug}
           />
-          <button
-            className="text-sm font-bold text-[#8fa1b5] underline-offset-4 transition hover:text-emerald-300 hover:underline"
-            type="button"
-            onClick={() => {
-              setStatus("idle");
-              setMessage("");
-              resetTurnstile();
-            }}
-          >
-            Använd en annan e-postadress
-          </button>
         </div>
       </div>
     );
