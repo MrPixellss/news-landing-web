@@ -38,11 +38,7 @@ export const metadata: Metadata = {
   },
 };
 
-const teaserFallbacks = [
-  "Dagens signaler sammanställs från flera källor.",
-  "Fokus ligger på vad som förändrats och varför det kan påverka riskbilden.",
-  "Full analys finns i rapporten.",
-];
+const lockedAnalysisFallback = "Full analys är låst i rapporten.";
 
 function normalizeTeaserSentence(value: string) {
   return normalizeSwedishCopy(value)
@@ -73,6 +69,10 @@ function looksBrokenTeaserSentence(value: string, headline: string) {
     lower.includes("; marknadseffekten") ||
     lower.includes("marknadseffekten är att") ||
     lower.includes("marknadseffekten") ||
+    lower.includes("präglas i dag av") ||
+    lower.includes("bygger inte på en enskild rubrik") ||
+    lower.includes("dagens signaler sammanställs") ||
+    lower.includes("fokus ligger på vad som förändrats") ||
     lower.includes("current rule-based") ||
     lower.includes("the first market impact") ||
     lower.includes("investors may") ||
@@ -86,10 +86,9 @@ function safeTeaserSentences(headline: string, teaser: string) {
   const candidates = normalizeSwedishCopy(teaser).split(/(?<=[.!?])\s+/)
     .map(normalizeTeaserSentence)
     .filter((item) => item.length >= 28 && !looksBrokenTeaserSentence(item, headline));
-  const source = [...candidates, ...teaserFallbacks];
   const seen = new Set<string>();
 
-  return source
+  return candidates
     .filter((item) => {
       const key = teaserKey(item);
       if (seen.has(key)) {
@@ -212,7 +211,9 @@ export default async function HomePage() {
                 normalizeSwedishCopy(block?.teaser),
               );
               const bullets = safeSentences.slice(0, 2);
-              const preview = shortPreview(safeSentences[2] || teaserFallbacks[2], 2);
+              const preview = safeSentences[2]
+                ? shortPreview(safeSentences[2], 2)
+                : lockedAnalysisFallback;
 
               return (
                 <article
