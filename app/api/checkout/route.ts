@@ -27,7 +27,7 @@ export async function POST(request: Request) {
       ? body.returnPath.trim()
       : "/";
 
-  if (!["day_pass", "monthly_access", "half_year_access"].includes(product)) {
+  if (!["day_pass", "monthly_access", "half_year_access", "monthly_access_intro_week"].includes(product)) {
     return NextResponse.json({ error: "Okänd produkt." }, { status: 400 });
   }
 
@@ -44,7 +44,9 @@ export async function POST(request: Request) {
 
   try {
     const backendPath =
-      product === "monthly_access" || product === "half_year_access"
+      product === "monthly_access" ||
+      product === "half_year_access" ||
+      product === "monthly_access_intro_week"
         ? "/api/subscriptions/create-checkout-session"
         : "/api/payments/create-checkout-session";
     const response = await fetch(`${baseUrl}${backendPath}`, {

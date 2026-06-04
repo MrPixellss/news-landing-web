@@ -8,6 +8,7 @@ import {
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as {
     topicSlug?: string;
+    product?: string;
     marketingOptIn?: boolean;
     customerEmail?: string;
     customerCountry?: string;
@@ -19,11 +20,16 @@ export async function POST(request: Request) {
     trackingFbc?: string;
   } | null;
   const topicSlug = normalizeCheckoutTopicSlug(body?.topicSlug);
+  const product = (body?.product || "monthly_access").trim();
   const customerEmail = normalizeCheckoutEmail(body?.customerEmail);
   const returnPath =
     body?.returnPath?.trim().startsWith("/") && !body.returnPath.trim().startsWith("//")
       ? body.returnPath.trim()
       : "/";
+
+  if (!["monthly_access", "half_year_access", "monthly_access_intro_week"].includes(product)) {
+    return NextResponse.json({ error: "Okänd produkt." }, { status: 400 });
+  }
 
   if (!isValidCheckoutEmail(customerEmail)) {
     return NextResponse.json(
@@ -42,6 +48,7 @@ export async function POST(request: Request) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         topic_slug: topicSlug,
+        product,
         marketing_opt_in: Boolean(body?.marketingOptIn),
         customer_email: customerEmail,
         customer_country: body?.customerCountry,

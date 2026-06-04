@@ -48,6 +48,28 @@ Jag vill få produktnyheter, erbjudanden och marknadsföring via e-post. Jag kan
 
 Starta månadsaccess - 249 kr/mån
 
+## Introduktionserbjudande Månadsaccess
+
+### Produkttext
+
+Månadsaccess - första veckan 9,99 kr, därefter 249 kr/mån, moms ingår
+
+Prova Finansanalytik med dagliga marknadsbriefingar under första veckan. Efter introduktionsveckan fortsätter Månadsaccess till ordinarie pris, 249 kr/mån, och kan sägas upp inför kommande perioder.
+
+### Checkboxar före betalning
+
+Krävs för köp:
+
+Jag godkänner Köpvillkoren och Integritetspolicyn, inklusive att första veckan kostar 9,99 kr och att prenumerationen därefter fortsätter till 249 kr/mån tills den sägs upp.
+
+Valfritt:
+
+Jag vill få produktnyheter, erbjudanden och marknadsföring via e-post. Jag kan avregistrera mig när som helst.
+
+### Knapptext
+
+Prova första veckan - 9,99 kr
+
 ## Kort disclaimer nära köp
 
 Finansanalytik är informations- och utbildningsmaterial baserat på AI-stödd analys av aktuella nyheter, offentliga källor och marknadssignaler. Det är inte investeringsrådgivning, finansiell rådgivning eller en rekommendation att köpa eller sälja tillgångar.
