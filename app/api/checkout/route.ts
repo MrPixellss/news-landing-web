@@ -44,7 +44,7 @@ export async function POST(request: Request) {
 
   try {
     const backendPath =
-      product === "monthly_access"
+      product === "monthly_access" || product === "half_year_access"
         ? "/api/subscriptions/create-checkout-session"
         : "/api/payments/create-checkout-session";
     const response = await fetch(`${baseUrl}${backendPath}`, {
