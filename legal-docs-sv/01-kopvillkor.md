@@ -42,9 +42,7 @@ Innehåll levereras via e-post och/eller görs tillgängligt på webbplatsen.
 
 Alla priser visas i svenska kronor inklusive moms, om inget annat anges.
 
-Dagspass kostar 49 kr inklusive moms. Månadsaccess kostar 249 kr/mån inklusive moms.
-
-Om ett introduktionserbjudande visas kan första veckan av Månadsaccess erbjudas för 9,99 kr inklusive moms. Efter introduktionsveckan övergår prenumerationen till ordinarie pris, 249 kr/mån inklusive moms, tills den sägs upp.
+Dagspass kostar 49 kr inklusive moms. Månadsaccess kostar 249 kr/mån inklusive moms. Halvårsaccess kostar 1 199 kr per 6 månader inklusive moms.
 
 Betalning hanteras av Stripe. TVP Byrå lagrar inte fullständiga kortnummer eller fullständiga betalningsuppgifter.
 
@@ -52,7 +50,7 @@ Stripe kan behandla betalningsuppgifter, faktureringsuppgifter och annan informa
 
 ## 5. Prenumeration och uppsägning
 
-Månadsaccess förnyas automatiskt varje månad tills prenumerationen sägs upp. Om du startar Månadsaccess via introduktionserbjudandet debiteras 9,99 kr för första veckan och därefter ordinarie månadspris enligt villkoren i betalflödet.
+Månadsaccess förnyas automatiskt varje månad tills prenumerationen sägs upp. Halvårsaccess förnyas automatiskt var sjätte månad tills prenumerationen sägs upp.
 
 Du kan säga upp prenumerationen för kommande betalningsperioder enligt de instruktioner som tillhandahålls vid köp, via Stripe eller genom att kontakta support@tvp-byra.se.
 

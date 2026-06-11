@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CheckoutButton } from "./components/CheckoutButton";
 import { FreeReportForm } from "./components/FreeReportForm";
 import { MobileStickyCta } from "./components/MobileStickyCta";
 import { PricingSection } from "./components/PricingSection";
@@ -18,7 +17,7 @@ export const revalidate = 0;
 export const metadata: Metadata = {
   title: "AI-stödd daglig marknadsanalys",
   description:
-    "Få dagens marknadsbild gratis: en svensk morgonbrief med 10 analysområden, primärkällor och tydlig riskbild direkt till din e-post.",
+    "Svensk morgonbrief med 10 analysområden, primärkällor och tydlig marknadsbild direkt till din e-post.",
   alternates: {
     canonical: "/",
   },
@@ -26,7 +25,7 @@ export const metadata: Metadata = {
     url: "/",
     title: "Finansanalytik - AI-stödd daglig marknadsanalys",
     description:
-      "Få dagens marknadsbild gratis: en svensk morgonbrief med 10 analysområden och tydlig riskbild direkt till din e-post.",
+      "Svensk morgonbrief med 10 analysområden, primärkällor och tydlig marknadsbild direkt till din e-post.",
     images: [
       {
         url: "/og-finansanalytik.png",
@@ -146,7 +145,7 @@ export default async function HomePage() {
               {reportDate}
             </p>
             <h1 className="mt-5 max-w-5xl text-[44px] font-bold leading-[0.94] tracking-[-0.04em] sm:text-6xl lg:text-[82px]">
-              Få dagens marknadsbild gratis
+              Se vad som styr marknaden innan börsen öppnar
             </h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-[#c7d1dd]">
               En komplett svensk marknadsbrief med 10 analysområden, byggd på
@@ -157,7 +156,6 @@ export default async function HomePage() {
                 "10 områden i en samlad rapport",
                 "Makro, ränta, börs, valutor, råvaror och riskbild",
                 "Byggd på nyheter, offentliga källor och primärdata",
-                "Inte investeringsrådgivning",
                 "1 gratisrapport per e-postadress",
               ].map((item) => (
                 <div key={item} className="border border-[#26313d] bg-[#0d1117] p-4">
@@ -251,29 +249,11 @@ export default async function HomePage() {
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#0b0f14]" />
                   </div>
                   <div className="mt-auto grid gap-2 pt-5">
-                    <a
-                      href="#gratis-rapport"
-                      className="border border-emerald-300/70 px-4 py-3 text-center text-sm font-black text-emerald-300 transition hover:bg-emerald-300 hover:text-[#06100c]"
-                    >
-                      Få hela gratis
-                    </a>
-                    <a
-                      href="#pricing"
-                      className="text-center text-sm font-black text-emerald-300 transition hover:text-emerald-200"
-                    >
-                      Se månadsaccess
-                    </a>
-                    <CheckoutButton
-                      buttonClassName="w-full border border-[#26313d] px-4 py-3 text-sm font-black text-[#8d9aaa] transition hover:border-emerald-300 hover:text-emerald-300 disabled:cursor-wait disabled:opacity-70"
-                      buttonLabel="Läs dagens rapport - 49 kr"
-                      priceLabel="49 kr"
-                      topicSlug={topic.slug}
-                    />
                     <Link
                       href={`/topics/${topic.slug}`}
-                      className="text-center text-sm font-bold text-[#a8b5c4] transition hover:text-emerald-300"
+                      className="border border-[#26313d] px-4 py-3 text-center text-sm font-black text-[#d7e1eb] transition hover:border-emerald-300 hover:text-emerald-300"
                     >
-                      Läs förhandsvisning →
+                      Läs förhandsvisning
                     </Link>
                   </div>
                 </article>

@@ -24,9 +24,9 @@ type PlanCardProps = {
 
 const faqItems = [
   {
-    question: "Är detta investeringsrådgivning?",
+    question: "Hur levereras rapporten?",
     answer:
-      "Nej. Finansanalytik är marknadsanalys och informationsbearbetning, inte personlig investeringsrådgivning.",
+      "Rapporten skickas via e-post med länk till dagens fullständiga analys.",
   },
   {
     question: "Vad får jag i gratisrapporten?",
@@ -41,12 +41,12 @@ const faqItems = [
   {
     question: "Vad är skillnaden mellan Dagsrapport och Månadsaccess?",
     answer:
-      "Dagsrapport ger tillgång till dagens rapport. Månadsaccess ger löpande dagliga rapporter under aktiv period.",
+      "Dagsrapport gäller dagens analys. Månadsaccess är för dig som vill följa marknadsbilden löpande.",
   },
   {
     question: "Varför välja Halvårsaccess?",
     answer:
-      "Halvårsaccess ger samma löpande tillgång som Månadsaccess men till lägre effektiv månadskostnad.",
+      "Halvårsaccess passar om du redan vet att du vill följa rapporterna över längre tid.",
   },
 ];
 
@@ -155,8 +155,7 @@ export function PricingSection({ primaryTopicSlug }: { primaryTopicSlug: string 
             Gratisrapporten visar kvaliteten. Månadsaccess är enklaste vägen att
             få marknadsbilden varje morgon. Halvårsaccess ger lägre
             månadskostnad för dig som vill följa marknaden löpande. Alla
-            rapporter bygger på primärkällor och regelstyrd analys. Inte
-            investeringsrådgivning.
+            rapporter bygger på primärkällor och regelstyrd analys.
           </p>
         </div>
       </div>
@@ -239,7 +238,7 @@ export function PricingSection({ primaryTopicSlug }: { primaryTopicSlug: string 
             "6 månaders tillgång",
             "Lägre effektiv månadskostnad",
             "Prioriterad e-postleverans",
-            "Arkivatkomst när tillgängligt",
+            "Samma rapportflöde under hela perioden",
           ]}
           condition="Engångsbetalning för 6 månaders access."
           secondaryText="Value-offer för dig som redan vet att du vill följa rapporterna löpande."
@@ -322,104 +321,6 @@ export function PricingSection({ primaryTopicSlug }: { primaryTopicSlug: string 
             </Link>
           }
         />
-      </div>
-
-      <div className="mt-8 border border-[#26313d] bg-[#0d1117] p-4 md:p-6">
-        <h3 className="text-2xl font-bold tracking-[-0.02em]">
-          Vilket alternativ passar dig?
-        </h3>
-        <div className="mt-5 grid gap-3 lg:grid-cols-3">
-          <article className="flex min-h-[250px] flex-col border border-emerald-300/60 bg-[#101821] p-5">
-            <span className="w-fit border border-emerald-300 bg-emerald-300 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-[#06100c]">
-              Bäst att börja med
-            </span>
-            <h4 className="mt-4 text-xl font-black">Månadsaccess</h4>
-            <p className="mt-3 text-sm leading-6 text-[#c7d1dd]">
-              För dig som vill få rapporten varje morgon och kunna avsluta när du
-              vill.
-            </p>
-            <div className="mt-auto pt-5">
-              <CheckoutButton
-                buttonLabel="Starta månadsaccess"
-                description="Du får dagliga fullständiga rapporter, veckosammanfattning och månadsutsikt via e-post under aktiv period."
-                onOpen={() =>
-                  trackProductEvent("monthly_click", {
-                    product: "monthly_access",
-                    productName: "Månadsaccess",
-                    priceLabel: "249 kr/mån",
-                    topicSlug: primaryTopicSlug,
-                    source: "pricing_choice",
-                  })
-                }
-                priceLabel="249 kr/mån"
-                product="monthly_access"
-                productName="Månadsaccess"
-                topicSlug={primaryTopicSlug}
-              />
-            </div>
-          </article>
-
-          <article className="flex min-h-[250px] flex-col border border-[#334253] bg-[#0f151d] p-5">
-            <span className="w-fit border border-emerald-300/70 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-emerald-300">
-              Mest värde
-            </span>
-            <h4 className="mt-4 text-xl font-black">Halvårsaccess</h4>
-            <p className="mt-3 text-sm leading-6 text-[#c7d1dd]">
-              För dig som redan vet att du vill följa marknaden löpande och vill
-              spara cirka 20%.
-            </p>
-            <div className="mt-auto pt-5">
-              <CheckoutButton
-                buttonClassName="w-full border border-emerald-300/70 px-5 py-4 text-sm font-black text-emerald-300 transition hover:bg-emerald-300 hover:text-[#06100c] disabled:cursor-wait disabled:opacity-70"
-                buttonLabel="Välj halvårsaccess"
-                description="Du får 6 månaders tillgång till Finansanalytik med dagliga rapporter, veckosammanfattning och månadsutsikt via e-post."
-                onOpen={() =>
-                  trackProductEvent("halfyear_click", {
-                    product: "half_year_access",
-                    productName: "Halvårsaccess",
-                    priceLabel: "1 199 kr",
-                    topicSlug: primaryTopicSlug,
-                    source: "pricing_choice",
-                  })
-                }
-                priceLabel="1 199 kr"
-                product="half_year_access"
-                productName="Halvårsaccess"
-                topicSlug={primaryTopicSlug}
-              />
-            </div>
-          </article>
-
-          <article className="flex min-h-[250px] flex-col border border-[#1f2934] bg-[#0b0f14] p-5">
-            <span className="w-fit border border-[#334253] px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-[#8d9aaa]">
-              Endast idag
-            </span>
-            <h4 className="mt-4 text-xl font-black text-[#d7e1eb]">Dagsrapport</h4>
-            <p className="mt-3 text-sm leading-6 text-[#a8b5c4]">
-              För dig som bara vill läsa dagens rapport en gång utan
-              abonnemang.
-            </p>
-            <div className="mt-auto pt-5">
-              <CheckoutButton
-                buttonClassName="w-full border border-[#26313d] px-5 py-4 text-sm font-black text-[#c7d1dd] transition hover:border-emerald-300 hover:text-emerald-300 disabled:cursor-wait disabled:opacity-70"
-                buttonLabel="Köp dagens rapport"
-                onOpen={() =>
-                  trackProductEvent("daypass_click", {
-                    product: "day_pass",
-                    productName: "Dagsrapport",
-                    priceLabel: "49 kr",
-                    topicSlug: primaryTopicSlug,
-                    source: "pricing_choice",
-                  })
-                }
-                priceLabel="49 kr"
-                product="day_pass"
-                productName="Dagsrapport"
-                topicSlug={primaryTopicSlug}
-              />
-            </div>
-          </article>
-        </div>
       </div>
 
       <div className="mt-8 grid gap-4 lg:grid-cols-5">

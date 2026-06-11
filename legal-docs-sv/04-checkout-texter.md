@@ -48,19 +48,19 @@ Jag vill få produktnyheter, erbjudanden och marknadsföring via e-post. Jag kan
 
 Starta månadsaccess - 249 kr/mån
 
-## Introduktionserbjudande Månadsaccess
+## Halvårsaccess
 
 ### Produkttext
 
-Månadsaccess - första veckan 9,99 kr, därefter 249 kr/mån, moms ingår
+Halvårsaccess - 1 199 kr per 6 månader, moms ingår
 
-Prova Finansanalytik med dagliga marknadsbriefingar under första veckan. Efter introduktionsveckan fortsätter Månadsaccess till ordinarie pris, 249 kr/mån, och kan sägas upp inför kommande perioder.
+Få löpande tillgång till dagliga marknadsbriefingar, veckosammanfattning och månadsutsikt under aktiv halvårsperiod.
 
 ### Checkboxar före betalning
 
 Krävs för köp:
 
-Jag godkänner Köpvillkoren och Integritetspolicyn, inklusive att första veckan kostar 9,99 kr och att prenumerationen därefter fortsätter till 249 kr/mån tills den sägs upp.
+Jag godkänner Köpvillkoren och Integritetspolicyn, inklusive omedelbar leverans av digitalt innehåll via e-post och att ångerrätten går förlorad när leveransen har påbörjats.
 
 Valfritt:
 
@@ -68,7 +68,7 @@ Jag vill få produktnyheter, erbjudanden och marknadsföring via e-post. Jag kan
 
 ### Knapptext
 
-Prova första veckan - 9,99 kr
+Välj halvårsaccess - 1 199 kr
 
 ## Kort disclaimer nära köp
 
