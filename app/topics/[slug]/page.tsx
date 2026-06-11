@@ -219,6 +219,29 @@ function uniqueAnalysisHighlights(
     .slice(0, 4);
 }
 
+function uniqueParagraphs(values: string[], limit: number) {
+  const seen = new Set<string>();
+  const result: string[] = [];
+
+  for (const value of values) {
+    const sentence = normalizeSwedishCopy(value).replace(/\s+/g, " ").trim();
+    const key = sentenceKey(sentence);
+
+    if (!sentence || sentence.length < 50 || seen.has(key)) {
+      continue;
+    }
+
+    seen.add(key);
+    result.push(sentence);
+
+    if (result.length >= limit) {
+      break;
+    }
+  }
+
+  return result;
+}
+
 function searchParamValue(
   params: Record<string, string | string[] | undefined>,
   key: string,
@@ -289,7 +312,18 @@ export default async function TopicPage({ params, searchParams }: TopicPageProps
   );
   const publicHighlights =
     publicHighlightsRaw.length >= 3 ? publicHighlightsRaw : fallbackHighlights(topic.name);
-  const publicLockedParagraphs = publicHighlights.slice(0, 4);
+  const openPreviewParagraphs = uniqueParagraphs(
+    [publicPreview, ...publicHighlights.slice(0, 2)],
+    2,
+  );
+  const publicLockedParagraphs = uniqueParagraphs(
+    [
+      ...publicHighlights.slice(openPreviewParagraphs.length),
+      ...publicHighlights,
+      publicPreview,
+    ],
+    4,
+  );
   const lockedCtaTitle = hideFreeReportOffer
     ? "Fortsätt med löpande marknadsaccess"
     : "Lås upp dagens fullständiga briefing";
@@ -384,9 +418,22 @@ export default async function TopicPage({ params, searchParams }: TopicPageProps
               <h2 className="mt-4 text-2xl font-bold tracking-[-0.02em]">
                 Kort utdrag ur analysen
               </h2>
-              <p className="mt-5 text-lg leading-9 text-[#c7d1dd]">
-                {publicPreview}
+            </div>
+
+            <div className="mx-auto mt-7 max-w-4xl border border-[#26313d] bg-[#0b0f14] p-5 md:p-7">
+              <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-emerald-300">
+                Öppen förhandsvisning
               </p>
+              <div className="mt-4 space-y-4">
+                {openPreviewParagraphs.map((paragraph) => (
+                  <p
+                    key={paragraph}
+                    className="text-lg leading-9 text-[#d4dce6]"
+                  >
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
             </div>
 
             <div className="relative mt-7 overflow-hidden border border-[#26313d] bg-[#0b0f14]">
