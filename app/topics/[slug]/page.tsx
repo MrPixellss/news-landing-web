@@ -389,27 +389,29 @@ export default async function TopicPage({ params, searchParams }: TopicPageProps
               </p>
             </div>
 
-            <div className="relative mt-7 min-h-[430px] overflow-hidden border border-[#26313d] bg-[#0b0f14]">
-              <div className="pointer-events-none select-none space-y-5 p-7 blur-[5px]">
-                {publicLockedParagraphs.map((paragraph) => (
-                  <p
-                    key={paragraph}
-                    className="text-base leading-8 text-[#d4dce6]"
-                  >
-                    {paragraph}
-                  </p>
-                ))}
-                {publicLockedParagraphs.map((paragraph) => (
-                  <p
-                    key={`locked-repeat-${paragraph}`}
-                    className="text-base leading-8 text-[#d4dce6]"
-                  >
-                    {paragraph}
-                  </p>
-                ))}
+            <div className="relative mt-7 overflow-hidden border border-[#26313d] bg-[#0b0f14]">
+              <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
+                <div className="space-y-5 p-7 blur-[5px]">
+                  {publicLockedParagraphs.map((paragraph) => (
+                    <p
+                      key={paragraph}
+                      className="text-base leading-8 text-[#d4dce6]"
+                    >
+                      {paragraph}
+                    </p>
+                  ))}
+                  {publicLockedParagraphs.map((paragraph) => (
+                    <p
+                      key={`locked-repeat-${paragraph}`}
+                      className="text-base leading-8 text-[#d4dce6]"
+                    >
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
               </div>
-              <div className="absolute inset-0 bg-gradient-to-b from-[#0b0f14]/20 via-[#0b0f14]/72 to-[#0b0f14]" />
-              <div className="absolute inset-0 grid place-items-center p-5">
+              <div className="absolute inset-0 bg-gradient-to-b from-[#0b0f14]/20 via-[#0b0f14]/78 to-[#0b0f14]" />
+              <div className="relative z-10 grid min-h-[700px] place-items-center p-5 py-8 sm:min-h-[660px] lg:min-h-[620px]">
                 <div className="w-full max-w-sm border border-emerald-300/55 bg-[#07090b]/95 p-5 text-center shadow-2xl">
                   <p className="text-xl font-black">
                     {lockedCtaTitle}
