@@ -61,6 +61,7 @@ export function FreeReportForm({
   const [consent, setConsent] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "sent" | "already" | "error">("idle");
   const [message, setMessage] = useState("");
+  const [introOfferToken, setIntroOfferToken] = useState("");
 
   useEffect(() => {
     trackProductEvent("free_report_view", {
@@ -139,6 +140,8 @@ export function FreeReportForm({
         already_sent?: boolean;
         message?: string;
         error?: string;
+        access_token?: string;
+        intro_offer_url?: string;
       };
 
       if (!response.ok) {
@@ -154,6 +157,7 @@ export function FreeReportForm({
       }
 
       if (payload.already_sent || payload.status === "already_sent") {
+        setIntroOfferToken(payload.access_token || "");
         setStatus("already");
         setMessage(payload.message || "Gratisrapporten har redan skickats till den här e-postadressen.");
         resetTurnstile();
@@ -181,6 +185,7 @@ export function FreeReportForm({
       }
 
       setStatus("sent");
+      setIntroOfferToken(payload.access_token || "");
       setMessage(payload.message || "Rapporten har skickats till din e-postadress.");
       trackProductEvent("free_report_submit_success", {
         result: "sent",
@@ -228,12 +233,19 @@ export function FreeReportForm({
         </h3>
         <p className="mt-3 text-base leading-7 text-[#c7d1dd]">
           {message ||
-            "Gratisrapporten kan bara skickas en gång per e-postadress. Vill du läsa vidare kan du välja betald access nedan."}
+            "Gratisrapporten kan bara skickas en gång per e-postadress. Du kan fortsätta med betald access nedan."}
         </p>
         <div className="mt-5 grid gap-3">
           <CheckoutButton
             buttonClassName="w-full bg-emerald-300 px-5 py-4 text-sm font-black text-[#04100b] transition hover:bg-emerald-200 disabled:cursor-wait disabled:opacity-70"
-            buttonLabel="Starta månadsaccess - 249 kr/mån"
+            buttonLabel={introOfferToken ? "Prova 7 dagar - 9,99 kr" : "Starta månadsaccess - 249 kr/mån"}
+            checkoutPath={introOfferToken ? "/api/intro-week-checkout" : "/api/subscription-checkout"}
+            description={
+              introOfferToken
+                ? "Du provar Månadsaccess i 7 dagar för 9,99 kr. Därefter fortsätter prenumerationen för 249 kr/mån tills du avslutar. Moms ingår."
+                : "Du får dagliga fullständiga rapporter, veckosammanfattning och månadsutsikt via e-post under aktiv period."
+            }
+            offerToken={introOfferToken || undefined}
             onOpen={() =>
               trackProductEvent("free_report_duplicate_monthly_click", {
                 topic_slug: topicSlug,
@@ -241,9 +253,9 @@ export function FreeReportForm({
                 placement: "free_report_duplicate",
               })
             }
-            priceLabel="249 kr/mån"
-            product="monthly_access"
-            productName="Månadsaccess"
+            priceLabel={introOfferToken ? "9,99 kr" : "249 kr/mån"}
+            product={introOfferToken ? "monthly_intro_week" : "monthly_access"}
+            productName={introOfferToken ? "Månadsaccess provvecka" : "Månadsaccess"}
             topicSlug={topicSlug}
           />
           <CheckoutButton
@@ -282,14 +294,14 @@ export function FreeReportForm({
             Din kostnadsfria marknadsbrief har skickats till din e-post.
           </h3>
           <p className="mt-3 text-base leading-7 text-[#c7d1dd]">
-            Den innehåller dagens samlade marknadsbild och analyser inom 10 områden.
+            Den innehåller en öppen exempelanalys och previews för dagens övriga områden.
           </p>
           <ul className="mt-4 grid gap-2 text-sm leading-6 text-[#a8b5c4]">
             {[
               "Dagens huvudbild",
-              "10 analysområden",
-              "Kort sammanfattning per område",
-              "Tillgång till full rapport via länk",
+              "1 fullständig exempelanalys",
+              "Preview av övriga analysområden",
+              "Tydlig väg till hela briefen",
             ].map((item) => (
               <li key={item} className="border-l-2 border-emerald-300/70 pl-3">
                 {item}
@@ -298,13 +310,19 @@ export function FreeReportForm({
           </ul>
           <div className="mt-5 grid gap-3">
             <p className="text-sm leading-6 text-[#c7d1dd]">
-              Vill du få marknadsbilden varje morgon? Månadsaccess ger dig
-              dagliga rapporter, veckosammanfattning och månadsutsikt. Avsluta
-              när du vill.
+              Vill du få hela marknadsbilden varje morgon? Prova Månadsaccess
+              i 7 dagar för 9,99 kr. Därefter 249 kr/mån tills du avslutar.
             </p>
             <CheckoutButton
               buttonClassName="w-full bg-emerald-300 px-5 py-4 text-sm font-black text-[#04100b] transition hover:bg-emerald-200 disabled:cursor-wait disabled:opacity-70"
-              buttonLabel="Starta månadsaccess - 249 kr/mån"
+              buttonLabel={introOfferToken ? "Prova 7 dagar - 9,99 kr" : "Starta månadsaccess - 249 kr/mån"}
+              checkoutPath={introOfferToken ? "/api/intro-week-checkout" : "/api/subscription-checkout"}
+              description={
+                introOfferToken
+                  ? "Du provar Månadsaccess i 7 dagar för 9,99 kr. Därefter fortsätter prenumerationen för 249 kr/mån tills du avslutar. Moms ingår."
+                  : "Du får dagliga fullständiga rapporter, veckosammanfattning och månadsutsikt via e-post under aktiv period."
+              }
+              offerToken={introOfferToken || undefined}
               onOpen={() =>
                 trackProductEvent("thank_you_monthly_click", {
                   topic_slug: topicSlug,
@@ -312,31 +330,11 @@ export function FreeReportForm({
                   placement: "free_report_success",
                 })
               }
-              priceLabel="249 kr/mån"
-              product="monthly_access"
-              productName="Månadsaccess"
+              priceLabel={introOfferToken ? "9,99 kr" : "249 kr/mån"}
+              product={introOfferToken ? "monthly_intro_week" : "monthly_access"}
+              productName={introOfferToken ? "Månadsaccess provvecka" : "Månadsaccess"}
               topicSlug={topicSlug}
             />
-            <div className="border border-[#26313d] bg-[#07090b] p-4">
-              <p className="text-sm leading-6 text-[#a8b5c4]">
-                För dig som vill följa marknaden löpande och spara cirka 20%
-                jämfört med månadsaccess.
-              </p>
-              <CheckoutButton
-                buttonClassName="mt-3 w-full border border-emerald-300/70 px-5 py-4 text-sm font-black text-emerald-300 transition hover:bg-emerald-300 hover:text-[#04100b] disabled:cursor-wait disabled:opacity-70"
-                buttonLabel="Välj halvårsaccess - 1 199 kr"
-                onOpen={() =>
-                  trackProductEvent("thank_you_halfyear_click", {
-                    topic_slug: topicSlug,
-                    source_path: currentSourcePath(sourcePath),
-                  })
-                }
-                priceLabel="1 199 kr"
-                product="half_year_access"
-                productName="Halvårsaccess"
-                topicSlug={topicSlug}
-              />
-            </div>
             <CheckoutButton
               buttonClassName="w-full border border-[#26313d] px-5 py-3 text-sm font-black text-[#c7d1dd] transition hover:border-emerald-300 hover:text-emerald-300 disabled:cursor-wait disabled:opacity-70"
               buttonLabel="Läs bara dagens rapport - 49 kr"
@@ -361,7 +359,14 @@ export function FreeReportForm({
         <div className="fixed inset-x-0 bottom-0 z-50 border-t border-emerald-300/50 bg-[#07090b]/98 p-4 shadow-[0_-18px_40px_rgba(0,0,0,0.55)] backdrop-blur md:hidden">
           <CheckoutButton
             buttonClassName="w-full bg-emerald-300 px-5 py-4 text-sm font-black text-[#04100b] transition hover:bg-emerald-200 disabled:cursor-wait disabled:opacity-70"
-            buttonLabel="Starta månadsaccess"
+            buttonLabel={introOfferToken ? "Prova 7 dagar - 9,99 kr" : "Starta månadsaccess"}
+            checkoutPath={introOfferToken ? "/api/intro-week-checkout" : "/api/subscription-checkout"}
+            description={
+              introOfferToken
+                ? "Du provar Månadsaccess i 7 dagar för 9,99 kr. Därefter fortsätter prenumerationen för 249 kr/mån tills du avslutar. Moms ingår."
+                : "Du får dagliga fullständiga rapporter, veckosammanfattning och månadsutsikt via e-post under aktiv period."
+            }
+            offerToken={introOfferToken || undefined}
             onOpen={() =>
               trackProductEvent("thank_you_monthly_click", {
                 topic_slug: topicSlug,
@@ -369,9 +374,9 @@ export function FreeReportForm({
                 placement: "mobile_sticky",
               })
             }
-            priceLabel="249 kr/mån"
-            product="monthly_access"
-            productName="Månadsaccess"
+            priceLabel={introOfferToken ? "9,99 kr" : "249 kr/mån"}
+            product={introOfferToken ? "monthly_intro_week" : "monthly_access"}
+            productName={introOfferToken ? "Månadsaccess provvecka" : "Månadsaccess"}
             topicSlug={topicSlug}
           />
         </div>

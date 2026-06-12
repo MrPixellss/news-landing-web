@@ -38,11 +38,19 @@ Månadsaccess ger tillgång till dagliga marknadsbriefingar med alla 10 teman, v
 
 Innehåll levereras via e-post och/eller görs tillgängligt på webbplatsen.
 
+Månadsaccess kan erbjudas med introduktionsperiod. Om ett introduktionserbjudande används framgår priset och perioden tydligt i betalflödet. Efter introduktionsperioden fortsätter prenumerationen till ordinarie månadspris tills den sägs upp.
+
+### Gratis provrapport
+
+Gratisrapporten är ett provformat som visar tjänstens struktur och kvalitet. Den kan innehålla en fullständig exempelanalys och låsta förhandsvisningar av övriga analysområden. Gratisrapporten är inte samma produkt som ett betalt dagspass eller en aktiv prenumeration.
+
 ## 4. Priser och betalning
 
 Alla priser visas i svenska kronor inklusive moms, om inget annat anges.
 
 Dagspass kostar 49 kr inklusive moms. Månadsaccess kostar 249 kr/mån inklusive moms. Halvårsaccess kostar 1 199 kr per 6 månader inklusive moms.
+
+Ett introduktionserbjudande för Månadsaccess kan erbjudas för 9,99 kr inklusive moms för de första 7 dagarna. Därefter fortsätter Månadsaccess för 249 kr/mån inklusive moms tills prenumerationen sägs upp.
 
 Betalning hanteras av Stripe. TVP Byrå lagrar inte fullständiga kortnummer eller fullständiga betalningsuppgifter.
 

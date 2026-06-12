@@ -12,23 +12,37 @@ type ThankYouPageProps = {
 export default async function ThankYouPage({ searchParams }: ThankYouPageProps) {
   const params = await searchParams;
   const product = params?.product || "";
-  const isMonthlyAccess = params?.subscription === "success" || product === "monthly_access";
+  const isIntroWeek = product === "monthly_intro_week";
   const isHalfYearAccess = product === "half_year_access";
+  const isMonthlyAccess =
+    !isHalfYearAccess &&
+    (isIntroWeek || product === "monthly_access" || params?.subscription === "success");
   const isDayPass = !isMonthlyAccess && !isHalfYearAccess;
 
-  const title = isMonthlyAccess
+  const title = isIntroWeek
+    ? "Tack. Din provvecka är aktiverad."
+    : isMonthlyAccess
     ? "Tack. Din månadsaccess aktiveras."
     : isHalfYearAccess
       ? "Tack. Din halvårsaccess aktiveras."
       : "Tack. Analyspaketet skickas till din e-post.";
 
-  const intro = isMonthlyAccess
+  const intro = isIntroWeek
+    ? "När Stripe har bekräftat betalningen skickar Finansanalytik dagens analyspaket till e-postadressen från din gratisrapport. Månadsaccess fortsätter därefter för 249 kr/mån tills du avslutar."
+    : isMonthlyAccess
     ? "När Stripe har bekräftat prenumerationen skickar Finansanalytik dagens analyspaket till e-postadressen du angav i kassan."
     : isHalfYearAccess
-      ? "När Stripe har bekräftat betalningen aktiveras din access för 6 månader och dagens analyspaket skickas till din e-post."
+      ? "När Stripe har bekräftat betalningen aktiveras din access för 6 månader och dagens analyspaket skickas till din e-post. Prenumerationen förnyas var sjätte månad tills du avslutar."
       : "När Stripe har bekräftat betalningen skickar Finansanalytik en privat länk till dagens tio analyser till e-postadressen du angav i kassan. Det krävs inget konto.";
 
-  const nextSteps = isMonthlyAccess
+  const nextSteps = isIntroWeek
+    ? [
+        "Dagens rapport skickas till din e-post.",
+        "Du har Månadsaccess under provveckan.",
+        "Efter 7 dagar fortsätter prenumerationen för 249 kr/mån om du inte avslutar.",
+        "Du kan hantera prenumerationen via länken i e-postmeddelandet.",
+      ]
+    : isMonthlyAccess
     ? [
         "Dagens rapport skickas till din e-post.",
         "Kommande rapporter skickas löpande under aktiv period.",
@@ -40,6 +54,7 @@ export default async function ThankYouPage({ searchParams }: ThankYouPageProps) 
           "Din access gäller i 6 månader.",
           "Rapporten skickas till e-postadressen du angav.",
           "Kommande rapporter levereras under aktiv period.",
+          "Halvårsaccess förnyas var sjätte månad om du inte avslutar inför nästa period.",
           "Support: support@tvp-byra.se.",
         ]
       : [
@@ -55,7 +70,9 @@ export default async function ThankYouPage({ searchParams }: ThankYouPageProps) 
         eventName="thank_you_view"
         properties={{
           product: isMonthlyAccess
-            ? "monthly_access"
+            ? isIntroWeek
+              ? "monthly_intro_week"
+              : "monthly_access"
             : isHalfYearAccess
               ? "half_year_access"
               : "day_pass",

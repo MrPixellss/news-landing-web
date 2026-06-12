@@ -479,15 +479,6 @@ export default async function TopicPage({ params, searchParams }: TopicPageProps
                       <p className="mt-2 text-xs font-bold uppercase tracking-[0.16em] text-emerald-300">
                         Moms ingår
                       </p>
-                      <CheckoutButton
-                        buttonClassName="mt-3 w-full border border-emerald-300/70 px-5 py-3 text-sm font-black text-emerald-300 transition hover:bg-emerald-300 hover:text-[#06100c] disabled:cursor-wait disabled:opacity-70"
-                        buttonLabel="Välj halvårsaccess - 1 199 kr"
-                        description="Du får 6 månaders tillgång till Finansanalytik med dagliga rapporter, veckosammanfattning och månadsutsikt via e-post."
-                        priceLabel="1 199 kr"
-                        product="half_year_access"
-                        productName="Halvårsaccess"
-                        topicSlug={slug}
-                      />
                       <p className="mt-4 border border-[#26313d] bg-[#0b0f14] p-4 text-sm font-bold leading-6 text-[#c7d1dd]">
                         Du har redan fått gratisrapporten via e-post. Nästa
                         steg är löpande access till hela analyspaketet.

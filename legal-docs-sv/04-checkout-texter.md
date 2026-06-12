@@ -34,6 +34,12 @@ Månadsaccess - 249 kr/mån, moms ingår
 
 Få dagliga marknadsbriefingar med alla 10 teman, veckosammanfattning och månadsutsikt. Rapporter levereras via e-post. Prenumerationen förnyas varje månad och kan sägas upp inför kommande perioder.
 
+### Introduktionserbjudande
+
+Prova Månadsaccess i 7 dagar - 9,99 kr, moms ingår.
+
+Efter introduktionsperioden fortsätter prenumerationen för 249 kr/mån, moms ingår, tills den sägs upp.
+
 ### Checkboxar före betalning
 
 Krävs för köp:
@@ -48,13 +54,15 @@ Jag vill få produktnyheter, erbjudanden och marknadsföring via e-post. Jag kan
 
 Starta månadsaccess - 249 kr/mån
 
+Prova 7 dagar - 9,99 kr
+
 ## Halvårsaccess
 
 ### Produkttext
 
 Halvårsaccess - 1 199 kr per 6 månader, moms ingår
 
-Få löpande tillgång till dagliga marknadsbriefingar, veckosammanfattning och månadsutsikt under aktiv halvårsperiod.
+Få löpande tillgång till dagliga marknadsbriefingar, veckosammanfattning och månadsutsikt under aktiv halvårsperiod. Prenumerationen förnyas var sjätte månad och kan sägas upp inför kommande perioder.
 
 ### Checkboxar före betalning
 

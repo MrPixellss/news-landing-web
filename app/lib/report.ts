@@ -49,6 +49,9 @@ export type FullTopicReport = ReportBlock & {
   full_report_body: string;
   sections: TopicReportSection[];
   market_snapshot?: MarketSnapshotItem[];
+  is_locked_preview?: boolean;
+  sample_role?: "full_example" | "locked_preview";
+  preview_sections?: string[];
   language_warnings?: {
     topic_slug: string;
     language_model: string;
@@ -89,6 +92,13 @@ export type PaidReportResponse = {
     topic_count: number;
     has_active_subscription?: boolean;
     offer_monthly_access?: boolean;
+    sample_report?: boolean;
+    sample_full_topic_count?: number;
+    locked_topic_count?: number;
+    intro_offer_token?: string;
+    intro_offer_url?: string;
+    intro_offer_price_label?: string;
+    intro_offer_after_label?: string;
   };
   topics: FullTopicReport[];
 };

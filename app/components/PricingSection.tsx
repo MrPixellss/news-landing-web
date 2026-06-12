@@ -31,7 +31,7 @@ const faqItems = [
   {
     question: "Vad får jag i gratisrapporten?",
     answer:
-      "Du får en fullständig rapport en gång via e-post, så att du kan bedöma kvaliteten innan du köper.",
+      "Du får en provrapport med en fullständig exempelanalys och previews för övriga områden.",
   },
   {
     question: "Kan jag avsluta månadsaccess?",
@@ -166,9 +166,9 @@ export function PricingSection({ primaryTopicSlug }: { primaryTopicSlug: string 
           price="0 kr"
           audience="För dig som vill testa kvaliteten innan du köper."
           features={[
-            "1 fullständig rapport via e-post",
-            "10 analysområden",
-            "Primärkällor och slutsatser",
+            "1 fullständig exempelanalys",
+            "Preview av övriga analysområden",
+            "Primärkällor och slutsatser i provformat",
             "Möjlighet att uppgradera efteråt",
           ]}
           condition="Endast en gratisrapport per e-postadress."
@@ -231,17 +231,17 @@ export function PricingSection({ primaryTopicSlug }: { primaryTopicSlug: string 
           price="1 199 kr"
           priceNote="för 6 månader, moms ingår"
           badge="Mest värde"
-          secondaryBadge="Spara cirka 20%"
+          secondaryBadge="Spara 295 kr"
           audience="För dig som vill följa marknaden löpande och få lägre effektiv månadskostnad."
           features={[
             "Allt i Månadsaccess",
             "6 månaders tillgång",
-            "Lägre effektiv månadskostnad",
+            "199,83 kr effektiv månadskostnad",
             "Prioriterad e-postleverans",
             "Samma rapportflöde under hela perioden",
           ]}
-          condition="Engångsbetalning för 6 månaders access."
-          secondaryText="Value-offer för dig som redan vet att du vill följa rapporterna löpande."
+          condition="Förnyas var sjätte månad. Avsluta inför nästa period."
+          secondaryText="Spara 295 kr jämfört med sex separata månader à 249 kr."
           action={
             <CheckoutButton
               buttonLabel="Välj halvårsaccess"

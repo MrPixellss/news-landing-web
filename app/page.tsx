@@ -156,7 +156,7 @@ export default async function HomePage() {
                 "10 områden i en samlad rapport",
                 "Makro, ränta, börs, valutor, råvaror och riskbild",
                 "Byggd på nyheter, offentliga källor och primärdata",
-                "1 gratisrapport per e-postadress",
+                "1 provrapport per e-postadress",
               ].map((item) => (
                 <div key={item} className="border border-[#26313d] bg-[#0d1117] p-4">
                   <p className="text-sm font-black text-emerald-300">{item}</p>
@@ -173,8 +173,8 @@ export default async function HomePage() {
               Få dagens marknadsbild gratis
             </h2>
             <p className="mt-3 text-base leading-7 text-[#c7d1dd]">
-              Ange e-post och godkänn utskick. Rapporten skickas direkt och
-              innehåller dagens samlade marknadsbild med 10 analysområden.
+              Ange e-post och godkänn utskick. Provrapporten skickas direkt
+              med en öppen exempelanalys och previews för övriga områden.
             </p>
             <div className="mt-5">
               <FreeReportForm sourcePath="/" topicSlug={primaryTopic.slug} />
@@ -193,8 +193,8 @@ export default async function HomePage() {
               </h2>
             </div>
             <p className="max-w-md text-sm leading-6 text-[#a8b5c4]">
-              Full rapport kan fås gratis en gång via e-post eller köpas som
-              dagspass för 49 kr.
+              Gratisrapporten visar formatet. Full rapport kan köpas som
+              dagspass för 49 kr eller följas löpande via Månadsaccess.
             </p>
           </div>
 

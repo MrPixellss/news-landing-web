@@ -11,12 +11,13 @@ import {
 type CheckoutButtonProps = {
   topicSlug: string;
   priceLabel: string;
-  product?: "day_pass" | "monthly_access" | "half_year_access";
+  product?: "day_pass" | "monthly_access" | "half_year_access" | "monthly_intro_week";
   productName?: string;
   buttonLabel?: string;
   description?: string;
   checkoutPath?: string;
   buttonClassName?: string;
+  offerToken?: string;
   onOpen?: () => void;
 };
 
@@ -72,6 +73,7 @@ export function CheckoutButton({
   description = "Du får dagens fullständiga briefing med alla 10 marknadsrapporter levererad via e-post.",
   checkoutPath = "/api/checkout",
   buttonClassName = "mt-5 w-full bg-emerald-300 px-5 py-4 text-sm font-black text-[#04100b] transition hover:bg-emerald-200 disabled:cursor-wait disabled:opacity-70",
+  offerToken,
   onOpen,
 }: CheckoutButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
@@ -96,12 +98,15 @@ export function CheckoutButton({
 
   const canCheckout = acceptedPurchaseConsent;
   const priceWithTax = `${displayPrice(priceLabel)}, moms ingår`;
+  const usesOfferToken = Boolean(offerToken);
   const visibleButtonLabel =
     buttonLabel || `Köp dagspass - ${displayPrice(priceLabel)}`;
   const normalizedCustomerEmail = customerEmail.trim().toLowerCase();
-  const isCustomerEmailValid = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(
-    normalizedCustomerEmail,
-  );
+  const isCustomerEmailValid =
+    usesOfferToken ||
+    /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(
+      normalizedCustomerEmail,
+    );
 
   function trackingPayload() {
     return {
@@ -152,7 +157,7 @@ export function CheckoutButton({
       return;
     }
 
-    if (!isCustomerEmailValid) {
+    if (!usesOfferToken && !isCustomerEmailValid) {
       setShowCustomerEmailError(true);
       setError("Ange en giltig e-postadress för leverans.");
       trackProductEvent("checkout_error", {
@@ -183,8 +188,9 @@ export function CheckoutButton({
         body: JSON.stringify({
           topicSlug,
           product,
+          offerToken,
           marketingOptIn,
-          customerEmail: normalizedCustomerEmail,
+          customerEmail: usesOfferToken ? undefined : normalizedCustomerEmail,
           customerCountry,
           billingPostalCode: billingPostalCode.trim(),
           returnPath: window.location.pathname + window.location.search,
@@ -200,17 +206,19 @@ export function CheckoutButton({
         throw new Error(payload.error || "Betalningen kunde inte startas.");
       }
 
-      try {
-        window.localStorage.setItem(
-          "finansanalytik_checkout_email",
-          normalizedCustomerEmail,
-        );
-      } catch {
-        // Do not block checkout if persistence is unavailable.
+      if (!usesOfferToken) {
+        try {
+          window.localStorage.setItem(
+            "finansanalytik_checkout_email",
+            normalizedCustomerEmail,
+          );
+        } catch {
+          // Do not block checkout if persistence is unavailable.
+        }
       }
 
       trackMetaEvent("InitiateCheckout", {
-        email: normalizedCustomerEmail,
+        email: usesOfferToken ? undefined : normalizedCustomerEmail,
         eventSourceUrl: window.location.href,
         eventId: tracking.trackingEventId,
         currency: "SEK",
@@ -276,43 +284,55 @@ export function CheckoutButton({
             </div>
 
             <div className="mt-6 space-y-5">
-              <div
-                className={
-                  showCustomerEmailError
-                    ? "border border-red-300/70 bg-red-950/20 p-4"
-                    : ""
-                }
-              >
-                <label className="block text-sm font-bold text-[#d7e1eb]">
-                  E-post för leverans
-                  <input
-                    autoComplete="email"
-                    className={`mt-2 w-full border bg-[#0b0f14] px-3 py-3 text-sm text-[#d7e1eb] outline-none placeholder:text-[#596678] focus:border-emerald-300 ${
-                      showCustomerEmailError
-                        ? "border-red-300"
-                        : "border-[#26313d]"
-                    }`}
-                    onChange={(event) => {
-                      setCustomerEmail(event.target.value);
-                      if (showCustomerEmailError) {
-                        setShowCustomerEmailError(false);
-                        setError("");
-                      }
-                    }}
-                    placeholder="namn@exempel.se"
-                    type="email"
-                    value={customerEmail}
-                  />
-                  <span className="mt-2 block text-xs font-normal leading-5 text-[#8d9aaa]">
-                    Vi använder samma e-post hos Stripe och för rapportleverans.
-                  </span>
-                </label>
-                {showCustomerEmailError ? (
-                  <p className="mt-3 text-sm font-bold leading-6 text-red-300">
-                    Ange en giltig e-postadress för att fortsätta.
+              {usesOfferToken ? (
+                <div className="border border-[#26313d] bg-[#0b0f14] p-4">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-[#7f91a7]">
+                    E-post
                   </p>
-                ) : null}
-              </div>
+                  <p className="mt-2 text-sm leading-6 text-[#d7e1eb]">
+                    Vi använder e-postadressen från din gratisrapport för Stripe
+                    och rapportleverans.
+                  </p>
+                </div>
+              ) : (
+                <div
+                  className={
+                    showCustomerEmailError
+                      ? "border border-red-300/70 bg-red-950/20 p-4"
+                      : ""
+                  }
+                >
+                  <label className="block text-sm font-bold text-[#d7e1eb]">
+                    E-post för leverans
+                    <input
+                      autoComplete="email"
+                      className={`mt-2 w-full border bg-[#0b0f14] px-3 py-3 text-sm text-[#d7e1eb] outline-none placeholder:text-[#596678] focus:border-emerald-300 ${
+                        showCustomerEmailError
+                          ? "border-red-300"
+                          : "border-[#26313d]"
+                      }`}
+                      onChange={(event) => {
+                        setCustomerEmail(event.target.value);
+                        if (showCustomerEmailError) {
+                          setShowCustomerEmailError(false);
+                          setError("");
+                        }
+                      }}
+                      placeholder="namn@exempel.se"
+                      type="email"
+                      value={customerEmail}
+                    />
+                    <span className="mt-2 block text-xs font-normal leading-5 text-[#8d9aaa]">
+                      Vi använder samma e-post hos Stripe och för rapportleverans.
+                    </span>
+                  </label>
+                  {showCustomerEmailError ? (
+                    <p className="mt-3 text-sm font-bold leading-6 text-red-300">
+                      Ange en giltig e-postadress för att fortsätta.
+                    </p>
+                  ) : null}
+                </div>
+              )}
 
               <div>
                 <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.24em] text-[#7f91a7]">

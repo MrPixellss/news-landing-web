@@ -216,9 +216,13 @@ export default async function PaidReportPage({ params }: PaidReportPageProps) {
 
   const reportDate = displayDate(data.date);
   const reportType = data.access.report_type || "daily";
+  const isFreeSample =
+    data.access.type === "free_report" && data.access.sample_report === true;
   const reportTitle = normalizeSwedishCopy(data.report_title);
   const heroTitle =
-    reportType === "weekly" || reportType === "monthly"
+    isFreeSample
+      ? "Din gratisrapport är klar"
+      : reportType === "weekly" || reportType === "monthly"
       ? reportTitle || "Periodrapport + prognos"
       : "Dagens analyspaket är upplåst";
   const logoSubtitle =
@@ -228,7 +232,9 @@ export default async function PaidReportPage({ params }: PaidReportPageProps) {
         ? "Månadsutsikt"
         : "Daglig marknadsanalys";
   const introFallback =
-    reportType === "weekly" || reportType === "monthly"
+    isFreeSample
+      ? "Här får du ett konkret prov på Finansanalytik: en fullständig exempelanalys och previews för dagens övriga områden."
+      : reportType === "weekly" || reportType === "monthly"
       ? "Här finns periodrapporten för din månadsaccess, med samlad analys och prognos för alla områden."
       : "Här finns hela dagens analys, byggd på primärkällor som har passerat kvalitetssil, ämnesstyrning och analytikerregler.";
   const primaryTopic =
@@ -241,9 +247,14 @@ export default async function PaidReportPage({ params }: PaidReportPageProps) {
       .sort((a, b) => topicOrder(a) - topicOrder(b)),
   ];
   const showMonthlyUpsell =
+    !isFreeSample &&
     data.access.type !== "monthly_access" &&
     data.access.has_active_subscription !== true &&
     data.access.offer_monthly_access !== false;
+  const showIntroOffer =
+    isFreeSample &&
+    data.access.has_active_subscription !== true &&
+    Boolean(data.access.intro_offer_token || token);
 
   return (
     <main className="min-h-screen bg-[#07090b] text-zinc-50">
@@ -291,11 +302,61 @@ export default async function PaidReportPage({ params }: PaidReportPageProps) {
                 Ingår
               </p>
               <p className="mt-3 text-xl font-black">
-                {data.access.topic_count} analyser
+                {isFreeSample
+                  ? `${data.access.sample_full_topic_count || 1} öppen analys + ${data.access.locked_topic_count || 0} previews`
+                  : `${data.access.topic_count} analyser`}
               </p>
             </div>
           </div>
         </section>
+
+        {showIntroOffer ? (
+          <section
+            id="intro-week"
+            className="border-b border-[#1a222c] py-8"
+          >
+            <div className="grid gap-5 border border-emerald-300/70 bg-[#0d1117] p-6 md:grid-cols-[1fr_360px] md:p-8">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-emerald-300">
+                  Nästa steg
+                </p>
+                <h2 className="mt-3 text-3xl font-bold tracking-[-0.03em]">
+                  Fortsätt få hela briefen varje morgon
+                </h2>
+                <p className="mt-3 max-w-3xl text-base leading-7 text-[#c7d1dd]">
+                  Prova Månadsaccess i 7 dagar. Du får hela dagens briefing,
+                  veckosammanfattning och månadsutsikt när de publiceras.
+                  Därefter fortsätter accessen för 249 kr/mån tills du avslutar.
+                </p>
+              </div>
+              <div className="border border-[#26313d] bg-[#0b0f14] p-5">
+                <p className="text-sm font-bold text-emerald-300">
+                  9,99 kr första 7 dagarna
+                </p>
+                <p className="mt-2 text-sm leading-6 text-[#a8b5c4]">
+                  Moms ingår. Ingen extra e-post krävs; vi använder adressen
+                  från din gratisrapport.
+                </p>
+                <CheckoutButton
+                  buttonLabel="Prova 7 dagar - 9,99 kr"
+                  checkoutPath="/api/intro-week-checkout"
+                  description="Du provar Månadsaccess i 7 dagar för 9,99 kr. Därefter fortsätter prenumerationen för 249 kr/mån tills du avslutar. Moms ingår."
+                  offerToken={data.access.intro_offer_token || token}
+                  priceLabel="9,99 kr"
+                  product="monthly_intro_week"
+                  productName="Månadsaccess provvecka"
+                  topicSlug={primaryTopic?.slug || "macro"}
+                />
+                <a
+                  className="mt-3 block border border-[#26313d] px-4 py-3 text-center text-sm font-black text-[#d7e1eb] transition hover:border-emerald-300 hover:text-emerald-300"
+                  href={`/#pricing`}
+                >
+                  Se övriga alternativ
+                </a>
+              </div>
+            </div>
+          </section>
+        ) : null}
 
         {showMonthlyUpsell ? (
           <section
@@ -329,6 +390,7 @@ export default async function PaidReportPage({ params }: PaidReportPageProps) {
                   checkoutPath="/api/subscription-checkout"
                   description="Du får månadsaccess med dagliga briefings via e-post. Prenumerationen förnyas månadsvis och hanteras av Stripe. Moms ingår i priset."
                   priceLabel="249 kr/mån"
+                  product="monthly_access"
                   productName="Månadsaccess"
                   topicSlug={primaryTopic?.slug || "macro"}
                 />
@@ -356,6 +418,60 @@ export default async function PaidReportPage({ params }: PaidReportPageProps) {
 
         <section className="space-y-8 py-8">
           {orderedReportTopics.map((topic, index) => {
+            if (isFreeSample && topic.is_locked_preview) {
+              return (
+                <article
+                  id={topic.slug}
+                  key={topic.slug}
+                  className="scroll-mt-6 border border-[#26313d] bg-[#0d1117] p-6 md:p-8"
+                >
+                  <div className="flex flex-col gap-3 border-b border-[#24303c] pb-6 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
+                      <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
+                        Preview {String(index + 1).padStart(2, "0")}
+                      </p>
+                      <h2 className="mt-4 text-4xl font-bold leading-tight tracking-[-0.03em] md:text-5xl">
+                        {topic.name}
+                      </h2>
+                    </div>
+                    <span className="inline-flex border border-[#3b4a58] px-3 py-2 text-sm font-black text-[#9fb0c2]">
+                      Full analys ingår i access
+                    </span>
+                  </div>
+                  <h3 className="mt-7 max-w-5xl text-2xl font-bold leading-tight md:text-3xl">
+                    {normalizeSwedishCopy(topic.headline)}
+                  </h3>
+                  {topic.teaser ? (
+                    <p className="mt-5 max-w-5xl text-lg leading-9 text-[#c7d1dd]">
+                      {normalizeSwedishCopy(topic.teaser)}
+                    </p>
+                  ) : null}
+                  {topic.preview_sections?.length ? (
+                    <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                      {topic.preview_sections.map((sectionTitle) => (
+                        <div
+                          key={sectionTitle}
+                          className="border border-[#26313d] bg-[#0b0f14] p-4"
+                        >
+                          <p className="text-sm font-black text-[#d7e1eb]">
+                            {normalizeSwedishCopy(sectionTitle)}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
+                  {showIntroOffer ? (
+                    <a
+                      className="mt-7 inline-flex border border-emerald-300/70 px-4 py-3 text-sm font-black text-emerald-300 transition hover:bg-emerald-300 hover:text-[#06100c]"
+                      href="#intro-week"
+                    >
+                      Lås upp alla analyser
+                    </a>
+                  ) : null}
+                </article>
+              );
+            }
+
             const bodyParagraphs = paragraphs(topic.full_report_body || topic.teaser);
             const structuredSections = topic.sections
               .map((section) => ({

@@ -22,6 +22,7 @@ Vi behandlar endast de personuppgifter som behövs för att tillhandahålla tjä
 - köphistorik och prenumerationsstatus
 - valda e-postpreferenser
 - Stripe-referenser kopplade till betalning
+- lead- och kampanjhändelser kopplade till gratisrapport, erbjudanden och checkout
 - teknisk information som behövs för säkerhet, felsökning och leverans
 - samtyckesstatus för cookies och marknadsföring
 - begränsad analys- och annonsdata om du samtycker till analys- eller marknadsföringscookies
@@ -35,6 +36,7 @@ Vi behandlar personuppgifter för att:
 
 - leverera köpta rapporter och prenumerationsinnehåll
 - hantera betalningar, kvitton och prenumerationsstatus
+- följa upp om gratisrapport, erbjudandelänkar och checkout fungerar tekniskt och kommersiellt
 - ge kundsupport
 - uppfylla bokförings- och rättsliga skyldigheter
 - skydda tjänsten mot missbruk och tekniska fel
@@ -54,13 +56,17 @@ Behandlingen sker med följande rättsliga grunder:
 
 Rapporter och serviceinformation som hör till ett köp eller en aktiv prenumeration skickas som en del av tjänsten.
 
-Marknadsföring via e-post skickas endast om du uttryckligen har samtyckt till det. Du kan när som helst återkalla ditt samtycke till marknadsföring genom avregistreringslänk eller genom att kontakta support@tvp-byra.se.
+Om du begär en gratisrapport och samtycker till produktrelaterad e-post kan vi skicka uppföljningar om rapporten, introduktionserbjudanden och hur tjänsten fungerar. Du kan när som helst återkalla ditt samtycke genom avregistreringslänk eller genom att kontakta support@tvp-byra.se.
+
+Marknadsföring via e-post skickas endast om du uttryckligen har samtyckt till det.
 
 ## 6. Betalningar via Stripe
 
 Betalningar hanteras av Stripe för TVP Byrå och tjänsten Finansanalytik. Stripe behandlar betalningsuppgifter enligt sina egna villkor och integritetspolicyer.
 
 Vi får endast den information som behövs för att bekräfta betalning, hantera prenumeration, uppfylla bokföringskrav och ge support.
+
+För erbjudanden efter gratisrapport kan vi skicka tekniska referenser till Stripe, till exempel produkt, rapport, lead-id och kampanjreferens. Dessa används för att koppla betalningen till rätt leverans och för att mäta om checkout-flödet fungerar. Fullständig e-postadress exponeras inte i interna funnel-rapporter.
 
 ## 7. Mottagare och leverantörer
 
