@@ -103,7 +103,7 @@ export function FreeReportForm({
 
     if (isTurnstileEnabled() && !turnstileToken) {
       setStatus("error");
-      setMessage("BekrÃ¤fta sÃ¤kerhetskontrollen fÃ¶r att fortsÃ¤tta.");
+      setMessage("Bekräfta säkerhetskontrollen för att fortsätta.");
       trackProductEvent("free_report_submit_error", {
         reason: "missing_turnstile",
         topic_slug: topicSlug,

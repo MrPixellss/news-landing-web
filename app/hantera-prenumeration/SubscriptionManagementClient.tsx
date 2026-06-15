@@ -135,7 +135,7 @@ export default function SubscriptionManagementClient({ token }: { token: string 
 
     if (isTurnstileEnabled() && !turnstileToken) {
       setSubmitting(false);
-      setError("BekrÃ¤fta sÃ¤kerhetskontrollen fÃ¶r att fortsÃ¤tta.");
+      setError("Bekräfta säkerhetskontrollen för att fortsätta.");
       return;
     }
 

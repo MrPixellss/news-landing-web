@@ -29,7 +29,7 @@ async function forwardMetaAdminRequest(request: NextRequest, context: RouteConte
     process.env.ADMIN_API_KEY?.trim() ||
     "";
   if (!adminKey) {
-    return NextResponse.json({ error: "Backend admin key saknas i servermiljÃ¶n." }, { status: 503 });
+    return NextResponse.json({ error: "Backend admin key saknas i servermiljön." }, { status: 503 });
   }
 
   const baseUrl =
