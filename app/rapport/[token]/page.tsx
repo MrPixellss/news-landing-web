@@ -463,7 +463,7 @@ export default async function PaidReportPage({ params }: PaidReportPageProps) {
                   {showIntroOffer ? (
                     <a
                       className="mt-7 inline-flex border border-emerald-300/70 px-4 py-3 text-sm font-black text-emerald-300 transition hover:bg-emerald-300 hover:text-[#06100c]"
-                      href="#intro-week"
+                      href={`/api/offer/intro-week?token=${encodeURIComponent(data.access.intro_offer_token || token)}&source=locked_preview`}
                     >
                       Lås upp alla analyser
                     </a>

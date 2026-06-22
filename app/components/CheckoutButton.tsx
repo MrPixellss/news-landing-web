@@ -150,6 +150,21 @@ export function CheckoutButton({
     setShowPurchaseConsentError(false);
     setIsModalOpen(true);
     trackProductEvent("checkout_open", trackingPayload());
+    if (usesOfferToken && product === "monthly_intro_week" && offerToken) {
+      fetch("/api/free-report-funnel-event", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          token: offerToken,
+          eventName: "intro_offer_clicked",
+          product,
+          sourcePath: window.location.pathname + window.location.search + window.location.hash,
+          metadata: { placement: "checkout_button_modal_open" },
+        }),
+      }).catch(() => {
+        // Tracking must not block the checkout modal.
+      });
+    }
   }
 
   async function startCheckout() {
