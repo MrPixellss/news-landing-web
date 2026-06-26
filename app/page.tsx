@@ -148,10 +148,11 @@ export default async function HomePage() {
               Se vad som styr marknaden innan börsen öppnar
             </h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-[#c7d1dd]">
-              En komplett svensk marknadsbrief med 10 analysområden, byggd på
-              primärkällor och daglig data. Skickas direkt till din e-post.
+              Få en provrapport via e-post: en öppen analys och previews från
+              dagens brief. Vill du ha hela marknadsbilden kan du prova 7 dagar
+              för 9,99 kr.
             </p>
-            <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-7 hidden gap-3 sm:grid-cols-2 lg:grid lg:grid-cols-3">
               {[
                 "10 områden i en samlad rapport",
                 "Makro, ränta, börs, valutor, råvaror och riskbild",
@@ -167,15 +168,23 @@ export default async function HomePage() {
 
           <div id="gratis-rapport" className="border border-[#26313d] bg-[#0d1117] p-5 md:p-6">
             <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
-              Gratisrapport
+              Gratis provrapport
             </p>
             <h2 className="mt-3 text-3xl font-bold tracking-[-0.03em]">
-              Få dagens marknadsbild gratis
+              Få provrapporten via e-post
             </h2>
             <p className="mt-3 text-base leading-7 text-[#c7d1dd]">
-              Ange e-post och godkänn utskick. Provrapporten skickas direkt
-              med en öppen exempelanalys och previews för övriga områden.
+              Ingen betalning krävs. Du får en öppen analys, previews för
+              övriga områden och en tydlig väg till hela briefen för 9,99 kr.
             </p>
+            <div className="mt-4 grid gap-2 text-sm font-bold text-[#d7e1eb] sm:grid-cols-2">
+              <span className="border border-emerald-300/40 bg-emerald-300/10 px-3 py-2 text-emerald-200">
+                1 öppen analys
+              </span>
+              <span className="border border-[#26313d] px-3 py-2">
+                7 dagar - 9,99 kr
+              </span>
+            </div>
             <div className="mt-5">
               <FreeReportForm sourcePath="/" topicSlug={primaryTopic.slug} />
             </div>

@@ -392,7 +392,7 @@ export function FreeReportForm({
       ].join(" ")}
       onSubmit={submit}
     >
-      <div className={compact ? "grid gap-3" : "grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]"}>
+      <div className={compact ? "grid gap-3" : "grid gap-3"}>
         <input
           aria-hidden="true"
           autoComplete="off"
@@ -409,20 +409,24 @@ export function FreeReportForm({
           type="email"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          placeholder="din@email.se"
-          className="min-h-12 border border-[#26313d] bg-[#07090b] px-4 text-base font-bold text-white outline-none transition placeholder:text-[#657489] focus:border-emerald-300"
+          placeholder="E-postadress"
+          className="min-h-14 border border-[#26313d] bg-[#07090b] px-4 text-base font-bold text-white outline-none transition placeholder:text-[#657489] focus:border-emerald-300"
           autoComplete="email"
         />
         <button
           type="submit"
           disabled={status === "loading"}
-          className="min-h-12 bg-emerald-300 px-5 text-sm font-black text-[#06100c] transition hover:bg-emerald-200 disabled:cursor-wait disabled:opacity-70"
+          className="min-h-14 bg-emerald-300 px-5 text-base font-black text-[#06100c] transition hover:bg-emerald-200 disabled:cursor-wait disabled:opacity-70"
         >
-          {status === "loading" ? "Skickar..." : "Få gratisrapport"}
+          {status === "loading" ? "Skickar..." : "Få provrapporten gratis"}
         </button>
       </div>
 
-      <label className="mt-4 grid cursor-pointer grid-cols-[20px_minmax(0,1fr)] gap-3 text-sm leading-6 text-[#a8b5c4]">
+      <p className="mt-3 text-sm font-bold leading-6 text-emerald-200">
+        Gratis provrapport först. Betalning krävs bara om du själv väljer 7 dagar för 9,99 kr.
+      </p>
+
+      <label className="mt-3 grid cursor-pointer grid-cols-[20px_minmax(0,1fr)] gap-3 text-xs leading-5 text-[#a8b5c4]">
         <input
           type="checkbox"
           checked={consent}
