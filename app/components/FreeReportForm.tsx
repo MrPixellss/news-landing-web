@@ -5,6 +5,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { CheckoutButton } from "./CheckoutButton";
 import {
   metaTrackingContext,
+  trackFreeReportPreleadEvent,
   trackGoogleAdsLeadConversion,
   trackMetaEvent,
   trackProductEvent,
@@ -64,10 +65,13 @@ export function FreeReportForm({
   const [introOfferToken, setIntroOfferToken] = useState("");
 
   useEffect(() => {
-    trackProductEvent("free_report_view", {
+    const trackingPayload = {
       topic_slug: topicSlug,
       source_path: currentSourcePath(sourcePath),
-    });
+    };
+    trackProductEvent("free_report_view", trackingPayload);
+    trackFreeReportPreleadEvent("landing_loaded", trackingPayload);
+    trackFreeReportPreleadEvent("free_report_view", trackingPayload);
   }, [sourcePath, topicSlug]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -78,6 +82,16 @@ export function FreeReportForm({
     const activeSourcePath = currentSourcePath(sourcePath);
     const companyWebsite = String(formData.get("companyWebsite") || "").trim();
     const turnstileToken = readTurnstileToken(form);
+    const submitContext = {
+      topic_slug: topicSlug,
+      source_path: activeSourcePath,
+      email_present: Boolean(cleanEmail),
+      consent_checked: consent,
+      turnstile_required: isTurnstileEnabled(),
+      turnstile_present: Boolean(turnstileToken),
+    };
+
+    trackFreeReportPreleadEvent("free_report_submit_attempt", submitContext);
 
     if (!validEmail(cleanEmail)) {
       setStatus("error");
@@ -86,6 +100,10 @@ export function FreeReportForm({
         reason: "invalid_email",
         topic_slug: topicSlug,
         source_path: activeSourcePath,
+      });
+      trackFreeReportPreleadEvent("free_report_submit_blocked", {
+        ...submitContext,
+        reason: "invalid_email",
       });
       return;
     }
@@ -98,6 +116,10 @@ export function FreeReportForm({
         topic_slug: topicSlug,
         source_path: activeSourcePath,
       });
+      trackFreeReportPreleadEvent("free_report_submit_blocked", {
+        ...submitContext,
+        reason: "missing_consent",
+      });
       return;
     }
 
@@ -108,6 +130,10 @@ export function FreeReportForm({
         reason: "missing_turnstile",
         topic_slug: topicSlug,
         source_path: activeSourcePath,
+      });
+      trackFreeReportPreleadEvent("free_report_submit_blocked", {
+        ...submitContext,
+        reason: "missing_turnstile",
       });
       return;
     }
@@ -153,6 +179,11 @@ export function FreeReportForm({
           topic_slug: topicSlug,
           source_path: activeSourcePath,
         });
+        trackFreeReportPreleadEvent("free_report_submit_error", {
+          ...submitContext,
+          reason: payload.error || "backend_error",
+          status_code: response.status,
+        });
         return;
       }
 
@@ -165,6 +196,10 @@ export function FreeReportForm({
           result: "blocked",
           topic_slug: topicSlug,
           source_path: activeSourcePath,
+        });
+        trackFreeReportPreleadEvent("free_report_duplicate", {
+          ...submitContext,
+          result: "blocked",
         });
         return;
       }
@@ -181,6 +216,10 @@ export function FreeReportForm({
           topic_slug: topicSlug,
           source_path: activeSourcePath,
         });
+        trackFreeReportPreleadEvent("free_report_submit_error", {
+          ...submitContext,
+          reason: "unsubscribed",
+        });
         return;
       }
 
@@ -192,9 +231,17 @@ export function FreeReportForm({
         topic_slug: topicSlug,
         source_path: activeSourcePath,
       });
+      trackFreeReportPreleadEvent("free_report_submit_success", {
+        ...submitContext,
+        result: "sent",
+      });
       trackProductEvent("thank_you_view", {
         topic_slug: topicSlug,
         source_path: activeSourcePath,
+      });
+      trackFreeReportPreleadEvent("thank_you_view", {
+        ...submitContext,
+        result: "sent",
       });
       trackMetaEvent("Lead", {
         email: cleanEmail,
@@ -213,6 +260,10 @@ export function FreeReportForm({
         reason: "network_error",
         topic_slug: topicSlug,
         source_path: activeSourcePath,
+      });
+      trackFreeReportPreleadEvent("free_report_submit_error", {
+        ...submitContext,
+        reason: "network_error",
       });
     }
   }
@@ -409,6 +460,12 @@ export function FreeReportForm({
           type="email"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
+          onFocus={() =>
+            trackFreeReportPreleadEvent("free_report_email_focus", {
+              topic_slug: topicSlug,
+              source_path: currentSourcePath(sourcePath),
+            })
+          }
           placeholder="E-postadress"
           className="min-h-14 border border-[#26313d] bg-[#07090b] px-4 text-base font-bold text-white outline-none transition placeholder:text-[#657489] focus:border-emerald-300"
           autoComplete="email"
@@ -430,7 +487,14 @@ export function FreeReportForm({
         <input
           type="checkbox"
           checked={consent}
-          onChange={(event) => setConsent(event.target.checked)}
+          onChange={(event) => {
+            setConsent(event.target.checked);
+            trackFreeReportPreleadEvent("free_report_consent_change", {
+              topic_slug: topicSlug,
+              source_path: currentSourcePath(sourcePath),
+              consent_checked: event.target.checked,
+            });
+          }}
           className="mt-1 size-4 accent-emerald-300"
         />
         <span>

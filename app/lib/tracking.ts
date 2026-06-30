@@ -18,6 +18,12 @@ type TrackingOptions = {
   skipServer?: boolean;
 };
 
+type PreleadEventProperties = Record<string, unknown> & {
+  product?: string;
+  topic_slug?: string;
+  source_path?: string;
+};
+
 type MetaTrackingContext = {
   trackingMarketingConsent: boolean;
   trackingEventId?: string;
@@ -162,4 +168,46 @@ export function trackProductEvent(
       detail: payload,
     }),
   );
+}
+
+export function trackFreeReportPreleadEvent(
+  eventName: string,
+  properties: PreleadEventProperties = {},
+) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const sourcePath =
+    typeof properties.source_path === "string" && properties.source_path
+      ? properties.source_path
+      : window.location.pathname + window.location.search + window.location.hash;
+  const metadata = {
+    page: window.location.pathname + window.location.search + window.location.hash,
+    referrer: document.referrer || "",
+    viewport_width: window.innerWidth,
+    viewport_height: window.innerHeight,
+    marketing_consent: marketingConsentGranted(),
+    ...properties,
+  };
+
+  fetch("/api/free-report-prelead-event", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      event_name: eventName,
+      product: properties.product || "free_report_sample",
+      topic_slug: properties.topic_slug || "macro",
+      source_path: sourcePath,
+      utm_source: params.get("utm_source") || undefined,
+      utm_medium: params.get("utm_medium") || undefined,
+      utm_campaign: params.get("utm_campaign") || undefined,
+      utm_content: params.get("utm_content") || undefined,
+      metadata,
+    }),
+    keepalive: true,
+  }).catch(() => {
+    // Analytics must never block the product flow.
+  });
 }
