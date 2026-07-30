@@ -21,7 +21,17 @@ type TrackingOptions = {
 type PreleadEventProperties = Record<string, unknown> & {
   product?: string;
   topic_slug?: string;
+  topicSlug?: string;
   source_path?: string;
+  sourcePath?: string;
+};
+
+type PaidIntentEventProperties = Record<string, unknown> & {
+  product?: string;
+  topic_slug?: string;
+  topicSlug?: string;
+  source_path?: string;
+  sourcePath?: string;
 };
 
 type MetaTrackingContext = {
@@ -209,5 +219,55 @@ export function trackFreeReportPreleadEvent(
     keepalive: true,
   }).catch(() => {
     // Analytics must never block the product flow.
+  });
+}
+
+export function trackPaidIntentEvent(
+  eventName: string,
+  properties: PaidIntentEventProperties = {},
+) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const topicSlug =
+    typeof properties.topic_slug === "string" && properties.topic_slug
+      ? properties.topic_slug
+      : typeof properties.topicSlug === "string" && properties.topicSlug
+        ? properties.topicSlug
+        : "macro";
+  const sourcePath =
+    typeof properties.source_path === "string" && properties.source_path
+      ? properties.source_path
+      : typeof properties.sourcePath === "string" && properties.sourcePath
+        ? properties.sourcePath
+        : window.location.pathname + window.location.search + window.location.hash;
+  const metadata = {
+    page: window.location.pathname + window.location.search + window.location.hash,
+    referrer: document.referrer || "",
+    viewport_width: window.innerWidth,
+    viewport_height: window.innerHeight,
+    marketing_consent: marketingConsentGranted(),
+    ...properties,
+  };
+
+  fetch("/api/paid-intent-event", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      event_name: eventName,
+      product: properties.product || "monthly_intro_week",
+      topic_slug: topicSlug,
+      source_path: sourcePath,
+      utm_source: params.get("utm_source") || undefined,
+      utm_medium: params.get("utm_medium") || undefined,
+      utm_campaign: params.get("utm_campaign") || undefined,
+      utm_content: params.get("utm_content") || undefined,
+      metadata,
+    }),
+    keepalive: true,
+  }).catch(() => {
+    // Analytics must never block the checkout flow.
   });
 }

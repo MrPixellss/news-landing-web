@@ -27,7 +27,7 @@ export async function POST(request: Request) {
       ? body.returnPath.trim()
       : "/";
 
-  if (!["monthly_access", "half_year_access"].includes(product)) {
+  if (!["monthly_access", "half_year_access", "monthly_intro_week"].includes(product)) {
     return NextResponse.json({ error: "Okänd produkt." }, { status: 400 });
   }
 

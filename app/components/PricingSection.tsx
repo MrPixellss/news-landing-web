@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { useEffect, useRef } from "react";
 
 import { CheckoutButton } from "./CheckoutButton";
-import { trackProductEvent } from "../lib/tracking";
+import { trackPaidIntentEvent, trackProductEvent } from "../lib/tracking";
 
 type PlanCardProps = {
   title: string;
@@ -131,6 +131,11 @@ export function PricingSection({ primaryTopicSlug }: { primaryTopicSlug: string 
           trackProductEvent("pricing_view", {
             source: "pricing",
           });
+          trackPaidIntentEvent("pricing_view", {
+            product: "monthly_access",
+            topicSlug: primaryTopicSlug,
+            source: "pricing",
+          });
           observer.disconnect();
         }
       },
@@ -139,7 +144,7 @@ export function PricingSection({ primaryTopicSlug }: { primaryTopicSlug: string 
 
     observer.observe(node);
     return () => observer.disconnect();
-  }, []);
+  }, [primaryTopicSlug]);
 
   return (
     <section ref={sectionRef} id="pricing" className="border-b border-[#1a222c] py-10">

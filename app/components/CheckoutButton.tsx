@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
   metaTrackingContext,
+  trackPaidIntentEvent,
   trackMetaEvent,
   trackProductEvent,
 } from "../lib/tracking";
@@ -121,6 +122,13 @@ export function CheckoutButton({
     };
   }
 
+  function trackPaidCheckoutEvent(eventName: string, properties: Record<string, unknown> = {}) {
+    trackPaidIntentEvent(eventName, {
+      ...trackingPayload(),
+      ...properties,
+    });
+  }
+
   useEffect(() => {
     let isMounted = true;
 
@@ -150,6 +158,13 @@ export function CheckoutButton({
     setShowPurchaseConsentError(false);
     setIsModalOpen(true);
     trackProductEvent("checkout_open", trackingPayload());
+    trackPaidCheckoutEvent("paid_cta_click", {
+      placement: "checkout_button",
+      uses_offer_token: usesOfferToken,
+    });
+    trackPaidCheckoutEvent("checkout_modal_open", {
+      uses_offer_token: usesOfferToken,
+    });
     if (usesOfferToken && product === "monthly_intro_week" && offerToken) {
       fetch("/api/free-report-funnel-event", {
         method: "POST",
@@ -172,12 +187,27 @@ export function CheckoutButton({
       return;
     }
 
+    trackPaidCheckoutEvent("checkout_submit_attempt", {
+      email_present: usesOfferToken || Boolean(normalizedCustomerEmail),
+      email_valid: isCustomerEmailValid,
+      purchase_consent: canCheckout,
+      marketing_opt_in: marketingOptIn,
+      customer_country: customerCountry,
+      postal_code_present: Boolean(billingPostalCode.trim()),
+      uses_offer_token: usesOfferToken,
+    });
+
     if (!usesOfferToken && !isCustomerEmailValid) {
       setShowCustomerEmailError(true);
       setError("Ange en giltig e-postadress för leverans.");
       trackProductEvent("checkout_error", {
         ...trackingPayload(),
         reason: "invalid_email",
+      });
+      trackPaidCheckoutEvent("checkout_submit_blocked", {
+        reason: "invalid_email",
+        email_present: Boolean(normalizedCustomerEmail),
+        email_valid: false,
       });
       return;
     }
@@ -188,6 +218,12 @@ export function CheckoutButton({
       trackProductEvent("checkout_error", {
         ...trackingPayload(),
         reason: "missing_purchase_consent",
+      });
+      trackPaidCheckoutEvent("checkout_submit_blocked", {
+        reason: "missing_purchase_consent",
+        email_present: usesOfferToken || Boolean(normalizedCustomerEmail),
+        email_valid: isCustomerEmailValid,
+        purchase_consent: false,
       });
       return;
     }
@@ -214,6 +250,7 @@ export function CheckoutButton({
       });
       const payload = (await response.json()) as {
         checkout_url?: string;
+        session_id?: string;
         error?: string;
       };
 
@@ -243,6 +280,11 @@ export function CheckoutButton({
         ...trackingPayload(),
         checkoutUrlCreated: true,
       });
+      trackPaidCheckoutEvent("stripe_redirect", {
+        checkout_url_created: true,
+        stripe_session_id: payload.session_id,
+        uses_offer_token: usesOfferToken,
+      });
       window.location.href = payload.checkout_url;
     } catch (err) {
       const message = err instanceof Error ? err.message : "Betalningen kunde inte startas.";
@@ -251,6 +293,11 @@ export function CheckoutButton({
         ...trackingPayload(),
         reason: "backend_or_stripe_error",
         message,
+      });
+      trackPaidCheckoutEvent("checkout_error", {
+        reason: "backend_or_stripe_error",
+        message,
+        uses_offer_token: usesOfferToken,
       });
       setIsLoading(false);
     }
@@ -333,6 +380,12 @@ export function CheckoutButton({
                           setError("");
                         }
                       }}
+                      onFocus={() =>
+                        trackPaidCheckoutEvent("checkout_email_focus", {
+                          email_present: Boolean(normalizedCustomerEmail),
+                          uses_offer_token: false,
+                        })
+                      }
                       placeholder="namn@exempel.se"
                       type="email"
                       value={customerEmail}
