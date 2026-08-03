@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { trackProductEvent } from "../lib/tracking";
+import { trackPaidIntentEvent, trackProductEvent } from "../lib/tracking";
 
 type MobileStickyCtaProps = {
   href: string;
   label: string;
   eventName: string;
   hideWhenVisibleSelector?: string;
+  paidIntentEventName?: string;
+  paidIntentProperties?: Record<string, unknown>;
 };
 
 export function MobileStickyCta({
@@ -15,6 +17,8 @@ export function MobileStickyCta({
   label,
   eventName,
   hideWhenVisibleSelector,
+  paidIntentEventName,
+  paidIntentProperties,
 }: MobileStickyCtaProps) {
   const [isHidden, setIsHidden] = useState(false);
 
@@ -48,12 +52,19 @@ export function MobileStickyCta({
       <a
         className="block bg-emerald-300 px-5 py-4 text-center text-sm font-black text-[#04100b] shadow-lg shadow-emerald-950/40 ring-1 ring-emerald-100/40 transition hover:bg-emerald-200"
         href={href}
-        onClick={() =>
+        onClick={() => {
           trackProductEvent(eventName, {
             source: "mobile_sticky",
             target: href,
-          })
-        }
+          });
+          if (paidIntentEventName) {
+            trackPaidIntentEvent(paidIntentEventName, {
+              placement: "mobile_sticky",
+              target: href,
+              ...paidIntentProperties,
+            });
+          }
+        }}
       >
         {label}
       </a>

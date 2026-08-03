@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { CheckoutButton } from "../components/CheckoutButton";
-import { FreeReportForm } from "../components/FreeReportForm";
 import { MobileStickyCta } from "../components/MobileStickyCta";
 import { PaidIntentEvent } from "../components/PaidIntentEvent";
 import { displayDate, getTodayTeaser, normalizeSwedishCopy, orderedTopics } from "../lib/report";
@@ -97,6 +96,20 @@ export default async function StartaPage() {
               Finansanalytik samlar makro, räntor, börs, valutor, råvaror och
               riskbild i en svensk morgonbrief. Börja med provvecka för 9,99 kr.
             </p>
+            <div className="mt-7 max-w-md">
+              <CheckoutButton
+                buttonLabel="Starta provveckan - 9,99 kr"
+                checkoutPath="/api/subscription-checkout"
+                description="Du får dagliga fullständiga rapporter, veckosammanfattning och månadsutsikt via e-post. Första 7 dagarna kostar 9,99 kr, därefter 249 kr/mån tills prenumerationen avslutas."
+                priceLabel="9,99 kr"
+                product="monthly_intro_week"
+                productName="Månadsaccess provvecka"
+                topicSlug={primaryTopic.slug}
+              />
+              <p className="mt-3 text-sm font-bold leading-6 text-[#9facbb]">
+                Öppnar säker Stripe-betalning. Du kan avsluta när du vill.
+              </p>
+            </div>
             <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {[
                 "9,99 kr första 7 dagarna",
@@ -210,18 +223,21 @@ export default async function StartaPage() {
           </div>
           <div id="provrapport" className="border border-[#26313d] bg-[#0d1117] p-5">
             <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#7f91a7]">
-              Vill du börja försiktigare?
+              Behöver du se formatet?
             </p>
             <h2 className="mt-3 text-2xl font-bold tracking-[-0.03em]">
-              Ta en gratis provrapport
+              Provtexten finns på sidan
             </h2>
             <p className="mt-3 text-sm leading-6 text-[#a8b5c4]">
-              Det här är sekundärt i reklamtestet, men finns kvar för personer som
-              behöver se formatet innan de startar provveckan.
+              Reklamtrafiken går inte längre in i en gratis leadgen-form. I stället
+              visar vi dagens ton, ämnena som ingår och en tydlig väg till provveckan.
             </p>
-            <div className="mt-5">
-              <FreeReportForm sourcePath="/starta#provrapport" topicSlug={primaryTopic.slug} />
-            </div>
+            <a
+              className="mt-5 inline-flex border border-emerald-300 px-4 py-3 text-sm font-black text-emerald-300 transition hover:bg-emerald-300 hover:text-[#04100b]"
+              href="#starta-checkout"
+            >
+              Gå till provveckan
+            </a>
           </div>
         </section>
       </div>
@@ -231,6 +247,12 @@ export default async function StartaPage() {
         hideWhenVisibleSelector="#starta-checkout"
         href="#starta-checkout"
         label="Prova 7 dagar - 9,99 kr"
+        paidIntentEventName="paid_cta_click"
+        paidIntentProperties={{
+          offer: "7_days_9_99_then_249_month",
+          product: "monthly_intro_week",
+          topicSlug: primaryTopic.slug,
+        }}
       />
     </main>
   );
