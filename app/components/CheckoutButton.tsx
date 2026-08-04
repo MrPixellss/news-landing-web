@@ -20,6 +20,7 @@ type CheckoutButtonProps = {
   buttonClassName?: string;
   offerToken?: string;
   onOpen?: () => void;
+  trackingPlacement?: string;
 };
 
 const TAX_COUNTRIES = [
@@ -76,6 +77,7 @@ export function CheckoutButton({
   buttonClassName = "mt-5 w-full bg-emerald-300 px-5 py-4 text-sm font-black text-[#04100b] transition hover:bg-emerald-200 disabled:cursor-wait disabled:opacity-70",
   offerToken,
   onOpen,
+  trackingPlacement = "checkout_button",
 }: CheckoutButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -159,7 +161,7 @@ export function CheckoutButton({
     setIsModalOpen(true);
     trackProductEvent("checkout_open", trackingPayload());
     trackPaidCheckoutEvent("paid_cta_click", {
-      placement: "checkout_button",
+      placement: trackingPlacement,
       uses_offer_token: usesOfferToken,
     });
     trackPaidCheckoutEvent("checkout_modal_open", {

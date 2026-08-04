@@ -90,25 +90,46 @@ export default async function StartaPage() {
               {reportDate}
             </p>
             <h1 className="mt-5 max-w-5xl text-[42px] font-bold leading-[0.96] tracking-[-0.04em] sm:text-6xl lg:text-[78px]">
-              Prova hela marknadsbriefen i 7 dagar
+              Få morgonens marknadsbild utan att jaga 10 källor
             </h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-[#c7d1dd]">
               Finansanalytik samlar makro, räntor, börs, valutor, råvaror och
-              riskbild i en svensk morgonbrief. Börja med provvecka för 9,99 kr.
+              riskbild i en svensk briefing. Prova första veckan för 9,99 kr,
+              därefter 249 kr/mån. Avsluta när du vill.
+            </p>
+            <p className="mt-5 max-w-2xl border-l-2 border-emerald-300/80 pl-4 text-sm font-bold leading-6 text-[#e5edf6]">
+              Dagens exempel:{" "}
+              {cleanText(
+                primaryBlock?.headline,
+                "Dagens makrobild sammanställs i rapporten.",
+              )}
             </p>
             <div className="mt-7 max-w-md">
               <CheckoutButton
-                buttonLabel="Starta provveckan - 9,99 kr"
+                buttonLabel="Starta provveckan för 9,99 kr"
                 checkoutPath="/api/subscription-checkout"
                 description="Du får dagliga fullständiga rapporter, veckosammanfattning och månadsutsikt via e-post. Första 7 dagarna kostar 9,99 kr, därefter 249 kr/mån tills prenumerationen avslutas."
                 priceLabel="9,99 kr"
                 product="monthly_intro_week"
                 productName="Månadsaccess provvecka"
+                trackingPlacement="starta_hero_primary"
                 topicSlug={primaryTopic.slug}
               />
               <p className="mt-3 text-sm font-bold leading-6 text-[#9facbb]">
-                Öppnar säker Stripe-betalning. Du kan avsluta när du vill.
+                Klicket öppnar villkor och e-postfält. Stripe startar först när du
+                bekräftar.
               </p>
+            </div>
+            <div className="mt-6 grid gap-2 text-sm font-bold text-[#d7e1eb] sm:grid-cols-3">
+              {[
+                "10 analysområden",
+                "Svensk morgonbrief",
+                "Källor och sammanhang",
+              ].map((item) => (
+                <span key={item} className="border border-[#26313d] bg-[#0d1117] px-3 py-2">
+                  {item}
+                </span>
+              ))}
             </div>
             <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {[
@@ -153,6 +174,7 @@ export default async function StartaPage() {
               priceLabel="9,99 kr"
               product="monthly_intro_week"
               productName="Månadsaccess provvecka"
+              trackingPlacement="starta_checkout_card"
               topicSlug={primaryTopic.slug}
             />
             <p className="mt-4 text-xs leading-5 text-[#9facbb]">
