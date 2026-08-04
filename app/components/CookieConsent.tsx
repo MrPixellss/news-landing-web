@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const CONSENT_VERSION = "2026-05-19";
 const STORAGE_KEY = "finansanalytik_cookie_consent";
+const COOKIE_CONSENT_HEIGHT_VAR = "--finansanalytik-cookie-consent-height";
 
 type ConsentState = {
   version: string;
@@ -200,6 +201,7 @@ function Toggle({
 }
 
 export function CookieConsent() {
+  const bannerRef = useRef<HTMLDivElement | null>(null);
   const [consent, setConsent] = useState<ConsentState | null>(null);
   const [isReady, setIsReady] = useState(false);
   const [isPreferencesOpen, setIsPreferencesOpen] = useState(false);
@@ -207,6 +209,38 @@ export function CookieConsent() {
   const [marketing, setMarketing] = useState(false);
 
   const hasChoice = useMemo(() => Boolean(consent), [consent]);
+
+  useEffect(() => {
+    if (!isReady || hasChoice || isPreferencesOpen) {
+      document.documentElement.style.setProperty(COOKIE_CONSENT_HEIGHT_VAR, "0px");
+      return;
+    }
+
+    if (!bannerRef.current) {
+      return;
+    }
+    const bannerElement: HTMLDivElement = bannerRef.current;
+
+    function updateHeight() {
+      const height = Math.ceil(bannerElement.getBoundingClientRect().height);
+      document.documentElement.style.setProperty(
+        COOKIE_CONSENT_HEIGHT_VAR,
+        `${height}px`,
+      );
+    }
+
+    updateHeight();
+    const observer =
+      typeof ResizeObserver === "undefined" ? null : new ResizeObserver(updateHeight);
+    observer?.observe(bannerElement);
+    window.addEventListener("resize", updateHeight);
+
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener("resize", updateHeight);
+      document.documentElement.style.setProperty(COOKIE_CONSENT_HEIGHT_VAR, "0px");
+    };
+  }, [hasChoice, isPreferencesOpen, isReady]);
 
   useEffect(() => {
     ensureGoogleConsentMode();
@@ -255,7 +289,10 @@ export function CookieConsent() {
   return (
     <>
       {!hasChoice ? (
-        <div className="fixed inset-x-0 bottom-0 z-50 border-t border-[#26313d] bg-[#07090b] p-4 text-zinc-50 shadow-2xl">
+        <div
+          ref={bannerRef}
+          className="fixed inset-x-0 bottom-0 z-50 border-t border-[#26313d] bg-[#07090b] p-4 text-zinc-50 shadow-2xl"
+        >
           <div className="mx-auto flex max-w-[1180px] flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <p className="max-w-3xl text-sm leading-6 text-[#d4dce6]">
               Vi använder nödvändiga cookies för att webbplatsen ska fungera.

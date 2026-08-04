@@ -36,6 +36,8 @@ function cleanText(value: string | undefined, fallback: string) {
   return normalizeSwedishCopy(value || "").replace(/\s+/g, " ").trim() || fallback;
 }
 
+const STARTA_CHECKOUT_OPEN_EVENT = "finansanalytik:starta-open-checkout";
+
 export default async function StartaPage() {
   const data = await getTodayTeaser();
   const hasBlocks = data.blocks.length > 0;
@@ -78,9 +80,9 @@ export default async function StartaPage() {
           </Link>
           <a
             className="hidden border border-[#26313d] px-4 py-3 text-sm font-bold text-[#d7e1eb] transition hover:border-emerald-300 hover:text-emerald-300 sm:inline-flex"
-            href="#starta-checkout"
+            href="#provrapport"
           >
-            Prova 7 dagar
+            Se vad som ingår
           </a>
         </header>
 
@@ -109,6 +111,7 @@ export default async function StartaPage() {
                 buttonLabel="Starta provveckan för 9,99 kr"
                 checkoutPath="/api/subscription-checkout"
                 description="Du får dagliga fullständiga rapporter, veckosammanfattning och månadsutsikt via e-post. Första 7 dagarna kostar 9,99 kr, därefter 249 kr/mån tills prenumerationen avslutas."
+                externalOpenEventName={STARTA_CHECKOUT_OPEN_EVENT}
                 priceLabel="9,99 kr"
                 product="monthly_intro_week"
                 productName="Månadsaccess provvecka"
@@ -116,8 +119,8 @@ export default async function StartaPage() {
                 topicSlug={primaryTopic.slug}
               />
               <p className="mt-3 text-sm font-bold leading-6 text-[#9facbb]">
-                Klicket öppnar villkor och e-postfält. Stripe startar först när du
-                bekräftar.
+                Klicket öppnar villkor och e-postfält. Betalning sker i Stripe
+                efter att du bekräftar.
               </p>
             </div>
             <div className="mt-6 grid gap-2 text-sm font-bold text-[#d7e1eb] sm:grid-cols-3">
@@ -168,7 +171,7 @@ export default async function StartaPage() {
               ))}
             </div>
             <CheckoutButton
-              buttonLabel="Prova 7 dagar - 9,99 kr"
+              buttonLabel="Starta provveckan för 9,99 kr"
               checkoutPath="/api/subscription-checkout"
               description="Du får dagliga fullständiga rapporter, veckosammanfattning och månadsutsikt via e-post. Första 7 dagarna kostar 9,99 kr, därefter 249 kr/mån tills prenumerationen avslutas."
               priceLabel="9,99 kr"
@@ -254,12 +257,17 @@ export default async function StartaPage() {
               Reklamtrafiken går inte längre in i en gratis leadgen-form. I stället
               visar vi dagens ton, ämnena som ingår och en tydlig väg till provveckan.
             </p>
-            <a
-              className="mt-5 inline-flex border border-emerald-300 px-4 py-3 text-sm font-black text-emerald-300 transition hover:bg-emerald-300 hover:text-[#04100b]"
-              href="#starta-checkout"
-            >
-              Gå till provveckan
-            </a>
+            <CheckoutButton
+              buttonClassName="mt-5 w-full bg-emerald-300 px-4 py-3 text-sm font-black text-[#04100b] transition hover:bg-emerald-200"
+              buttonLabel="Starta provveckan för 9,99 kr"
+              checkoutPath="/api/subscription-checkout"
+              description="Du får dagliga fullständiga rapporter, veckosammanfattning och månadsutsikt via e-post. Första 7 dagarna kostar 9,99 kr, därefter 249 kr/mån tills prenumerationen avslutas."
+              priceLabel="9,99 kr"
+              product="monthly_intro_week"
+              productName="Månadsaccess provvecka"
+              trackingPlacement="starta_format_card"
+              topicSlug={primaryTopic.slug}
+            />
           </div>
         </section>
       </div>
@@ -268,8 +276,8 @@ export default async function StartaPage() {
         eventName="paid_mobile_sticky_click"
         hideWhenVisibleSelector="#starta-checkout"
         href="#starta-checkout"
-        label="Prova 7 dagar - 9,99 kr"
-        paidIntentEventName="paid_cta_click"
+        label="Starta provveckan för 9,99 kr"
+        openCheckoutEventName={STARTA_CHECKOUT_OPEN_EVENT}
         paidIntentProperties={{
           offer: "7_days_9_99_then_249_month",
           product: "monthly_intro_week",

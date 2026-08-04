@@ -8,6 +8,7 @@ type MobileStickyCtaProps = {
   label: string;
   eventName: string;
   hideWhenVisibleSelector?: string;
+  openCheckoutEventName?: string;
   paidIntentEventName?: string;
   paidIntentProperties?: Record<string, unknown>;
 };
@@ -17,6 +18,7 @@ export function MobileStickyCta({
   label,
   eventName,
   hideWhenVisibleSelector,
+  openCheckoutEventName,
   paidIntentEventName,
   paidIntentProperties,
 }: MobileStickyCtaProps) {
@@ -47,27 +49,58 @@ export function MobileStickyCta({
     return null;
   }
 
-  return (
-    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-emerald-300/50 bg-[#07090b]/98 p-4 shadow-[0_-18px_40px_rgba(0,0,0,0.55)] backdrop-blur md:hidden">
-      <a
-        className="block bg-emerald-300 px-5 py-4 text-center text-sm font-black text-[#04100b] shadow-lg shadow-emerald-950/40 ring-1 ring-emerald-100/40 transition hover:bg-emerald-200"
-        href={href}
-        onClick={() => {
-          trackProductEvent(eventName, {
-            source: "mobile_sticky",
-            target: href,
-          });
-          if (paidIntentEventName) {
-            trackPaidIntentEvent(paidIntentEventName, {
-              placement: "mobile_sticky",
+  function handleClick() {
+    trackProductEvent(eventName, {
+      source: "mobile_sticky",
+      target: href,
+    });
+
+    if (openCheckoutEventName) {
+      window.dispatchEvent(
+        new CustomEvent(openCheckoutEventName, {
+          detail: {
+            placement: "mobile_sticky",
+            properties: {
               target: href,
               ...paidIntentProperties,
-            });
-          }
-        }}
-      >
-        {label}
-      </a>
+            },
+          },
+        }),
+      );
+      return;
+    }
+
+    if (paidIntentEventName) {
+      trackPaidIntentEvent(paidIntentEventName, {
+        placement: "mobile_sticky",
+        target: href,
+        ...paidIntentProperties,
+      });
+    }
+  }
+
+  return (
+    <div
+      className="fixed inset-x-0 z-50 border-t border-emerald-300/50 bg-[#07090b]/98 p-4 shadow-[0_-18px_40px_rgba(0,0,0,0.55)] backdrop-blur transition-[bottom] md:hidden"
+      style={{ bottom: "var(--finansanalytik-cookie-consent-height, 0px)" }}
+    >
+      {openCheckoutEventName ? (
+        <button
+          className="block w-full bg-emerald-300 px-5 py-4 text-center text-sm font-black text-[#04100b] shadow-lg shadow-emerald-950/40 ring-1 ring-emerald-100/40 transition hover:bg-emerald-200"
+          onClick={handleClick}
+          type="button"
+        >
+          {label}
+        </button>
+      ) : (
+        <a
+          className="block bg-emerald-300 px-5 py-4 text-center text-sm font-black text-[#04100b] shadow-lg shadow-emerald-950/40 ring-1 ring-emerald-100/40 transition hover:bg-emerald-200"
+          href={href}
+          onClick={handleClick}
+        >
+          {label}
+        </a>
+      )}
     </div>
   );
 }

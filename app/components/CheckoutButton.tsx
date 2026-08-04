@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   metaTrackingContext,
   trackPaidIntentEvent,
@@ -21,6 +21,12 @@ type CheckoutButtonProps = {
   offerToken?: string;
   onOpen?: () => void;
   trackingPlacement?: string;
+  externalOpenEventName?: string;
+};
+
+type CheckoutOpenEventDetail = {
+  placement?: string;
+  properties?: Record<string, unknown>;
 };
 
 const TAX_COUNTRIES = [
@@ -78,6 +84,7 @@ export function CheckoutButton({
   offerToken,
   onOpen,
   trackingPlacement = "checkout_button",
+  externalOpenEventName,
 }: CheckoutButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -98,9 +105,15 @@ export function CheckoutButton({
   const [marketingOptIn, setMarketingOptIn] = useState(false);
   const [customerCountry, setCustomerCountry] = useState("SE");
   const [billingPostalCode, setBillingPostalCode] = useState("");
+  const [activeTrackingPlacement, setActiveTrackingPlacement] =
+    useState(trackingPlacement);
 
   const canCheckout = acceptedPurchaseConsent;
   const priceWithTax = `${displayPrice(priceLabel)}, moms ingår`;
+  const introWeekSummary =
+    product === "monthly_intro_week"
+      ? "7 dagar för 9,99 kr. Därefter 249 kr/mån tills du avslutar."
+      : "";
   const usesOfferToken = Boolean(offerToken);
   const visibleButtonLabel =
     buttonLabel || `Köp dagspass - ${displayPrice(priceLabel)}`;
@@ -111,7 +124,7 @@ export function CheckoutButton({
       normalizedCustomerEmail,
     );
 
-  function trackingPayload() {
+  const trackingPayload = useCallback(() => {
     return {
       product,
       productName,
@@ -122,14 +135,14 @@ export function CheckoutButton({
           ? ""
           : window.location.pathname + window.location.search + window.location.hash,
     };
-  }
+  }, [priceLabel, product, productName, topicSlug]);
 
-  function trackPaidCheckoutEvent(eventName: string, properties: Record<string, unknown> = {}) {
+  const trackPaidCheckoutEvent = useCallback((eventName: string, properties: Record<string, unknown> = {}) => {
     trackPaidIntentEvent(eventName, {
       ...trackingPayload(),
       ...properties,
     });
-  }
+  }, [trackingPayload]);
 
   useEffect(() => {
     let isMounted = true;
@@ -153,18 +166,26 @@ export function CheckoutButton({
     };
   }, []);
 
-  function openModal() {
+  const openModal = useCallback((placementOverride?: string, properties: Record<string, unknown> = {}) => {
+    const placement = placementOverride?.trim() || trackingPlacement;
+    setActiveTrackingPlacement(placement);
     onOpen?.();
     setError("");
     setShowCustomerEmailError(false);
     setShowPurchaseConsentError(false);
     setIsModalOpen(true);
-    trackProductEvent("checkout_open", trackingPayload());
+    trackProductEvent("checkout_open", {
+      ...trackingPayload(),
+      placement,
+    });
     trackPaidCheckoutEvent("paid_cta_click", {
-      placement: trackingPlacement,
+      ...properties,
+      placement,
       uses_offer_token: usesOfferToken,
     });
     trackPaidCheckoutEvent("checkout_modal_open", {
+      ...properties,
+      placement,
       uses_offer_token: usesOfferToken,
     });
     if (usesOfferToken && product === "monthly_intro_week" && offerToken) {
@@ -182,14 +203,38 @@ export function CheckoutButton({
         // Tracking must not block the checkout modal.
       });
     }
-  }
+  }, [
+    offerToken,
+    onOpen,
+    product,
+    trackingPayload,
+    trackingPlacement,
+    trackPaidCheckoutEvent,
+    usesOfferToken,
+  ]);
+
+  useEffect(() => {
+    if (!externalOpenEventName) {
+      return;
+    }
+
+    function handleExternalOpen(event: Event) {
+      const detail = (event as CustomEvent<CheckoutOpenEventDetail>).detail;
+      openModal(detail?.placement, detail?.properties || {});
+    }
+
+    window.addEventListener(externalOpenEventName, handleExternalOpen);
+    return () => window.removeEventListener(externalOpenEventName, handleExternalOpen);
+  }, [externalOpenEventName, openModal]);
 
   async function startCheckout() {
     if (isLoading) {
       return;
     }
 
+    const placement = activeTrackingPlacement || trackingPlacement;
     trackPaidCheckoutEvent("checkout_submit_attempt", {
+      placement,
       email_present: usesOfferToken || Boolean(normalizedCustomerEmail),
       email_valid: isCustomerEmailValid,
       purchase_consent: canCheckout,
@@ -204,9 +249,11 @@ export function CheckoutButton({
       setError("Ange en giltig e-postadress för leverans.");
       trackProductEvent("checkout_error", {
         ...trackingPayload(),
+        placement,
         reason: "invalid_email",
       });
       trackPaidCheckoutEvent("checkout_submit_blocked", {
+        placement,
         reason: "invalid_email",
         email_present: Boolean(normalizedCustomerEmail),
         email_valid: false,
@@ -219,9 +266,11 @@ export function CheckoutButton({
       setError("Du behöver godkänna de obligatoriska villkoren före betalning.");
       trackProductEvent("checkout_error", {
         ...trackingPayload(),
+        placement,
         reason: "missing_purchase_consent",
       });
       trackPaidCheckoutEvent("checkout_submit_blocked", {
+        placement,
         reason: "missing_purchase_consent",
         email_present: usesOfferToken || Boolean(normalizedCustomerEmail),
         email_valid: isCustomerEmailValid,
@@ -280,9 +329,11 @@ export function CheckoutButton({
 
       trackProductEvent("stripe_redirect", {
         ...trackingPayload(),
+        placement,
         checkoutUrlCreated: true,
       });
       trackPaidCheckoutEvent("stripe_redirect", {
+        placement,
         checkout_url_created: true,
         stripe_session_id: payload.session_id,
         uses_offer_token: usesOfferToken,
@@ -293,10 +344,12 @@ export function CheckoutButton({
       setError(message);
       trackProductEvent("checkout_error", {
         ...trackingPayload(),
+        placement,
         reason: "backend_or_stripe_error",
         message,
       });
       trackPaidCheckoutEvent("checkout_error", {
+        placement,
         reason: "backend_or_stripe_error",
         message,
         uses_offer_token: usesOfferToken,
@@ -310,7 +363,7 @@ export function CheckoutButton({
       <button
         className={buttonClassName}
         disabled={isLoading}
-        onClick={openModal}
+        onClick={() => openModal()}
         type="button"
       >
         {visibleButtonLabel}
@@ -334,6 +387,11 @@ export function CheckoutButton({
                 <p className="mt-2 text-sm font-bold text-emerald-300">
                   {priceWithTax}
                 </p>
+                {introWeekSummary ? (
+                  <p className="mt-2 text-sm font-bold leading-6 text-[#d7e1eb]">
+                    {introWeekSummary}
+                  </p>
+                ) : null}
                 <p className="mt-3 text-sm leading-6 text-[#a8b5c4]">
                   {description}
                 </p>
@@ -384,6 +442,7 @@ export function CheckoutButton({
                       }}
                       onFocus={() =>
                         trackPaidCheckoutEvent("checkout_email_focus", {
+                          placement: activeTrackingPlacement || trackingPlacement,
                           email_present: Boolean(normalizedCustomerEmail),
                           uses_offer_token: false,
                         })
@@ -403,45 +462,6 @@ export function CheckoutButton({
                   ) : null}
                 </div>
               )}
-
-              <div>
-                <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.24em] text-[#7f91a7]">
-                  Skatteuppgifter
-                </p>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <label className="block text-sm font-bold text-[#d7e1eb]">
-                    Land
-                    <select
-                      className="mt-2 w-full border border-[#26313d] bg-[#0b0f14] px-3 py-3 text-sm text-[#d7e1eb] outline-none focus:border-emerald-300"
-                      onChange={(event) => setCustomerCountry(event.target.value)}
-                      value={customerCountry}
-                    >
-                      {TAX_COUNTRIES.map(([code, name]) => (
-                        <option key={code} value={code}>
-                          {name}
-                        </option>
-                      ))}
-                    </select>
-                    <span className="mt-2 block text-xs font-normal leading-5 text-[#8d9aaa]">
-                      Förifylls om möjligt. Du kan ändra innan betalning.
-                    </span>
-                  </label>
-                  <label className="block text-sm font-bold text-[#d7e1eb]">
-                    Faktureringspostnummer
-                    <input
-                      className="mt-2 w-full border border-[#26313d] bg-[#0b0f14] px-3 py-3 text-sm text-[#d7e1eb] outline-none placeholder:text-[#596678] focus:border-emerald-300"
-                      maxLength={24}
-                      onChange={(event) => setBillingPostalCode(event.target.value)}
-                      placeholder="Valfritt"
-                      type="text"
-                      value={billingPostalCode}
-                    />
-                    <span className="mt-2 block text-xs font-normal leading-5 text-[#8d9aaa]">
-                      Du kan lämna tomt. Stripe kan fylla i eller fråga vid behov.
-                    </span>
-                  </label>
-                </div>
-              </div>
 
               <div
                 className={
@@ -499,6 +519,43 @@ export function CheckoutButton({
                 ) : null}
               </div>
 
+              <details className="border border-[#26313d] bg-[#0b0f14] p-4">
+                <summary className="cursor-pointer text-sm font-bold text-[#d7e1eb]">
+                  Faktureringsuppgifter vid behov
+                </summary>
+                <p className="mt-3 text-xs leading-5 text-[#8d9aaa]">
+                  Land används för moms. Postnummer är valfritt här; Stripe kan
+                  fylla i eller fråga vid betalning om det behövs.
+                </p>
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                  <label className="block text-sm font-bold text-[#d7e1eb]">
+                    Land
+                    <select
+                      className="mt-2 w-full border border-[#26313d] bg-[#07090b] px-3 py-3 text-sm text-[#d7e1eb] outline-none focus:border-emerald-300"
+                      onChange={(event) => setCustomerCountry(event.target.value)}
+                      value={customerCountry}
+                    >
+                      {TAX_COUNTRIES.map(([code, name]) => (
+                        <option key={code} value={code}>
+                          {name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="block text-sm font-bold text-[#d7e1eb]">
+                    Faktureringspostnummer
+                    <input
+                      className="mt-2 w-full border border-[#26313d] bg-[#07090b] px-3 py-3 text-sm text-[#d7e1eb] outline-none placeholder:text-[#596678] focus:border-emerald-300"
+                      maxLength={24}
+                      onChange={(event) => setBillingPostalCode(event.target.value)}
+                      placeholder="Valfritt"
+                      type="text"
+                      value={billingPostalCode}
+                    />
+                  </label>
+                </div>
+              </details>
+
               <div>
                 <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.24em] text-[#7f91a7]">
                   Valfritt
@@ -532,7 +589,7 @@ export function CheckoutButton({
                 onClick={startCheckout}
                 type="button"
               >
-                {isLoading ? "Skickar till Stripe..." : "Fortsätt till säker betalning"}
+                {isLoading ? "Skickar till Stripe..." : "Fortsätt till Stripe för betalning"}
               </button>
               <button
                 className="border border-[#26313d] px-5 py-4 text-sm font-black text-[#d7e1eb] hover:border-emerald-300"
